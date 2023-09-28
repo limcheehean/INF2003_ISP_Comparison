@@ -13,6 +13,8 @@ def signup():
     signup_form_data = request.form
     signup_email = signup_form_data['email']
     signup_password = signup_form_data['password']
+    
+    # Add in some email & password validation
 
     # Hash password
     #   Using hashlib for SHA512 for now, may use bcrypt for better security in the future
