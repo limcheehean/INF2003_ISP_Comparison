@@ -9,7 +9,9 @@ import uuid
 
 app = Flask(__name__)
 
-# Mail configuration
+##############
+# Mail Setup #
+##############
 app.config.update(
     MAIL_SERVER='smtp.office365.com',
     MAIL_PORT=587,
@@ -20,6 +22,10 @@ app.config.update(
 )
 
 mail = Mail(app)
+
+########
+# APIs #
+########
 
 @app.route('/')
 def hello_world():  # put application's code here
