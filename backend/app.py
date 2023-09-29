@@ -25,6 +25,9 @@ def signup():
     if not normalized_email:
         return "Invalid email", 400
     
+    # Use normalized email
+    signup_email = normalized_email
+    
     if (not password_check(signup_password)["password_ok"]):
         print(password_check(signup_password))
         return "Bad password", 400
