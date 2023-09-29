@@ -27,11 +27,30 @@ def hello_world():  # put application's code here
 
 @app.route('/signup', methods = ['POST'])
 def signup():
+    ''' Signup API
+    
+    Form Parameters
+    ---------------
+    name: str
+        Name of user. No need to be unique.
+    email: str
+        Email address of user. 
+    password: str
+        Password of user. Should have at least 8 characters, 1 symbol, 1 uppercase, 1 lowercase, digit
+        
+    Return code
+    ----------------
+    400: 
+        Invalid email or password. (Will return error messages "Invalid email" or "Invalid password")
+    403: 
+        Existing account with email already exists.
+    '''
     signup_form_data = request.form
+    signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
     signup_password = signup_form_data['password']
     
-    # Add in some email & password validation
+    # Email & password validation
     normalized_email = email_check(signup_email, deliverability=True)
     if not normalized_email:
         return "Invalid email", 400
