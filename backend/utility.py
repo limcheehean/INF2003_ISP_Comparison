@@ -5,6 +5,7 @@ Contains useful methods, such as email and password validation
 
     * email_check: Validates email
     * password_check: Checks password complexity
+    * hash_password: returns SHA 512 hash of password
     
 '''
 
@@ -13,6 +14,8 @@ Contains useful methods, such as email and password validation
 from email_validator import validate_email, EmailNotValidError
 
 import re
+
+import hashlib, uuid
 
 
 def email_check(email, deliverability=False):
@@ -77,3 +80,12 @@ def password_check(password):
         'lowercase_error' : lowercase_error,
         'symbol_error' : symbol_error,
     }
+
+def hash_password(password):
+    
+    # Hash password
+    #   Using hashlib for SHA512 for now, may use bcrypt for better security in the future
+    
+    salt = uuid.uuid4().hex
+    hashed_password = hashlib.sha512((password + salt).encode('UTF-8')).hexdigest()
+    return hashed_password
