@@ -135,4 +135,4 @@ def signup_confirmation(signup_uuid):
     return "Confirmation received"
     
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
