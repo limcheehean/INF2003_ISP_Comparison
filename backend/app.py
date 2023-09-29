@@ -1,6 +1,12 @@
 from flask import Flask, request, url_for
 import hashlib, uuid
 
+#!pip install Flask-Mail
+from flask_mail import Mail, Message
+
+# utility functions
+from utility import email_check, password_check
+
 app = Flask(__name__)
 
 
@@ -15,7 +21,14 @@ def signup():
     signup_password = signup_form_data['password']
     
     # Add in some email & password validation
-
+    normalized_email = email_check(signup_email, deliverability=True)
+    if not normalized_email:
+        return "Invalid email", 400
+    
+    if (not password_check(signup_password)["password_ok"]):
+        print(password_check(signup_password))
+        return "Bad password", 400
+    
     # Hash password
     #   Using hashlib for SHA512 for now, may use bcrypt for better security in the future
     salt = uuid.uuid4().hex
@@ -47,7 +60,6 @@ def signup_confirmation(signup_uuid):
     
 
     return "Confirmation received"
-
-
+    
 if __name__ == '__main__':
     app.run()
