@@ -1,5 +1,7 @@
 from flask import Flask, request, url_for
 
+from datetime import datetime
+
 #!pip install Flask-Mail
 from flask_mail import Mail, Message
 
@@ -23,6 +25,13 @@ app.config.update(
 
 mail = Mail(app)
 
+#####################
+# Throwaway globals #
+#####################
+# Since database does not exist yet,
+# this variable acts in place of the database, storing email verification link uuid and when email was sent
+signup_uuid_dict = {}
+
 ########
 # APIs #
 ########
@@ -38,7 +47,7 @@ def signup():
     Form Parameters
     ---------------
     name: str
-        Name of user. No need to be unique.
+        Name of user. Should contain only normal characters.
     email: str
         Email address of user. 
     password: str
@@ -47,7 +56,7 @@ def signup():
     Return code
     ----------------
     400: 
-        Invalid email or password. (Will return error messages "Invalid email" or "Invalid password")
+        Invalid/Bad email, password or name. (Will return error messages "Invalid email" or "Invalid password")
     403: 
         Existing account with email already exists.
     '''
@@ -55,6 +64,8 @@ def signup():
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
     signup_password = signup_form_data['password']
+    
+    # <!> Name validation
     
     # Email & password validation
     normalized_email = email_check(signup_email, deliverability=True)
@@ -77,7 +88,7 @@ def signup():
     signup_uuid = uuid.uuid4()
     signup_confirmation_link = url_for('signup_confirmation', _external = True, signup_uuid = str(signup_uuid)) 
 
-    # Store signup details, sign up UUID, into database
+    # <!> Store signup details (name, normalized email, hashed password), sign up UUID, into database
     # <!> consider hashing the UUID
     #   Check if email already exists or not
 
@@ -86,6 +97,8 @@ def signup():
     print("Hashed password: ", hashed_password)
     print("Sign up UUID: ", str(signup_uuid))
     print("Sign up confirmation link: ", signup_confirmation_link)
+    
+    signup_uuid_dict.update({str(signup_uuid): datetime.now()})
 
     # Send confirmation email
     '''
@@ -97,13 +110,27 @@ def signup():
     mail.send(msg)
     '''
     
-    # Can choose to redirect to other pages with render_template('page.html')
+    # <!> Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"
  
 @app.route('/join/<path:signup_uuid>')
 def signup_confirmation(signup_uuid):
     print("UUID received: ", signup_uuid)
     
+    # <!> Check against database records for UUID, and check if it expired
+    #   <!> If uuid does not exist
+    if (signup_uuid not in signup_uuid_dict):
+        print(signup_uuid_dict)
+        return "Invalid confirmation link", 403
+    #   <!> If more than 10 mins passed, delete record, return error
+    if ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds() > 10 * 60):
+        signup_uuid_dict.pop(signup_uuid)
+        return "Confirmation link expired", 403
+    
+    print ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds())
+    signup_uuid_dict.pop(signup_uuid)
+    
+    # <!> Add user to database
 
     return "Confirmation received"
     
