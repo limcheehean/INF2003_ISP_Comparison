@@ -9,6 +9,17 @@ import uuid
 
 app = Flask(__name__)
 
+# Mail configuration
+app.config.update(
+    MAIL_SERVER='smtp.office365.com',
+    MAIL_PORT=587,
+    MAIL_USE_TLS=True,
+    MAIL_USE_SSL=False,
+    MAIL_USERNAME = 'inf2003ispcompare@outlook.sg', # Can change
+    MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
+)
+
+mail = Mail(app)
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -29,7 +40,7 @@ def signup():
         print(password_check(signup_password))
         return "Bad password", 400
     
-    #   Store normalized email
+    #   Store normalized email in variable
     signup_email = normalized_email
     
     #   Hash password
@@ -43,6 +54,7 @@ def signup():
 
     # Store signup details, sign up UUID, into database
     # <!> consider hashing the UUID
+    #   Check if email already exists or not
 
     print("Sign up email: ", signup_email)
     print("Sign up password: ", signup_password)
@@ -51,7 +63,13 @@ def signup():
     print("Sign up confirmation link: ", signup_confirmation_link)
 
     # Send confirmation email
-
+    msg = Message("Confirmation link",
+                  sender="inf2003ispcompare@outlook.sg",
+                  recipients=[signup_email])
+    
+    msg.body = "signup_confirmation_link is " + signup_confirmation_link
+    mail.send(msg)
+    
     # Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"
  
@@ -63,4 +81,4 @@ def signup_confirmation(signup_uuid):
     return "Confirmation received"
     
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
