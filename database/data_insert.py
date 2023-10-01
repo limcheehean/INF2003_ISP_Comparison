@@ -10,12 +10,12 @@ local_db = {
 
 # Insert it yourself and DO NOT push to repo!!!
 remote_db = {
-    "host": "",
-    "username": "",
-    "password": ""
+    "host": "db.spmovy.com",
+    "username": "inf2002admin",
+    "password": "Password098"
 }
 
-current_db = local_db
+current_db = remote_db
 
 
 def get_column_name(name):
@@ -34,7 +34,7 @@ with open("create_db.sql", "r") as file:
     cursor.execute(file.read())
 
 # Insert data
-db = connect(database="isp_comparison_tool", **current_db)
+db = connect(database="isp_comparison", **current_db)
 cursor = db.cursor()
 
 workbook = Excel("combined_database.xlsx")

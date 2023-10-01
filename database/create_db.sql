@@ -1,8 +1,8 @@
-DROP DATABASE IF EXISTS isp_comparison_tool;
+DROP DATABASE IF EXISTS isp_comparison;
 
-CREATE DATABASE isp_comparison_tool;
+CREATE DATABASE isp_comparison;
 
-USE isp_comparison_tool;
+USE isp_comparison;
 
 # The relationship to 'Plan' is one is to one (or many)
 CREATE TABLE Company (
