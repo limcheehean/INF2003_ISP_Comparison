@@ -28,7 +28,7 @@ def hello_world():  # put application's code here
 @app.route("/api/login", methods=["POST"])
 def login():
     print(session.get("uid"))
-    return login_user((db, mongo), request.json)
+    return login_user((db_cursor, mongo), request.json)
 
 
 @app.route("/api/logout", methods=["GET"])
