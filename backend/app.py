@@ -41,7 +41,7 @@ def logout():
 def signup():
     ''' Signup API
     
-    Form Parameters
+    JSON Body Parameters
     ---------------
     name: str
         Name of user. Should contain only normal characters.
