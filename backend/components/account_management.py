@@ -1,4 +1,5 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from functools import wraps
 from uuid import uuid4
 
 from bcrypt import checkpw, hashpw, gensalt
@@ -18,7 +19,34 @@ signup_uuid_dict = {}
 # Authentication functions #
 ############################
 
-invalid_email_password_error = {"status": "error", "message": "Invalid username or password"}, 401
+
+# Decorator for endpoints that require the user to be logged in
+def require_login(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+
+        from app import mongo
+
+        # Not logged in
+        if not (session_id := session.get("uid")):
+            return {"status": "unauthorised", "message": "You are not allowed to access this resource"}, 401
+
+        login = mongo.session.find_one({"session_id": session_id})
+
+        # Session expired
+        # TODO: Get session timeout from config file
+        if (login.get("logged_in") + timedelta(minutes=300)) < datetime.now():
+            mongo.session.delete_one({"session_id": session_id})
+            return {"status": "error", "message": "Your session has timed out, please login again"}, 400
+
+        # Renew session and continue with function
+        mongo.session.update_one({"session_id": session_id}, {"$set": {"login": datetime.now()}})
+        return f(*args, **kwargs)
+
+    return wrap
+
+
+invalid_email_password_error = {"status": "error", "message": "Invalid username or password"}, 400
 
 
 def login_user(databases, data):
