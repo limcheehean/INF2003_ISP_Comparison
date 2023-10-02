@@ -61,6 +61,7 @@ def logout_user(mongo):
 
     return {"status": "success", "message": "Logout successful"}
 
+
 def handle_signup(db, db_cursor,request):
     signup_form_data = request.json
     signup_name = signup_form_data['name']
