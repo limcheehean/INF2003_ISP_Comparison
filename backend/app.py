@@ -2,11 +2,8 @@ import toml
 from flask import Flask, request, session
 
 
-
-#!pip install flaskext
-#!pip install flask-mysql
+from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
-#!pip install Flask-Mail
 from flask_mail import Mail, Message
 
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
@@ -16,6 +13,7 @@ app.config.from_file("config.toml", load=toml.load)
 mail = Mail(app)
 db = MySQL(app).connect()
 db_cursor = db.cursor()
+mongo = PyMongo(app).db
 
 ########
 # APIs #
@@ -30,12 +28,12 @@ def hello_world():  # put application's code here
 @app.route("/api/login", methods=["POST"])
 def login():
     print(session.get("uid"))
-    return login_user(db, db_cursor, request.json)
+    return login_user((db, mongo), request.json)
 
 
 @app.route("/api/logout", methods=["GET"])
 def logout():
-    return logout_user()
+    return logout_user(mongo)
 
 
 @app.route('/api/signup', methods = ['POST'])
