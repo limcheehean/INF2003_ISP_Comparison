@@ -29,7 +29,7 @@ def logout():
     return logout_user(mongo)
 
 
-@app.route('/api/signup', methods = ['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
     """ Signup API
 
@@ -83,7 +83,6 @@ def signup():
     }
 """
     return handle_signup(db, db_cursor, request)
-
 
 
 @app.route('/join/<path:signup_token>')

@@ -1,15 +1,14 @@
-
-'''Server utility files
+"""Server utility files
 
 Contains useful methods, such as email and password validation
 
     * email_check: Validates email
     * password_check: Checks password complexity
     * hash_password: returns SHA 512 hash of password
-    
-'''
 
-#!pip install email-validator
+"""
+
+# !pip install email-validator
 #   Not only checks syntax, but also deliverability (queries DNS), and also normalizes email 
 from email_validator import validate_email, EmailNotValidError
 
@@ -40,7 +39,8 @@ def email_check(email, deliverability=False):
     except EmailNotValidError as e:
         print(str(e))
         return None
-    
+
+
 # https://stackoverflow.com/questions/16709638/checking-the-strength-of-a-password-how-to-check-conditions#32542964
 def password_check(password):
     """
@@ -70,25 +70,26 @@ def password_check(password):
     symbol_error = re.search(r"\W", password) is None
 
     # overall result
-    password_ok = not ( length_error or digit_error or uppercase_error or lowercase_error or symbol_error )
+    password_ok = not (length_error or digit_error or uppercase_error or lowercase_error or symbol_error)
 
     return {
-        'password_ok' : password_ok,
-        'length_error' : length_error,
-        'digit_error' : digit_error,
-        'uppercase_error' : uppercase_error,
-        'lowercase_error' : lowercase_error,
-        'symbol_error' : symbol_error,
+        'password_ok': password_ok,
+        'length_error': length_error,
+        'digit_error': digit_error,
+        'uppercase_error': uppercase_error,
+        'lowercase_error': lowercase_error,
+        'symbol_error': symbol_error,
     }
 
+
 def hash_password(password):
-    
     # Hash password
     #   Using hashlib for SHA512 for now, may use bcrypt for better security in the future
-    
+
     salt = uuid.uuid4().hex
     hashed_password = hashlib.sha512((password + salt).encode('UTF-8')).hexdigest()
     return hashed_password
+
 
 def name_check(name: str):
     '''Makes sure name has no symbols, no numbers, and at least 1 character
@@ -103,5 +104,5 @@ def name_check(name: str):
         If True, it means that name is acceptable.
     '''
     name_ok = re.search('^[A-Za-z ]*$', name)
-    
+
     return name_ok
