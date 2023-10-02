@@ -1,43 +1,18 @@
 import toml
-from flask import Flask, request, url_for, session
+from flask import Flask, request, session
 
-from datetime import datetime
 
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
 from flask_mail import Mail, Message
 
-from components.account_management import login_user, logout_user
-# utility functions
-from utility import email_check, password_check, hash_password
-import uuid
+from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
-
 mail = Mail(app)
 db = MySQL(app).connect().cursor()
 mongo = PyMongo(app).db
-
-##############
-# Mail Setup #
-##############
-# app.config.update(
-#     MAIL_SERVER='smtp.office365.com',
-#     MAIL_PORT=587,
-#     MAIL_USE_TLS=True,
-#     MAIL_USE_SSL=False,
-#     MAIL_USERNAME = 'inf2003ispcompare@outlook.sg', # Can change
-#     MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
-# )
-
-
-#####################
-# Throwaway globals #
-#####################
-# Since database does not exist yet,
-# this variable acts in place of the database, storing email verification link uuid and when email was sent
-signup_uuid_dict = {}
 
 ########
 # APIs #
@@ -60,11 +35,11 @@ def logout():
     return logout_user(mongo)
 
 
-@app.route('/signup', methods = ['POST'])
+@app.route('/api/signup', methods = ['POST'])
 def signup():
     ''' Signup API
     
-    Form Parameters
+    JSON Body Parameters
     ---------------
     name: str
         Name of user. Should contain only normal characters.
@@ -80,80 +55,13 @@ def signup():
     403: 
         Existing account with email already exists.
     '''
-    signup_form_data = request.form
-    signup_name = signup_form_data['name']
-    signup_email = signup_form_data['email']
-    signup_password = signup_form_data['password']
-    
-    # <!> Name validation
-    
-    # Email & password validation
-    normalized_email = email_check(signup_email, deliverability=True)
-    if not normalized_email:
-        return "Invalid email", 400
-    
-    if (not password_check(signup_password)["password_ok"]):
-        print(password_check(signup_password))
-        return "Bad password", 400
-    
-    #   Store normalized email in variable
-    signup_email = normalized_email
-    
-    #   Hash password
-    hashed_password = hash_password(signup_password)
+    return handle_signup(request)
 
-    # Generate UUID and email confirmation link 
-    #   (UUID is used in the confirmation link)
-    #   Python's UUID4 uses urandom (cannot be seeded)
-    signup_uuid = uuid.uuid4()
-    signup_confirmation_link = url_for('signup_confirmation', _external = True, signup_uuid = str(signup_uuid)) 
-
-    # <!> Store signup details (name, normalized email, hashed password), sign up UUID, into database
-    # <!> consider hashing the UUID
-    #   Check if email already exists or not
-
-    print("Sign up email: ", signup_email)
-    print("Sign up password: ", signup_password)
-    print("Hashed password: ", hashed_password)
-    print("Sign up UUID: ", str(signup_uuid))
-    print("Sign up confirmation link: ", signup_confirmation_link)
-    
-    signup_uuid_dict.update({str(signup_uuid): datetime.now()})
-
-    # Send confirmation email
-    '''
-    msg = Message("Confirmation link",
-                  sender="inf2003ispcompare@outlook.sg",
-                  recipients=[signup_email])
-    
-    msg.body = "signup_confirmation_link is " + signup_confirmation_link
-    mail.send(msg)
-    '''
-    
-    # <!> Can choose to redirect to other pages with render_template('page.html')
-    return "Signup request received"
 
 
 @app.route('/join/<path:signup_uuid>')
 def signup_confirmation(signup_uuid):
-    print("UUID received: ", signup_uuid)
-    
-    # <!> Check against database records for UUID, and check if it expired
-    #   <!> If uuid does not exist
-    if (signup_uuid not in signup_uuid_dict):
-        print(signup_uuid_dict)
-        return "Invalid confirmation link", 403
-    #   <!> If more than 10 mins passed, delete record, return error
-    if ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds() > 10 * 60):
-        signup_uuid_dict.pop(signup_uuid)
-        return "Confirmation link expired", 403
-    
-    print ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds())
-    signup_uuid_dict.pop(signup_uuid)
-    
-    # <!> Add user to database
-
-    return "Confirmation received"
+    return handle_signup_confirmation(signup_uuid)
 
 
 if __name__ == '__main__':

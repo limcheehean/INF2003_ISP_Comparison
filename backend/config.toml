@@ -8,9 +8,13 @@ MAIL_USE_SSL = false
 MAIL_USERNAME = 'inf2003ispcompare@outlook.sg'
 MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
 
-MYSQL_DATABASE_HOST = 'localhost'
-MYSQL_DATABASE_USER = 'root'
-MYSQL_DATABASE_PASSWORD = 'root'
+MYSQL_DATABASE_HOST = 'db.spmovy.com'
+MYSQL_DATABASE_PORT = 3306
+MYSQL_DATABASE_USER = 'inf2002admin'
+MYSQL_DATABASE_PASSWORD = 'Password098'
 MYSQL_DATABASE_DB = 'isp_comparison'
 
 MONGO_URI = 'mongodb://localhost:27017/isp_comparison'
+
+[MYSQL_SSL_CA]
+fake_flag_to_enable_tls = true
