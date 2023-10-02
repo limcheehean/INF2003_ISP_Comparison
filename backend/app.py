@@ -1,10 +1,8 @@
 import toml
 from flask import Flask, request, session
-
-
+from flask_mail import Mail
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
-from flask_mail import Mail, Message
 
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
 
@@ -14,10 +12,6 @@ mail = Mail(app)
 db = MySQL(app).connect().cursor()
 mongo = PyMongo(app).db
 
-########
-# APIs #
-########
-
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -26,7 +20,6 @@ def hello_world():  # put application's code here
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    print(session.get("uid"))
     return login_user((db, mongo), request.json)
 
 
@@ -35,28 +28,27 @@ def logout():
     return logout_user(mongo)
 
 
-@app.route('/api/signup', methods = ['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
-    ''' Signup API
-    
+    """ Signup API
+
     JSON Body Parameters
     ---------------
     name: str
         Name of user. Should contain only normal characters.
     email: str
-        Email address of user. 
+        Email address of user.
     password: str
         Password of user. Should have at least 8 characters, 1 symbol, 1 uppercase, 1 lowercase, digit
-        
+
     Return code
     ----------------
-    400: 
+    400:
         Invalid/Bad email, password or name. (Will return error messages "Invalid email" or "Invalid password")
-    403: 
+    403:
         Existing account with email already exists.
-    '''
+    """
     return handle_signup(request)
-
 
 
 @app.route('/join/<path:signup_uuid>')
