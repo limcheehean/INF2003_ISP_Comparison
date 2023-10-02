@@ -1,15 +1,18 @@
 import toml
 from flask import Flask, request, session
-from flask_mail import Mail
+
+
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
+from flask_mail import Mail, Message
 
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
 mail = Mail(app)
-db = MySQL(app).connect().cursor()
+db = MySQL(app).connect()
+db_cursor = db.cursor()
 mongo = PyMongo(app).db
 
 
@@ -28,32 +31,66 @@ def logout():
     return logout_user(mongo)
 
 
-@app.route('/api/signup', methods=['POST'])
+@app.route('/api/signup', methods = ['POST'])
 def signup():
-    """ Signup API
+    ''' Signup API
+    
+    This API allows users to sign up for your service.
 
-    JSON Body Parameters
+    JSON Body Parameters:
+    ---------------------
+    - name (str): Name of the user. Should contain only normal characters.
+    - email (str): Email address of the user.
+    - password (str): Password of the user. Should have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit.
+
+    Return Codes:
+    -------------
+    - 200 OK: Successful signup.
+        - JSON Body:
+            - "status" (str): "success"
+            - "message" (str): "Signup successful"
+
+    - 400 Bad Request: Invalid input.
+        - JSON Body:
+            - "status" (str): "error"
+            - "message" (str): A descriptive error message.
+                - Invalid email -> "Invalid email"
+                - Invalid name -> "Invalid name"
+                - Bad password -> "Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit"
+                - Other -> "Invalid email, name, or password"
+
+    - 403 Forbidden: Existing account with the provided email already exists.
+        - JSON Body:
+            - "status" (str): "error"
+            - "message" (str): "An account with this email already exists"
+
+    Example Request:
     ---------------
-    name: str
-        Name of user. Should contain only normal characters.
-    email: str
-        Email address of user.
-    password: str
-        Password of user. Should have at least 8 characters, 1 symbol, 1 uppercase, 1 lowercase, digit
+    POST /signup
+    Content-Type: application/json
+    {
+        "name": "John Doe",
+        "email": "johndoe@example.com",
+        "password": "P@ssw0rd"
+    }
 
-    Return code
+    Example Response:
     ----------------
-    400:
-        Invalid/Bad email, password or name. (Will return error messages "Invalid email" or "Invalid password")
-    403:
-        Existing account with email already exists.
-    """
-    return handle_signup(request)
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+        "status": "success",
+        "message": "Signup successful"
+    }
+'''
+    return handle_signup(db,db_cursor, request)
 
 
-@app.route('/join/<path:signup_uuid>')
-def signup_confirmation(signup_uuid):
-    return handle_signup_confirmation(signup_uuid)
+
+@app.route('/join/<path:signup_token>')
+def signup_confirmation(signup_token):
+    return handle_signup_confirmation(signup_token)
 
 
 if __name__ == '__main__':

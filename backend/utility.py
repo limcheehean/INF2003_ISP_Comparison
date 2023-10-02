@@ -89,3 +89,19 @@ def hash_password(password):
     salt = uuid.uuid4().hex
     hashed_password = hashlib.sha512((password + salt).encode('UTF-8')).hexdigest()
     return hashed_password
+
+def name_check(name: str):
+    '''Makes sure name has no symbols, no numbers, and at least 1 character
+    
+    Parameters
+    ----------
+    name: str
+    
+    Returns
+    ----------
+    bool
+        If True, it means that name is acceptable.
+    '''
+    name_ok = re.search('^[A-Za-z ]*$', name)
+    
+    return name_ok
