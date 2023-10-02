@@ -1,29 +1,35 @@
-from flask import Flask, request, url_for
+import toml
+from flask import Flask, request, url_for, session
 
 from datetime import datetime
 
+from flaskext.mysql import MySQL
 #!pip install Flask-Mail
 from flask_mail import Mail, Message
 
+from components.account_management import login_user, logout_user
 # utility functions
 from utility import email_check, password_check, hash_password
 import uuid
 
 app = Flask(__name__)
+app.config.from_file("config.toml", load=toml.load)
+
+mail = Mail(app)
+db = MySQL(app).connect().cursor()
 
 ##############
 # Mail Setup #
 ##############
-app.config.update(
-    MAIL_SERVER='smtp.office365.com',
-    MAIL_PORT=587,
-    MAIL_USE_TLS=True,
-    MAIL_USE_SSL=False,
-    MAIL_USERNAME = 'inf2003ispcompare@outlook.sg', # Can change
-    MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
-)
+# app.config.update(
+#     MAIL_SERVER='smtp.office365.com',
+#     MAIL_PORT=587,
+#     MAIL_USE_TLS=True,
+#     MAIL_USE_SSL=False,
+#     MAIL_USERNAME = 'inf2003ispcompare@outlook.sg', # Can change
+#     MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
+# )
 
-mail = Mail(app)
 
 #####################
 # Throwaway globals #
@@ -36,9 +42,22 @@ signup_uuid_dict = {}
 # APIs #
 ########
 
+
 @app.route('/')
 def hello_world():  # put application's code here
     return 'Hello World!'
+
+
+@app.route("/api/login", methods=["POST"])
+def login():
+    print(session.get("uid"))
+    return login_user(db, request.json)
+
+
+@app.route("/api/logout", methods=["GET"])
+def logout():
+    return logout_user()
+
 
 @app.route('/signup', methods = ['POST'])
 def signup():
@@ -112,7 +131,8 @@ def signup():
     
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"
- 
+
+
 @app.route('/join/<path:signup_uuid>')
 def signup_confirmation(signup_uuid):
     print("UUID received: ", signup_uuid)
@@ -133,5 +153,7 @@ def signup_confirmation(signup_uuid):
     # <!> Add user to database
 
     return "Confirmation received"
+
+
 if __name__ == '__main__':
     app.run()
