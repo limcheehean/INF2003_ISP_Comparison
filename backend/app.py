@@ -1,10 +1,8 @@
 import toml
-from flask import Flask, request, session
-
-
+from flask import Flask, request
+from flask_mail import Mail
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
-from flask_mail import Mail, Message
 
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
 
@@ -15,10 +13,6 @@ db = MySQL(app).connect()
 db_cursor = db.cursor()
 mongo = PyMongo(app).db
 
-########
-# APIs #
-########
-
 
 @app.route('/')
 def hello_world():  # put application's code here
@@ -27,7 +21,6 @@ def hello_world():  # put application's code here
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    print(session.get("uid"))
     return login_user((db_cursor, mongo), request.json)
 
 
@@ -36,10 +29,10 @@ def logout():
     return logout_user(mongo)
 
 
-@app.route('/api/signup', methods = ['POST'])
+@app.route('/api/signup', methods=['POST'])
 def signup():
-    ''' Signup API
-    
+    """ Signup API
+
     This API allows users to sign up for your service.
 
     JSON Body Parameters:
@@ -54,7 +47,7 @@ def signup():
         - JSON Body:
             - "status" (str): "success"
             - "message" (str): "Signup successful"
-        
+
     - 400 Bad Request: Invalid input.
         - JSON Body:
             - "status" (str): "error"
@@ -88,9 +81,8 @@ def signup():
         "status": "success",
         "message": "Signup successful"
     }
-'''
-    return handle_signup(db,db_cursor, request)
-
+"""
+    return handle_signup(db, db_cursor, request)
 
 
 @app.route('/join/<path:signup_token>')
