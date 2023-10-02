@@ -3,8 +3,8 @@ from flask import Flask, request, url_for, session
 
 from datetime import datetime
 
+from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
-#!pip install Flask-Mail
 from flask_mail import Mail, Message
 
 from components.account_management import login_user, logout_user
@@ -17,6 +17,7 @@ app.config.from_file("config.toml", load=toml.load)
 
 mail = Mail(app)
 db = MySQL(app).connect().cursor()
+mongo = PyMongo(app).db
 
 ##############
 # Mail Setup #
@@ -51,12 +52,12 @@ def hello_world():  # put application's code here
 @app.route("/api/login", methods=["POST"])
 def login():
     print(session.get("uid"))
-    return login_user(db, request.json)
+    return login_user((db, mongo), request.json)
 
 
 @app.route("/api/logout", methods=["GET"])
 def logout():
-    return logout_user()
+    return logout_user(mongo)
 
 
 @app.route('/signup', methods = ['POST'])
