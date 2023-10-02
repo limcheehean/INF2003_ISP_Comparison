@@ -68,7 +68,7 @@ def handle_signup(db, db_cursor,request):
     
     if (not password_check(signup_password)["password_ok"]):
         print(password_check(signup_password))
-        return {"status": "error", "message":"Bad password"}, 400
+        return {"status": "error", "message":"Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit"}, 400
     
     #   Store normalized email in variable
     signup_email = normalized_email
@@ -83,9 +83,9 @@ def handle_signup(db, db_cursor,request):
     signup_confirmation_link = url_for('signup_confirmation', _external = True, signup_token = str(signup_token)) 
 
     token_created = datetime.now()
-    # <!> Store signup details (name, normalized email, hashed password), sign up UUID, into database
+    # Store signup details (name, normalized email, hashed password), sign up UUID, into database
     # <!> consider hashing the UUID
-    #   Check if email already exists or not
+    #   <!> Check if email already exists or not
     try:
         db_cursor.execute("INSERT INTO USER (name, email, password_hash, activated, token, token_created) "
                 f"VALUES('{signup_name}', '{normalized_email}', '{hash_password}', false, '{signup_token}', '{token_created.strftime('%Y-%m-%d %H:%M:%S')}') ")
