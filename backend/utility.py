@@ -15,7 +15,7 @@ from email_validator import validate_email, EmailNotValidError
 
 import re
 
-import hashlib, uuid
+from bcrypt import hashpw, gensalt
 
 
 def email_check(email, deliverability=False):
@@ -84,11 +84,10 @@ def password_check(password):
 def hash_password(password):
     
     # Hash password
-    #   Using hashlib for SHA512 for now, may use bcrypt for better security in the future
+    #   Using bcrypt's hashpw
     
-    salt = uuid.uuid4().hex
-    hashed_password = hashlib.sha512((password + salt).encode('UTF-8')).hexdigest()
-    return hashed_password
+    hashpw(password.encode("utf-8"), gensalt()) 
+    return hashpw
 
 def name_check(name: str):
     '''Makes sure name has no symbols, no numbers, and at least 1 character
