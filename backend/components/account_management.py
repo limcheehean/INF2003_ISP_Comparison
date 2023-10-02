@@ -88,7 +88,7 @@ def handle_signup(db, db_cursor,request):
     #   <!> Check if email already exists or not
     try:
         db_cursor.execute("INSERT INTO USER (name, email, password_hash, activated, token, token_created) "
-                f"VALUES('{signup_name}', '{normalized_email}', '{hash_password}', false, '{signup_token}', '{token_created.strftime('%Y-%m-%d %H:%M:%S')}') ")
+                f"VALUES('{signup_name}', '{normalized_email}', '{hashed_password}', false, '{signup_token}', '{token_created.strftime('%Y-%m-%d %H:%M:%S')}') ")
         
         db.commit()
     except Exception as e:
@@ -102,6 +102,7 @@ def handle_signup(db, db_cursor,request):
     print("Sign up UUID: ", str(signup_token))
     print("Sign up confirmation link: ", signup_confirmation_link)
     
+    # <!> To remove, once signup_confirmation switches to database as well
     signup_uuid_dict.update({str(signup_token): datetime.now()})
 
     # Send confirmation email
