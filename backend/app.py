@@ -133,6 +133,5 @@ def signup_confirmation(signup_uuid):
     # <!> Add user to database
 
     return "Confirmation received"
-    
 if __name__ == '__main__':
     app.run()
