@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 # utility functions
-from utility import email_check, password_check, hash_password
+from utility import email_check, password_check, hash_password, name_check
 
 from bcrypt import checkpw
 from flask import session, url_for
@@ -50,13 +50,15 @@ def login_user(db, data):
 def logout_user():
     return {}
 
-def handle_signup(db,request):
+def handle_signup(db, db_cursor,request):
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
     signup_password = signup_form_data['password']
     
-    # <!> Name validation
+    # Name validation
+    if not name_check(signup_name):
+        return "Invalid name", 400 
     
     # Email & password validation
     normalized_email = email_check(signup_email, deliverability=True)
@@ -76,20 +78,30 @@ def handle_signup(db,request):
     # Generate UUID and email confirmation link 
     #   (UUID is used in the confirmation link)
     #   Python's UUID4 uses urandom (cannot be seeded)
-    signup_uuid = uuid4()
-    signup_confirmation_link = url_for('signup_confirmation', _external = True, signup_uuid = str(signup_uuid)) 
+    signup_token = uuid4()
+    signup_confirmation_link = url_for('signup_confirmation', _external = True, signup_token = str(signup_token)) 
 
+    token_created = datetime.now()
     # <!> Store signup details (name, normalized email, hashed password), sign up UUID, into database
     # <!> consider hashing the UUID
     #   Check if email already exists or not
+    try:
+        db_cursor.execute("INSERT INTO USER (name, email, password_hash, activated, token, token_created) "
+                f"VALUES('{signup_name}', '{normalized_email}', '{hash_password}', false, '{signup_token}', '{token_created.strftime('%Y-%m-%d %H:%M:%S')}') ")
+        
+        db.commit()
+    except Exception as e:
+        print("Error: ", e)
+        return "Bad request", 400
 
     print("Sign up email: ", signup_email)
+    print("Sign up name: ", signup_name)
     print("Sign up password: ", signup_password)
     print("Hashed password: ", hashed_password)
-    print("Sign up UUID: ", str(signup_uuid))
+    print("Sign up UUID: ", str(signup_token))
     print("Sign up confirmation link: ", signup_confirmation_link)
     
-    signup_uuid_dict.update({str(signup_uuid): datetime.now()})
+    signup_uuid_dict.update({str(signup_token): datetime.now()})
 
     # Send confirmation email
     '''
@@ -104,21 +116,21 @@ def handle_signup(db,request):
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"
 
-def handle_signup_confirmation(signup_uuid):
-    print("UUID received: ", signup_uuid)
+def handle_signup_confirmation(signup_token):
+    print("UUID received: ", signup_token)
     
     # <!> Check against database records for UUID, and check if it expired
     #   <!> If uuid does not exist
-    if (signup_uuid not in signup_uuid_dict):
+    if (signup_token not in signup_uuid_dict):
         print(signup_uuid_dict)
         return "Invalid confirmation link", 403
     #   <!> If more than 10 mins passed, delete record, return error
-    if ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds() > 10 * 60):
-        signup_uuid_dict.pop(signup_uuid)
+    if ((datetime.now()-signup_uuid_dict[signup_token]).total_seconds() > 10 * 60):
+        signup_uuid_dict.pop(signup_token)
         return "Confirmation link expired", 403
     
-    print ((datetime.now()-signup_uuid_dict[signup_uuid]).total_seconds())
-    signup_uuid_dict.pop(signup_uuid)
+    print ((datetime.now()-signup_uuid_dict[signup_token]).total_seconds())
+    signup_uuid_dict.pop(signup_token)
     
     # <!> Add user to database
 

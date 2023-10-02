@@ -14,7 +14,8 @@ from components.account_management import login_user, logout_user, handle_signup
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
 mail = Mail(app)
-db = MySQL(app).connect().cursor()
+db = MySQL(app).connect()
+db_cursor = db.cursor()
 
 ########
 # APIs #
@@ -29,7 +30,7 @@ def hello_world():  # put application's code here
 @app.route("/api/login", methods=["POST"])
 def login():
     print(session.get("uid"))
-    return login_user(db, request.json)
+    return login_user(db, db_cursor, request.json)
 
 
 @app.route("/api/logout", methods=["GET"])
@@ -53,17 +54,17 @@ def signup():
     Return code
     ----------------
     400: 
-        Invalid/Bad email, password or name. (Will return error messages "Invalid email" or "Invalid password")
+        Invalid/Bad email, password or name. (May return error messages "Invalid email"/"Bad password"/"Invalid name")
     403: 
         Existing account with email already exists.
     '''
-    return handle_signup(db,request)
+    return handle_signup(db,db_cursor, request)
 
 
 
-@app.route('/join/<path:signup_uuid>')
-def signup_confirmation(signup_uuid):
-    return handle_signup_confirmation(signup_uuid)
+@app.route('/join/<path:signup_token>')
+def signup_confirmation(signup_token):
+    return handle_signup_confirmation(signup_token)
 
 
 if __name__ == '__main__':
