@@ -54,7 +54,19 @@ def signup():
     Return code
     ----------------
     400: 
-        Invalid/Bad email, password or name. (May return error messages "Invalid email"/"Bad password"/"Invalid name")
+        Invalid/Bad email, password or name.
+        
+        JSON Body
+            "status": "error" 
+            
+            Invalid email -> "message": "Invalid email"
+            
+            Invalid name -> "message": "Invalid name"
+            
+            Bad password -> "message": "Bad password"
+            
+            Other: "message" -> "message": "Invalid email, name or password"
+            
     403: 
         Existing account with email already exists.
     '''

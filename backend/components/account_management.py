@@ -10,7 +10,6 @@ from datetime import datetime
 
 invalid_email_password_error = {"status": "error", "message": "Invalid username or password"}, 401
 
-
 #####################
 # Throwaway globals #
 #####################
@@ -56,18 +55,20 @@ def handle_signup(db, db_cursor,request):
     signup_email = signup_form_data['email']
     signup_password = signup_form_data['password']
     
+    # <!> Add max length validation for all 3 parameters
+    
     # Name validation
     if not name_check(signup_name):
-        return "Invalid name", 400 
+        return {"status": "error", "message":"Invalid name"}, 400 
     
     # Email & password validation
     normalized_email = email_check(signup_email, deliverability=True)
     if not normalized_email:
-        return "Invalid email", 400
+        return {"status": "error", "message":"Invalid email"}, 400
     
     if (not password_check(signup_password)["password_ok"]):
         print(password_check(signup_password))
-        return "Bad password", 400
+        return {"status": "error", "message":"Bad password"}, 400
     
     #   Store normalized email in variable
     signup_email = normalized_email
@@ -92,7 +93,7 @@ def handle_signup(db, db_cursor,request):
         db.commit()
     except Exception as e:
         print("Error: ", e)
-        return "Bad request", 400
+        return {"status": "error", "message":"Invalid email, name or password"}, 400
 
     print("Sign up email: ", signup_email)
     print("Sign up name: ", signup_name)
