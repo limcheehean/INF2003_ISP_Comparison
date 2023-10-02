@@ -14,5 +14,7 @@ MYSQL_DATABASE_USER = 'inf2002admin'
 MYSQL_DATABASE_PASSWORD = 'Password098'
 MYSQL_DATABASE_DB = 'isp_comparison'
 
+MONGO_URI = 'mongodb://localhost:27017/isp_comparison'
+
 [MYSQL_SSL_CA]
 fake_flag_to_enable_tls = true
