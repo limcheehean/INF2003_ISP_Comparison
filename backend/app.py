@@ -4,7 +4,8 @@ from flask_mail import Mail
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
 
-from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation
+from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
+    require_login
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -27,6 +28,12 @@ def login():
 @app.route("/api/logout", methods=["GET"])
 def logout():
     return logout_user(mongo)
+
+
+@app.route("/api/check_login", methods=["GET"])
+@require_login
+def check_login():
+    return {"status": "success"}
 
 
 @app.route('/api/signup', methods=['POST'])
