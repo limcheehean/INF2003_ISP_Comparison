@@ -57,7 +57,7 @@ def signup():
     403: 
         Existing account with email already exists.
     '''
-    return handle_signup(request)
+    return handle_signup(db,request)
 
 
 

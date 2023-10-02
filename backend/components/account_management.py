@@ -50,7 +50,7 @@ def login_user(db, data):
 def logout_user():
     return {}
 
-def handle_signup(request):
+def handle_signup(db,request):
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
