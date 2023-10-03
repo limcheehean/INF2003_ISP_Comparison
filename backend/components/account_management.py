@@ -141,10 +141,6 @@ def handle_signup(db, db_cursor, mail, request):
         return {"status": "error", "message": "Invalid email, name or password"}, 400
 
     print("Sign up email: ", signup_email)
-    print("Sign up name: ", signup_name)
-    print("Sign up password: ", signup_password)
-    print("Hashed password: ", hashed_password)
-    print("Sign up UUID: ", str(signup_token))
     print("Sign up confirmation link: ", signup_confirmation_link)
 
     # <!> To remove, once signup_confirmation switches to database as well
