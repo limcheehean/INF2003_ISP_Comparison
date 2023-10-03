@@ -8,6 +8,8 @@ from flask import session, url_for
 # utility functions
 from utility import email_check, password_check, hash_password, name_check
 
+from flask_mail import Message
+
 #####################
 # Throwaway globals #
 #####################
@@ -84,7 +86,7 @@ def logout_user(mongo):
     return {"status": "success", "message": "Logout successful"}
 
 
-def handle_signup(db, db_cursor, request):
+def handle_signup(db, db_cursor, mail, request):
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
@@ -149,14 +151,14 @@ def handle_signup(db, db_cursor, request):
     signup_uuid_dict.update({str(signup_token): datetime.now()})
 
     # Send confirmation email
-    '''
+    
     msg = Message("Confirmation link",
                   sender="inf2003ispcompare@outlook.sg",
                   recipients=[signup_email])
     
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
     mail.send(msg)
-    '''
+    
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"

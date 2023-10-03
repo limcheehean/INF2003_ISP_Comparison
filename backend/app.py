@@ -89,7 +89,7 @@ def signup():
         "message": "Signup successful"
     }
 """
-    return handle_signup(db, db_cursor, request)
+    return handle_signup(db, db_cursor, mail, request)
 
 
 @app.route('/join/<path:signup_token>')
