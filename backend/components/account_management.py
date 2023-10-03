@@ -99,7 +99,7 @@ def handle_signup(db, db_cursor, mail, request):
         return {"status": "error", "message": "Invalid name"}, 400
 
         # Email & password validation
-    normalized_email = email_check(signup_email, deliverability=True)
+    normalized_email = email_check(signup_email, deliverability=False)
     if not normalized_email:
         return {"status": "error", "message": "Invalid email"}, 400
 
