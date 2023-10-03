@@ -99,7 +99,29 @@ def signup():
 
 @app.route('/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(signup_token)
+    """ Signup Confirmation API
+
+    This API allows users to confirm their account registration and activate their account, with a signup token provided previously
+
+    Path Parameters:
+    ---------------------
+    - signup_token (str): Account registration token
+
+    Return Codes:
+    -------------
+    - 200 OK: Successful account activation.
+        - JSON Body:
+            - "status" (str): "success"
+            - "message" (str): "Account successfully activated."
+
+    - 403 Bad Request: Invalid input.
+        - JSON Body:
+            - "status" (str): "error"
+            - "message" (str): A descriptive error message.
+                - Invalid signup token -> "Invalid signup token."
+                - Expired signup token -> "Confirmation link expired. Please register again."
+    """
+    return handle_signup_confirmation(db, db_cursor, signup_token)
 
 
 if __name__ == '__main__':

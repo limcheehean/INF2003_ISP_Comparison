@@ -12,13 +12,6 @@ from flask_mail import Message
 
 from flaskext.mysql import MySQL, pymysql
 
-#####################
-# Throwaway globals #
-#####################
-# Since database does not exist yet,
-# this variable acts in place of the database, storing email verification link uuid and when email was sent
-signup_uuid_dict = {}
-
 ############################
 # Authentication functions #
 ############################
@@ -153,9 +146,6 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     print("Sign up email: ", signup_email)
     print("Sign up confirmation link: ", signup_confirmation_link)
 
-    # <!> To remove, once signup_confirmation switches to database as well
-    signup_uuid_dict.update({str(signup_token): datetime.now()})
-
     # Send confirmation email
     
     '''
@@ -171,30 +161,38 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     return "Signup request received"
 
 
-def handle_signup_confirmation(signup_token):
-    print("UUID received: ", signup_token)
+def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, signup_token):
+    print("Signup token received: ", signup_token)
 
-    # <!> Check against database records for UUID, and check if it expired
-    #   <!> If uuid does not exist
-    if signup_token not in signup_uuid_dict:
-        print(signup_uuid_dict)
-        return "Invalid confirmation link", 403
-    #   <!> If more than 10 mins passed, delete record, return error
-    if (datetime.now() - signup_uuid_dict[signup_token]).total_seconds() > 10 * 60:
-        signup_uuid_dict.pop(signup_token)
-        return "Confirmation link expired", 403
+    # How long before token expires, in seconds
+    token_expire = 60*10
+    # Check against database records for signup token, and check if it expired
+    count = db_cursor.execute("SELECT id, activated, token_created FROM user WHERE token = %s", signup_token)
+    
+    # If signup token does not exist
+    if count == 0:
+        return {"status": "error", "message": "Invalid signup token."}, 403
+    
+    else:
+        user = db_cursor.fetchone()
+        token_created = user[2]
+        # If signup token expired
+        #   <?> Can consider deleting user data here, but it is automatically done in signup api upon re-registration,
+        if (datetime.now() - token_created).total_seconds() > token_expire:
+            return {"status": "error", "message": "Confirmation link expired. Please register again."}, 403
+        
+        else:
+            # <?> Sets signup_token to null, may use empty string if preferred
+            db_cursor.execute("""UPDATE user
+                              SET token = NULL, activated = True 
+                              WHERE id = %s;
+                              """, user[0])
+            return {"status": "success", "message": "Account successfully activated."}, 200
 
-    print((datetime.now() - signup_uuid_dict[signup_token]).total_seconds())
-    signup_uuid_dict.pop(signup_token)
 
-    # <!> Add user to database
-
-    return "Confirmation received"
-
-# <!> Check if user exists or not, if exist, delete if token was generated more than one minute ago
-#   <!> If token was generated within the past one minute, return that information as well
 def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
     ''' Simple method to check if user account exists, and is activated or not
+    
     Note: If user account is not activated, but token is generated since more than one minute ago, user account will be deleted.
     Parameters:
     duration_seconds: 
@@ -211,6 +209,7 @@ def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_secon
     
     '''
     account_activated = generated_within_duration = False
+    token = ''
     
     count = db_cursor.execute("SELECT activated, token_created FROM user WHERE email = %s", email)
     if count == 0:
