@@ -101,10 +101,10 @@ CREATE TABLE Rider (
 # The relationship to 'UserPlan' is zero to many.
 CREATE TABLE User (
     id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(255),
-    email VARCHAR(255),
-    password_hash VARCHAR(255),
-    activated BOOLEAN,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    activated BOOLEAN NOT NULL,
     token VARCHAR(255),
     token_created DATETIME
 );
