@@ -123,8 +123,15 @@ def handle_signup(db, db_cursor, request):
     # <!> consider hashing the UUID
     #   <!> Check if email already exists or not
     try:
-        db_cursor.execute("INSERT INTO USER (name, email, password_hash, activated, token, token_created) "
-                          f"VALUES('{signup_name}', '{normalized_email}', '{hashed_password}', false, '{signup_token}', '{token_created.strftime('%Y-%m-%d %H:%M:%S')}') ")
+        
+        # Use parameterized query, which prevents sql injection, and also offers precompilation
+        parameterized_insert_query = """
+        INSERT INTO USER (name, email, password_hash, activated, token, token_created)
+        VALUES(%s, %s, %s, false, %s, %s)
+        """
+        signup_tuple = (signup_name, normalized_email, hashed_password, signup_token, token_created.strftime('%Y-%m-%d %H:%M:%S'))
+
+        db_cursor.execute(parameterized_insert_query, signup_tuple)
 
         db.commit()
     except Exception as e:
