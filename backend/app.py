@@ -64,7 +64,7 @@ def signup():
                 - Bad password -> "Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit"
                 - Other -> "Invalid email, name, or password"
 
-    - 403 Forbidden: Existing account with the provided email already exists.
+    - 409 Conflict: Existing account with the provided email already exists.
         - JSON Body:
             - "status" (str): "error"
             - "message" (str): "An account with this email already exists"

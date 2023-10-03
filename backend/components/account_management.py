@@ -10,6 +10,8 @@ from utility import email_check, password_check, hash_password, name_check
 
 from flask_mail import Message
 
+from flaskext.mysql import MySQL, pymysql
+
 #####################
 # Throwaway globals #
 #####################
@@ -86,7 +88,7 @@ def logout_user(mongo):
     return {"status": "success", "message": "Logout successful"}
 
 
-def handle_signup(db, db_cursor, mail, request):
+def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, mail, request):
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
@@ -136,9 +138,13 @@ def handle_signup(db, db_cursor, mail, request):
         db_cursor.execute(parameterized_insert_query, signup_tuple)
 
         db.commit()
-    except Exception as e:
-        print("Error: ", e)
-        return {"status": "error", "message": "Invalid email, name or password"}, 400
+    except Exception as e: 
+        
+        if ("Duplicate entry" in e.args[1]):
+            return {"status": "error", "message": "An account with this email already exists"}, 409
+        else:
+            print("Error: ", e)
+            return {"status": "error", "message": "Invalid email, name or password"}, 400
 
     print("Sign up email: ", signup_email)
     print("Sign up confirmation link: ", signup_confirmation_link)
