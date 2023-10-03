@@ -68,6 +68,11 @@ def signup():
         - JSON Body:
             - "status" (str): "error"
             - "message" (str): "An account with this email already exists"
+    
+    - 429 Too Many Request: User re-registered with same email too soon
+        - JSON Body:
+            - "status" (str): "error"
+            - "message" (str): "Account re-registration made too soon. Please try again later"
 
     Example Request:
     ---------------

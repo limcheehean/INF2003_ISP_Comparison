@@ -112,6 +112,15 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
 
     #   Store normalized email in variable
     signup_email = normalized_email
+    
+    # Check if user account already exists or not
+    user_account_status = check_user_exist(db_cursor, signup_email, 60)
+    if (user_account_status["account_activated"]):
+        return {"status": "error", "message": "An account with this email already exists"}, 409
+    
+    # Check if User very recently re-registered with same email. Reject if True
+    elif (user_account_status["generated_within_duration"]):
+        return {"status": "error", "message": "Account re-registration made too soon. Please try again later"}, 429
 
     #   Hash password
     hashed_password = hashpw(signup_password.encode("utf-8"), gensalt())
@@ -124,8 +133,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
 
     token_created = datetime.now()
     # Store signup details (name, normalized email, hashed password), sign up UUID, into database
-    # <!> consider hashing the UUID
-    #   <!> Check if email already exists or not
+    
     try:
         
         # Use parameterized query, which prevents sql injection, and also offers precompilation
@@ -139,12 +147,8 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
 
         db.commit()
     except Exception as e: 
-        
-        if ("Duplicate entry" in e.args[1]):
-            return {"status": "error", "message": "An account with this email already exists"}, 409
-        else:
-            print("Error: ", e)
-            return {"status": "error", "message": "Invalid email, name or password"}, 400
+        print("Error: ", e)
+        return {"status": "error", "message": "Invalid email, name or password"}, 400
 
     print("Sign up email: ", signup_email)
     print("Sign up confirmation link: ", signup_confirmation_link)
@@ -186,3 +190,56 @@ def handle_signup_confirmation(signup_token):
     # <!> Add user to database
 
     return "Confirmation received"
+
+# <!> Check if user exists or not, if exist, delete if token was generated more than one minute ago
+#   <!> If token was generated within the past one minute, return that information as well
+def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
+    ''' Simple method to check if user account exists, and is activated or not
+    Note: If user account is not activated, but token is generated since more than one minute ago, user account will be deleted.
+    Parameters:
+    duration_seconds: 
+     - If token was generated more than duration_seconds ago, user account will be deleted.
+     - Else, 'generated_within_duration' will be True
+    
+    Returns: 
+    dict: Dictionary indicating user account status
+    --------
+    
+    The dictionary contains the following information
+    - 'account_activated' (bool): True if user already exists, and account is activated
+    - 'generated_within_duration' (bool): True if user account is not activated, but token was generated within (duration_seconds) ago
+    
+    '''
+    account_activated = generated_within_duration = False
+    
+    count = db_cursor.execute("SELECT activated, token_created FROM user WHERE email = %s", email)
+    if count == 0:
+        pass
+    else:
+        # Get the user information
+        user = db_cursor.fetchone()
+        
+        # Check if user account is not activated
+        if not user[0]:
+            
+            # Check when signup token was generated
+            #token_created = datetime.strptime(user[1],'%Y-%m-%d %H:%M:%S')
+            token_created = user[1]
+            
+            # If generated more than (duration_seconds) ago, delete user
+            if (datetime.now() - token_created).total_seconds() > duration_seconds:
+                db_cursor.execute("DELETE FROM user WHERE email = %s", email)
+                
+            # If generated too soon (within duration_seconds), return as found.
+            else:
+                generated_within_duration = True
+    
+        # Else, if user account is activated
+        else:
+            account_activated = True
+            
+            
+    return {
+        'account_activated': account_activated,
+        'generated_within_duration': generated_within_duration
+    }
