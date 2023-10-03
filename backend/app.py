@@ -1,11 +1,13 @@
 import toml
 from flask import Flask, request
-from flask_mail import Mail
+from flask_mail import Mail, Message
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
 
+from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
+
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -123,6 +125,13 @@ def signup_confirmation(signup_token):
     """
     return handle_signup_confirmation(db, db_cursor, signup_token)
 
+@app.route('/api/forgotPassword', methods=['POST'])
+def forgot_password():
+    return handle_forgot_password(db, db_cursor, request)
+
+@app.route('/resetPassword/<path:reset_token>', methods=['POST'])
+def reset_password(reset_token):
+    return handle_reset_token(reset_token, db, db_cursor, request)
 
 if __name__ == '__main__':
     app.run()
