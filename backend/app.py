@@ -125,13 +125,16 @@ def signup_confirmation(signup_token):
     """
     return handle_signup_confirmation(db, db_cursor, signup_token)
 
+
 @app.route('/api/forgotPassword', methods=['POST'])
 def forgot_password():
-    return handle_forgot_password(db, db_cursor, request)
+    return handle_forgot_password(db, db_cursor, mail, request)
+
 
 @app.route('/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
+
 
 if __name__ == '__main__':
     app.run()

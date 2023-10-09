@@ -1,31 +1,14 @@
-from datetime import datetime, timedelta
-from functools import wraps
+from datetime import datetime
 from uuid import uuid4
 
-import toml
-
-from bcrypt import checkpw, hashpw, gensalt
-from flask import session, url_for, Flask
-from flask_mail import Mail, Message
-from flaskext.mysql import MySQL
-from flask_pymongo import PyMongo
-
-
-
-app = Flask(__name__)
-app.config.from_file("/Users/alainpierre/IdeaProjects/INF2003_ISP_Comparison/backend/config.toml", load=toml.load)
-mail = Mail(app)
-db = MySQL(app).connect()
-db_cursor = db.cursor()
-mongo = PyMongo(app).db
-
-############################
-# Password functions #
-############################
+from bcrypt import hashpw, gensalt
+from flask import url_for
+from flask_mail import Message
 
 password_uuid_dict = {}
 
-def handle_forgot_password(db, db_cursor, request):
+
+def handle_forgot_password(db, db_cursor, mail, request):
     forgotPwd_form_data = request.json
     forgotPwd_email = forgotPwd_form_data['email']
 
@@ -59,8 +42,6 @@ def handle_forgot_password(db, db_cursor, request):
     except Exception as e:
         print("Error: ", e)
         return {"status": "error", "message": "Invalid email"}, 400
-
-
 
     msg = Message("Password Reset Link", sender="inf2003ispcompare@outlook.sg", recipients=['alnes.paronda@gmail.com'])
     msg.body = "You are receiving this email as you have forgotten your password. Clink on this link to reset your password: " + forgotPwd_link
@@ -105,7 +86,6 @@ def handle_reset_token(reset_token, db, db_cursor, request):
     except Exception as e:
         print("Error: ", e)
         return {"status": "error", "message": "Invalid email"}, 400
-
 
     print((datetime.now() - password_uuid_dict[reset_token]).total_seconds())
     password_uuid_dict.pop(reset_token)
