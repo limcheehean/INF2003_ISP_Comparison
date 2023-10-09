@@ -7,7 +7,7 @@ from flaskext.mysql import MySQL
 from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
-
+from components.plans_comparison import get_premiums
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -107,6 +107,53 @@ def forgot_password():
 @app.route('/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
+
+
+@app.route("/api/compare_premiums", methods=["POST"])
+def compare_premiums():
+    """ Compare Premiums API
+
+    This API allows users to retrieve premiums for plans and riders.
+
+    JSON Body Parameters:
+    ---------------------
+    - plans (list): List of objects containing plan_id and/or rider_id
+
+    Return Codes:
+    -------------
+    - 200 OK: Successful signup.
+        - JSON Body:
+            - "status" (str): "success"
+            - "data" (object): Object containing plan, rider and premium information
+
+    Example Request:
+    ---------------
+    POST /compare_premiums
+    Content-Type: application/json
+    {
+        "plans": [
+            {
+                "plan_id": 1,
+                "rider_id": 1
+            }
+        ]
+    }
+
+    Example Response:
+    ----------------
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+        "status": "success",
+        "data": {
+            "comparisons": [...]
+            "plan": {...}
+            "rider": {...}
+        }
+    }
+    """
+    return get_premiums(db, request)
 
 
 if __name__ == '__main__':
