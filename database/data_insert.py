@@ -1,21 +1,16 @@
+from json import load
 from re import sub
 from mysql.connector import connect
 from excel import Excel
 
-local_db = {
-    "host": "localhost",
-    "username": "root",
-    "password": "root"
-}
 
-# Insert it yourself and DO NOT push to repo!!!
-remote_db = {
-    "host": "db.spmovy.com",
-    "username": "inf2002admin",
-    "password": "Password098"
-}
+# Duplicate the db_connections.json file and name it db_connections_local.json
+# DO NOT edit the db_connections.json or push db_connections_local.json to the repository!
+with open("db_connections_local.json", "r") as file:
+    db_connections = load(file)
 
-current_db = remote_db
+# Select the database specified in the file
+current_db = db_connections["local"]
 
 
 def get_column_name(name):
