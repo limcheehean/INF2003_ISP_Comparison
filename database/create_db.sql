@@ -151,3 +151,10 @@ CREATE TABLE RiderBenefitDetail (
     FOREIGN KEY (rider_id) REFERENCES Rider(id),
     FOREIGN KEY (rider_benefit_id) REFERENCES RiderBenefit(id)
 );
+
+CREATE TABLE MediShieldLifePremium (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    age INT,
+    amount DECIMAL(15, 2),
+    annual_withdrawal_limit DECIMAL(15, 2)
+);
