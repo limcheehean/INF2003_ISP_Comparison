@@ -1,4 +1,4 @@
 toml
-flask
+flask 2.3.3
 bcrypt
 Flask-PyMongo
