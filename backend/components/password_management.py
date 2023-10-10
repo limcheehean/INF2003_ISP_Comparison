@@ -13,7 +13,7 @@ from flask_pymongo import PyMongo
 
 
 app = Flask(__name__)
-app.config.from_file("/Users/alainpierre/IdeaProjects/INF2003_ISP_Comparison/backend/config.toml", load=toml.load)
+app.config.from_file("../config.toml", load=toml.load)
 mail = Mail(app)
 db = MySQL(app).connect()
 db_cursor = db.cursor()
