@@ -77,3 +77,17 @@ def get_premiums(db, request):
             comparisons.append({"plan": plan, "rider": rider, "premiums": premiums})
 
     return {"status": "success", "data": {"medishield_life": medishield_life, "comparisons": comparisons}}
+
+
+def filter_by_ward(db, db_cursor, request):
+
+    selectPlan_form_data = request.json
+    ward_type = selectPlan_form_data["ward_type"]
+
+    try:
+        db_cursor.execute("SELECT * FROM PLAN WHERE ward_type = %s", ward_type)
+
+        queried_plans = db_cursor.fetchall()
+
+    except Exception as e:
+        print("Error: " + e)
