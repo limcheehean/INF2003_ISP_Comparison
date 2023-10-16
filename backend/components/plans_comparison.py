@@ -119,10 +119,10 @@ def get_rider_benefits(db_cursor, request):
     
     # Add in the conditions (i.e. what rider ids to look for) into the rider benefit query
     not_first = 0
-    #   Store query
+    #  Variables to store generated queries
     generated_riderbenefitsquery = riderbenefitdetailquery 
     generated_ridernamequery = ridernamequery
-    #   Start adding in rider_ids into the query
+    #   Start adding in rider_ids into the queries
     for rider_id in rider_ids:
         if not_first:
             generated_riderbenefitsquery += " , %s"
@@ -137,68 +137,55 @@ def get_rider_benefits(db_cursor, request):
     print("Generated_ridernamequery: ", generated_ridernamequery)
          
     try:
-        # Get rider benefits from database
+        # Execute queries 
+        #   Get rider benefits from database
         db_cursor.execute(generated_riderbenefitsquery, tuple(rider_ids))
         
-        #Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
+        #   Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
         
         print("Row headers: ", details_row_headers)
 
         queried_riderbenefits = db_cursor.fetchall()
         
-        # Get rider names
+        #   Get rider names
         db_cursor.execute(generated_ridernamequery, tuple(rider_ids))
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
         print("Row headers: ", details_row_headers)
         queried_ridernames = db_cursor.fetchall()
         
-        # Convert queried results into json
-        #json_data=[]
-        json_data = []
+        # Organize the data for table use
+        # Derive 3 types of data: Rows, columns, and cells
+        rider_benefit_details = []
         rider_benefits = {}
         riders = {}
+        
+        # Get riders
         for result in queried_ridernames:
             riders[result[0]] = ({
                 "rider_id": result[0],
                 "rider_name": result[1]
             }
             )
-            '''
-            json_data[result[0]] = ({
-                "rider_id": result[0],
-                "rider_name": result[1],
-                "benefits": []
-            })
-            '''
-        print("All rider layout: ", json_data)
+        # Get rider benefits and rider_benefit_details (cell data)
         for result in queried_riderbenefits:
             if not rider_benefits.get(result[2]): rider_benefits[result[2]] = { "rider_benefit_id": result[2], "rider_benefit_name": result[1]}
-            '''
-            json_data[result[3]]["benefits"].append(
-                {"rider_benefit_id": result[2],
-                 "rider_id": result[3],
-                    "detail": result[0]
-                    }
-            )
-            '''
-            json_data.append({
+            rider_benefit_details.append({
                 "rider_id": result[3],
                 "rider_benefit_id": result[2],
                 "detail": result[0]
             })
         
+        # Convert to json format
         json_data = {
             "rider_benefits": list(rider_benefits.values()),
             "riders": list(riders.values()),
-            "rider_benefit_details": json_data
+            "rider_benefit_details": rider_benefit_details
         }
-        
-        #json_data.append(dict(zip(details_row_headers,result)))
 
     except Exception as e:
         print("Error: ")
         print(e)
         return {"status": "error", "message": "Database query failure"}
 
-    return json_data
+    return {"status": "success", "data": json_data}
