@@ -28,16 +28,16 @@ SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
 FROM riderbenefitdetail AS rbd
 JOIN riderbenefit as rb 
     ON rbd.rider_benefit_id = rb.id 
-"""
+WHERE rbd.rider_id in ("""
 
 #riderbenefitsconditions = """
 #where rider_id = %s
 #"""
 
 ridernamequery = """
-SELECT rb.name, rb.id
+SELECT rb.id, rb.name
 FROM rider AS rb
-"""
+WHERE rb.id in ("""
 
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None):
@@ -109,36 +109,52 @@ def filter_by_ward(db, db_cursor, request):
         print("Error: ", e)
         
 def get_rider_benefits(db_cursor, request):
+    '''
+    This method performs 2 queries: 
+        one to get the rider benefits, while another to get the rider names. 
+    
+    It dynamically generates the queries based on the number of rider ids provided.
+    
+    Parameterized queries are used to prevent sql injection.
+    '''
     
     request_data = request.json
     rider_ids = request_data["rider_ids"]
     
     # Add in the conditions (i.e. what rider ids to look for) into the rider benefit query
     not_first = 0
-    generated_riderbenefitsquery = riderbenefitsquery # Store query
-    #   Start adding in WHERE statements into the query
+    #   Store query
+    generated_riderbenefitsquery = riderbenefitsquery 
+    generated_ridernamequery = ridernamequery
+    #   Start adding in rider_ids into the query
     for rider_id in rider_ids:
         if not_first:
-            generated_riderbenefitsquery += " OR rider_id = %s"
+            generated_riderbenefitsquery += " , %s"
+            generated_ridernamequery += " , %s"
         else:
             not_first = 1
-            generated_riderbenefitsquery += " WHERE rider_id = %s" 
-    generated_riderbenefitsquery += ";"
+            generated_riderbenefitsquery += "%s" 
+            generated_ridernamequery += "%s"
+    generated_riderbenefitsquery += ");"
+    generated_ridernamequery += ");"
     print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
+    print("Generated_ridernamequery: ", generated_ridernamequery)
          
     try:
         # Get rider benefits from database
         db_cursor.execute(generated_riderbenefitsquery, tuple(rider_ids))
         
         #Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
-        row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+        details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+        
+        print("Row headers: ", details_row_headers)
 
         queried_riderbenefits = db_cursor.fetchall()
         
         # Convert queried results into json
         json_data=[]
         for result in queried_riderbenefits:
-            json_data.append(dict(zip(row_headers,result)))
+            json_data.append(dict(zip(details_row_headers,result)))
 
     except Exception as e:
         print("Error: ", e)
