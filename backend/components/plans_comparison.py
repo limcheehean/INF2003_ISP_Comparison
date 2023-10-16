@@ -30,6 +30,22 @@ JOIN riderbenefit as rb
     ON rbd.rider_benefit_id = rb.id 
 WHERE rbd.rider_id in ("""
 
+'''
+SELECT rb.name, rbd1.detail AS '1', rbd2.detail AS '2' 
+FROM riderbenefit rb, riderbenefitdetail rbd1, riderbenefitdetail rbd2 
+WHERE 1 AND rbd1.rider_id = 1 AND rbd2.rider_id = 2 
+AND rb.id = rbd1.rider_benefit_id AND rb.id = rbd2.rider_benefit_id;
+'''
+
+#"""SELECT rb.name"""
+
+#gen_select = lambda count: f",rbd{count}.detail AS %s "
+
+#"""FROM riderbenefit rb, """
+
+#gen_from = lambda count: f", riderbenefitdetail rbd{count} "
+#gen_condition_rid = lambda count:  f" AND rbd{count}.rider_id = %s"
+#gen_condition_rbid = lambda count:  f" AND rb.id = rbd{count}.rider_benefit_id"
 #riderbenefitsconditions = """
 #where rider_id = %s
 #"""
