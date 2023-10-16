@@ -102,7 +102,8 @@ def filter_by_ward(db, db_cursor, request):
         queried_plans = db_cursor.fetchall()
 
     except Exception as e:
-        print("Error: " + e)
+        # Use , instead of +, as e is not a string
+        print("Error: ", e)
         
 def get_rider_benefits(db_cursor, request):
     
