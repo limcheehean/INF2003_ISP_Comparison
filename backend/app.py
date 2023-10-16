@@ -1,5 +1,5 @@
 import toml
-from flask import Flask, request
+from flask import Flask, request, url_for
 from flask_mail import Mail, Message
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
@@ -96,7 +96,7 @@ def signup():
 
 @app.route('/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(signup_token)
+    return handle_signup_confirmation(signup_token, db_cursor, signup_token)
 
 
 @app.route('/api/forgotPassword', methods=['POST'])
