@@ -31,9 +31,9 @@ JOIN riderbenefit as rb
 WHERE rbd.rider_id in ("""
 
 ridernamequery = """
-SELECT rb.id, rb.name
-FROM rider AS rb
-WHERE rb.id in ("""
+SELECT r.id, r.name
+FROM rider AS r
+WHERE r.id in ("""
 
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None):
@@ -131,7 +131,7 @@ def get_rider_benefits(db_cursor, request):
             not_first = 1
             generated_riderbenefitsquery += "%s" 
             generated_ridernamequery += "%s"
-    generated_riderbenefitsquery += ");"
+    generated_riderbenefitsquery += ") ORDER BY rbd.rider_id;"
     generated_ridernamequery += ");"
     print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
     print("Generated_ridernamequery: ", generated_ridernamequery)
@@ -147,14 +147,39 @@ def get_rider_benefits(db_cursor, request):
 
         queried_riderbenefits = db_cursor.fetchall()
         
+        # Get rider names
+        db_cursor.execute(generated_ridernamequery, tuple(rider_ids))
+        details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+        print("Row headers: ", details_row_headers)
+        queried_ridernames = db_cursor.fetchall()
+        
         # Convert queried results into json
-        json_data=[]
+        #json_data=[]
+        json_data = {}
+        rider_benefits = {}
+        for result in queried_ridernames:
+            json_data[result[0]] = ({
+                "rider_id": result[0],
+                "rider_name": result[1],
+                "benefits": []
+            })
+        print("All rider layout: ", json_data)
         for result in queried_riderbenefits:
-            json_data.append(dict(zip(details_row_headers,result)))
+            json_data[result[3]]["benefits"].append(
+                {"rider_benefit_id": result[2],
+                    "detail": result[0]
+                    }
+            )
+        '''
+        json_data = {
+            "riders": list(json_data.values())
+        }
+        '''
+        #json_data.append(dict(zip(details_row_headers,result)))
 
     except Exception as e:
-        print("Error: ", e)
+        print("Error: ")
+        print(e)
         return {"status": "error", "message": "Database query failure"}
-    
-    #print("Json results: ", json_data)
+
     return json_data
