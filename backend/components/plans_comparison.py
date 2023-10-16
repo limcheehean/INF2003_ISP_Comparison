@@ -23,11 +23,11 @@ AND p.plan_id = %s
 AND r.rider_id = %s
 """
 
-riderbenefitsquery = """
+riderbenefitdetailquery = """
 SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
 FROM riderbenefitdetail AS rbd
 JOIN riderbenefit as rb 
-    ON rbd.rider_benefit_id = rb.id 
+    ON rbd.rider_benefit_id = rb.id
 WHERE rbd.rider_id in ("""
 
 ridernamequery = """
@@ -120,7 +120,7 @@ def get_rider_benefits(db_cursor, request):
     # Add in the conditions (i.e. what rider ids to look for) into the rider benefit query
     not_first = 0
     #   Store query
-    generated_riderbenefitsquery = riderbenefitsquery 
+    generated_riderbenefitsquery = riderbenefitdetailquery 
     generated_ridernamequery = ridernamequery
     #   Start adding in rider_ids into the query
     for rider_id in rider_ids:
@@ -155,26 +155,45 @@ def get_rider_benefits(db_cursor, request):
         
         # Convert queried results into json
         #json_data=[]
-        json_data = {}
+        json_data = []
         rider_benefits = {}
+        riders = {}
         for result in queried_ridernames:
+            riders[result[0]] = ({
+                "rider_id": result[0],
+                "rider_name": result[1]
+            }
+            )
+            '''
             json_data[result[0]] = ({
                 "rider_id": result[0],
                 "rider_name": result[1],
                 "benefits": []
             })
+            '''
         print("All rider layout: ", json_data)
         for result in queried_riderbenefits:
+            if not rider_benefits.get(result[2]): rider_benefits[result[2]] = { "rider_benefit_id": result[2], "rider_benefit_name": result[1]}
+            '''
             json_data[result[3]]["benefits"].append(
                 {"rider_benefit_id": result[2],
+                 "rider_id": result[3],
                     "detail": result[0]
                     }
             )
-        '''
+            '''
+            json_data.append({
+                "rider_id": result[3],
+                "rider_benefit_id": result[2],
+                "detail": result[0]
+            })
+        
         json_data = {
-            "riders": list(json_data.values())
+            "rider_benefits": list(rider_benefits.values()),
+            "riders": list(riders.values()),
+            "rider_benefit_details": json_data
         }
-        '''
+        
         #json_data.append(dict(zip(details_row_headers,result)))
 
     except Exception as e:
