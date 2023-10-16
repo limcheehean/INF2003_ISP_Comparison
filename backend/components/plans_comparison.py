@@ -27,8 +27,10 @@ AND r.rider_id = %s
 # If need, then have to add in {join rider on rider_id = rider.id}
 # rbd.detail, rbd.name, rbd.rider_benefit_id, rbd.rider_id
 riderbenefitsquery = """
-SELECT * from riderbenefitdetail rbd
-join riderbenefit on rider_benefit_id = riderbenefit.id 
+SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
+from riderbenefitdetail AS rbd
+join riderbenefit as rb 
+    on rbd.rider_benefit_id = rb.id 
 """
 riderbenefitsconditions = """
 where rider_id = %s
@@ -130,7 +132,8 @@ def get_rider_benefits(db_cursor, request):
             json_data.append(dict(zip(row_headers,result)))
 
     except Exception as e:
-        print("Error: " + e)
+        print("Error: ", e)
+        return {"status": "error", "message": "Database query failure"}
     
     #print("Json results: ", json_data)
     return json_data
