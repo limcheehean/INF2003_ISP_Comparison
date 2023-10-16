@@ -23,6 +23,13 @@ AND p.plan_id = %s
 AND r.rider_id = %s
 """
 
+# <?> Need names of riders? 
+# If need, then have to add in {join rider on rider_id = rider.id}
+riderbenefitsquery = """
+SELECT * from riderbenefitdetail
+join riderbenefit on rider_benefit_id = riderbenefit.id 
+where rider_id = %s;
+"""
 
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None):
@@ -91,3 +98,4 @@ def filter_by_ward(db, db_cursor, request):
 
     except Exception as e:
         print("Error: " + e)
+        
