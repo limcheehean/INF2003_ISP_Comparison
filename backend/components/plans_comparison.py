@@ -23,17 +23,20 @@ AND p.plan_id = %s
 AND r.rider_id = %s
 """
 
-# <?> Need names of riders? 
-# If need, then have to add in {join rider on rider_id = rider.id}
-# rbd.detail, rbd.name, rbd.rider_benefit_id, rbd.rider_id
 riderbenefitsquery = """
 SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
-from riderbenefitdetail AS rbd
-join riderbenefit as rb 
-    on rbd.rider_benefit_id = rb.id 
+FROM riderbenefitdetail AS rbd
+JOIN riderbenefit as rb 
+    ON rbd.rider_benefit_id = rb.id 
 """
-riderbenefitsconditions = """
-where rider_id = %s
+
+#riderbenefitsconditions = """
+#where rider_id = %s
+#"""
+
+ridernamequery = """
+SELECT rb.name, rb.id
+FROM rider AS rb
 """
 
 # Use this method to cache common queries that is unlikely to change
