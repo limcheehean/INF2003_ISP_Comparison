@@ -1,5 +1,5 @@
 import toml
-from flask import Flask, request
+from flask import Flask, request, url_for
 from flask_mail import Mail, Message
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
@@ -7,7 +7,7 @@ from flaskext.mysql import MySQL
 from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
-from components.plans_comparison import get_premiums
+from components.plans_comparison import get_premiums, get_rider_benefits
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -96,7 +96,7 @@ def signup():
 
 @app.route('/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(signup_token)
+    return handle_signup_confirmation(signup_token, db_cursor, signup_token)
 
 
 @app.route('/api/forgotPassword', methods=['POST'])
@@ -107,7 +107,6 @@ def forgot_password():
 @app.route('/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
-
 
 @app.route("/api/compare_premiums", methods=["POST"])
 def compare_premiums():
@@ -155,6 +154,11 @@ def compare_premiums():
     """
     return get_premiums(db, request)
 
+# <?> Check if user is logged in?
+@app.route("/api/get_rider_benefits", methods=["POST"])
+def rider_benefits():
+    return get_rider_benefits(db_cursor, request)
+    
 
 if __name__ == '__main__':
     app.run()

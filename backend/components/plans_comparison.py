@@ -23,6 +23,16 @@ AND p.plan_id = %s
 AND r.rider_id = %s
 """
 
+# <?> Need names of riders? 
+# If need, then have to add in {join rider on rider_id = rider.id}
+# rbd.detail, rbd.name, rbd.rider_benefit_id, rbd.rider_id
+riderbenefitsquery = """
+SELECT * from riderbenefitdetail rbd
+join riderbenefit on rider_benefit_id = riderbenefit.id 
+"""
+riderbenefitsconditions = """
+where rider_id = %s
+"""
 
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None):
@@ -77,3 +87,50 @@ def get_premiums(db, request):
             comparisons.append({"plan": plan, "rider": rider, "premiums": premiums})
 
     return {"status": "success", "data": {"medishield_life": medishield_life, "comparisons": comparisons}}
+
+
+def filter_by_ward(db, db_cursor, request):
+
+    selectPlan_form_data = request.json
+    ward_type = selectPlan_form_data["ward_type"]
+
+    try:
+        db_cursor.execute("SELECT * FROM PLAN WHERE ward_type = %s", ward_type)
+
+        queried_plans = db_cursor.fetchall()
+
+    except Exception as e:
+        print("Error: " + e)
+        
+def get_rider_benefits(db_cursor, request):
+    
+    request_data = request.json
+    rider_ids = request_data["rider_ids"]
+    not_first = 0
+    generated_riderbenefitsquery = riderbenefitsquery
+    for rider_id in rider_ids:
+        if not_first:
+            generated_riderbenefitsquery += " OR rider_id = %s"
+        else:
+            not_first = 1
+            generated_riderbenefitsquery += " WHERE rider_id = %s" 
+    generated_riderbenefitsquery += ";"
+    print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
+            
+    try:
+        db_cursor.execute(generated_riderbenefitsquery, tuple(rider_ids))
+        
+        #Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
+        row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+
+        queried_riderbenefits = db_cursor.fetchall()
+        
+        json_data=[]
+        for result in queried_riderbenefits:
+            json_data.append(dict(zip(row_headers,result)))
+
+    except Exception as e:
+        print("Error: " + e)
+    
+    #print("Json results: ", json_data)
+    return json_data

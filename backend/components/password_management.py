@@ -7,8 +7,13 @@ from flask_mail import Message
 
 password_uuid_dict = {}
 
+############################
+# Password functions #
+############################
 
-def handle_forgot_password(db, db_cursor, mail, request):
+password_uuid_dict = {}
+
+def handle_forgot_password(db, db_cursor, request, mail):
     forgotPwd_form_data = request.json
     forgotPwd_email = forgotPwd_form_data['email']
 
