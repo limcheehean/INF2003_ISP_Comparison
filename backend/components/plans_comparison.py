@@ -112,8 +112,11 @@ def get_rider_benefits(db_cursor, request):
     
     request_data = request.json
     rider_ids = request_data["rider_ids"]
+    
+    # Add in the conditions (i.e. what rider ids to look for) into the rider benefit query
     not_first = 0
-    generated_riderbenefitsquery = riderbenefitsquery
+    generated_riderbenefitsquery = riderbenefitsquery # Store query
+    #   Start adding in WHERE statements into the query
     for rider_id in rider_ids:
         if not_first:
             generated_riderbenefitsquery += " OR rider_id = %s"
@@ -122,8 +125,9 @@ def get_rider_benefits(db_cursor, request):
             generated_riderbenefitsquery += " WHERE rider_id = %s" 
     generated_riderbenefitsquery += ";"
     print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
-            
+         
     try:
+        # Get rider benefits from database
         db_cursor.execute(generated_riderbenefitsquery, tuple(rider_ids))
         
         #Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
@@ -131,6 +135,7 @@ def get_rider_benefits(db_cursor, request):
 
         queried_riderbenefits = db_cursor.fetchall()
         
+        # Convert queried results into json
         json_data=[]
         for result in queried_riderbenefits:
             json_data.append(dict(zip(row_headers,result)))
