@@ -18,7 +18,7 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
 import { Link } from 'react-router-dom';
-import Slide from '@mui/material/Slide';
+//import Slide from '@mui/material/Slide';
 
 
 interface FormElements extends HTMLFormControlsCollection {
