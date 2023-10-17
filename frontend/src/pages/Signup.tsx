@@ -22,7 +22,6 @@ interface FormElements extends HTMLFormControlsCollection {
     fullName: HTMLInputElement;
     email: HTMLInputElement;
     password: HTMLInputElement;
-    persistent: HTMLInputElement;
 }
 interface SignUpFormElement extends HTMLFormElement {
     readonly elements: FormElements;
@@ -160,7 +159,6 @@ export default function SignUp() {
                                         fullName: formElements.fullName.value,
                                         email: formElements.email.value,
                                         password: formElements.password.value,
-                                        persistent: formElements.persistent.checked,
                                     };
                                     alert(JSON.stringify(data, null, 2));
                                 }}
