@@ -155,9 +155,9 @@ const Login = () => {
                 <Typography level="h3">Sign in</Typography>
                 <Typography level="body-sm">
                   New to company?{' '}
-                  <a href="#replace-with-a-link">
+                  <Link to="/Signup">
                     Sign up!
-                  </a>
+                  </Link>
                 </Typography>
               </Stack>
 
