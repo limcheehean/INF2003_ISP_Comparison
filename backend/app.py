@@ -4,6 +4,7 @@ from flask_mail import Mail, Message
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
 
+from components.co_payment_calculator import calculate_co_payment
 from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
@@ -108,6 +109,7 @@ def forgot_password():
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
 
+
 @app.route("/api/compare_premiums", methods=["POST"])
 def compare_premiums():
     """ Compare Premiums API
@@ -120,7 +122,7 @@ def compare_premiums():
 
     Return Codes:
     -------------
-    - 200 OK: Successful signup.
+    - 200 OK: Premiums retrieved successfully
         - JSON Body:
             - "status" (str): "success"
             - "data" (object): Object containing plan, rider and premium information
@@ -153,6 +155,7 @@ def compare_premiums():
     }
     """
     return get_premiums(db, request)
+
 
 # <?> Check if user is logged in?
 @app.route("/api/get_rider_benefits", methods=["POST"])
@@ -228,7 +231,62 @@ def rider_benefits():
     }
     """
     return get_rider_benefits(db_cursor, request)
-    
+
+
+@app.route("/api/co_payment", methods=["POST"])
+def co_payment():
+    """ Co-payment Calculator API
+
+    This API allows users to calculate their co-payment amount for their hospital bill.
+
+    JSON Body Parameters:
+    ---------------------
+    - total_bill (float): total hospital bill amount
+    - plan_id: id of selected plan
+    - rider_id: id of selected rider
+    - age: age of insured
+    - ward_type: ward class billed by hospital
+
+    Return Codes:
+    -------------
+    - 200 OK: Premiums retrieved successfully
+        - JSON Body:
+            - "status" (str): "success"
+            - "data" (object): Object containing data about the cash and claimable breakdown
+
+    Example Request:
+    ---------------
+    POST /api/co_payment
+    Content-Type: application/json
+    {
+        "total_bill": 200000,
+         "plan_id": 3,
+         "rider_id": 4,
+        "age": 65,
+        "ward_type": "B1"
+    }
+
+    Example Response:
+    ----------------
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+      "data": {
+        "cash_payment": 3000.0,
+        "co_insurance": 9875.0,
+        "co_payment": 3000.0,
+        "covered": 197000.0,
+        "deductible": 125.0,
+        "over_limit": 0,
+        "pro_ration": 0.0,
+        "total_bill": 200000
+      },
+      "status": "success"
+    }
+    """
+    return calculate_co_payment(request, db)
+
 
 if __name__ == '__main__':
     app.run()
