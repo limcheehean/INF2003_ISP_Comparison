@@ -1,5 +1,5 @@
 import toml
-from flask import Flask, request
+from flask import Flask, request, url_for
 from flask_mail import Mail, Message
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
@@ -7,7 +7,7 @@ from flaskext.mysql import MySQL
 from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
-from components.plans_comparison import get_premiums
+from components.plans_comparison import get_premiums, get_rider_benefits
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -96,7 +96,7 @@ def signup():
 
 @app.route('/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(signup_token)
+    return handle_signup_confirmation(signup_token, db_cursor, signup_token)
 
 
 @app.route('/api/forgotPassword', methods=['POST'])
@@ -107,7 +107,6 @@ def forgot_password():
 @app.route('/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
-
 
 @app.route("/api/compare_premiums", methods=["POST"])
 def compare_premiums():
@@ -155,6 +154,81 @@ def compare_premiums():
     """
     return get_premiums(db, request)
 
+# <?> Check if user is logged in?
+@app.route("/api/get_rider_benefits", methods=["POST"])
+def rider_benefits():
+    """ Get Rider Benefits API
+
+    This API allows users to retrieve relevant rider benefit details.
+
+    JSON Body Parameters:
+    ---------------------
+    - rider_ids (list): List of objects containing rider_ids
+    
+    Example request body:
+        {
+            "rider_ids": [1,2,3]
+        }
+
+    Return Codes:
+    -------------
+    - 200 OK: Successfully retrieved data
+        - JSON Body:
+            - "status" (str): "success"
+            - "data" (object): Object containing rider_benefits, riders, and rider_benefit_details
+                    - "rider_benefits" (list): A list of rider benefits, which can be used as row labels.
+                            (rider_benefit_id, rider_benefit_name)
+                    - "riders" (list): A list of riders, which can be used as column headers.
+                            (rider_id, rider_name)
+                    - "rider_benefit_details" (object): List of rider benefit details 
+                            (contains detail, rider_id, rider_benefit)
+    
+    Example on possible way to build table here:
+    https://codesandbox.io/embed/material-ui-menu-test-forked-ykks5c?fontsize=14&hidenavigation=1&theme=dark
+
+    Example Request:
+    ---------------
+    POST /api/get_rider_benefits
+    Content-Type: application/json
+    {
+        "rider_ids": ["1","2","3"]
+    }
+
+    Example Response:
+    ----------------
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+        "status": "success",
+        "data": {
+            "rider_benefit_details": [
+                {
+                    "detail": "Detail 1",
+                    "rider_benefit_id": 1,
+                    "rider_id": 1
+                },
+                ...
+            },
+            "riders": [
+                {
+                    "rider_id": 1,
+                    "rider_name": "Rider A"
+                },
+                ...
+            ]
+            "rider_benefits": [
+                {
+                    "rider_benefit_id": 1,
+                    "rider_benefit_name": "Outpatient benefit"
+                },
+                ...
+            ]
+        }
+    }
+    """
+    return get_rider_benefits(db_cursor, request)
+    
 
 if __name__ == '__main__':
     app.run()

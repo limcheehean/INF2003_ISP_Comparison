@@ -23,6 +23,17 @@ AND p.plan_id = %s
 AND r.rider_id = %s
 """
 
+riderbenefitdetailquery = """
+SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
+FROM riderbenefitdetail AS rbd
+JOIN riderbenefit as rb 
+    ON rbd.rider_benefit_id = rb.id
+WHERE rbd.rider_id in ("""
+
+ridernamequery = """
+SELECT r.id, r.name
+FROM rider AS r
+WHERE r.id in ("""
 
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None):
@@ -90,4 +101,91 @@ def filter_by_ward(db, db_cursor, request):
         queried_plans = db_cursor.fetchall()
 
     except Exception as e:
-        print("Error: " + e)
+        # Use , instead of +, as e is not a string
+        print("Error: ", e)
+        
+def get_rider_benefits(db_cursor, request):
+    '''
+    This method performs 2 queries: 
+        one to get the rider benefits, while another to get the rider names. 
+    
+    It dynamically generates the queries based on the number of rider ids provided.
+    
+    Parameterized queries are used to prevent sql injection.
+    '''
+    
+    request_data = request.json
+    rider_ids = request_data["rider_ids"]
+    
+    # Add in the conditions (i.e. what rider ids to look for) into the rider benefit query
+    not_first = 0
+    #  Variables to store generated queries
+    generated_riderbenefitsquery = riderbenefitdetailquery 
+    generated_ridernamequery = ridernamequery
+    #   Start adding in rider_ids into the queries
+    for rider_id in rider_ids:
+        if not_first:
+            generated_riderbenefitsquery += " , %s"
+            generated_ridernamequery += " , %s"
+        else:
+            not_first = 1
+            generated_riderbenefitsquery += "%s" 
+            generated_ridernamequery += "%s"
+    generated_riderbenefitsquery += ") ORDER BY rbd.rider_id;"
+    generated_ridernamequery += ");"
+    print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
+    print("Generated_ridernamequery: ", generated_ridernamequery)
+         
+    try:
+        # Execute queries 
+        #   Get rider benefits from database
+        db_cursor.execute(generated_riderbenefitsquery, tuple(rider_ids))
+        
+        #   Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
+        details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+        
+        print("Row headers: ", details_row_headers)
+
+        queried_riderbenefits = db_cursor.fetchall()
+        
+        #   Get rider names
+        db_cursor.execute(generated_ridernamequery, tuple(rider_ids))
+        details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
+        print("Row headers: ", details_row_headers)
+        queried_ridernames = db_cursor.fetchall()
+        
+        # Organize the data for table use
+        # Derive 3 types of data: Rows, columns, and cells
+        rider_benefit_details = []
+        rider_benefits = {}
+        riders = {}
+        
+        # Get riders
+        for result in queried_ridernames:
+            riders[result[0]] = ({
+                "rider_id": result[0],
+                "rider_name": result[1]
+            }
+            )
+        # Get rider benefits and rider_benefit_details (cell data)
+        for result in queried_riderbenefits:
+            if not rider_benefits.get(result[2]): rider_benefits[result[2]] = { "rider_benefit_id": result[2], "rider_benefit_name": result[1]}
+            rider_benefit_details.append({
+                "rider_id": result[3],
+                "rider_benefit_id": result[2],
+                "detail": result[0]
+            })
+        
+        # Convert to json format
+        json_data = {
+            "rider_benefits": list(rider_benefits.values()),
+            "riders": list(riders.values()),
+            "rider_benefit_details": rider_benefit_details
+        }
+
+    except Exception as e:
+        print("Error: ")
+        print(e)
+        return {"status": "error", "message": "Database query failure"}
+
+    return {"status": "success", "data": json_data}
