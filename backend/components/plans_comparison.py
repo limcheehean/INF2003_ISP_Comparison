@@ -1,27 +1,7 @@
+from re import sub
+from typing import Union
+
 from CustomDictCursor import CustomDictCursor
-
-standalone_plan_premiums_sql = """
-SELECT p.age,
-       p.amount AS plan_premium,
-       m.amount + p.amount AS total,
-       GREATEST(0, (p.amount - annual_withdrawal_limit)) AS cash_outlay
-FROM medishieldlifepremium m, planpremium p
-WHERE m.age = p.age
-AND p.plan_id = %s;
-"""
-
-plan_rider_premiums_sql = """
-SELECT p.age,
-       p.amount AS plan_premium,
-       r.amount AS rider_premium,
-       m.amount + p.amount + r.amount AS total,
-       GREATEST(0, (p.amount - annual_withdrawal_limit)) + r.amount AS cash_outlay
-FROM medishieldlifepremium m, planpremium p, riderpremium r
-WHERE m.age = p.age
-AND m.age = r.age
-AND p.plan_id = %s
-AND r.rider_id = %s
-"""
 
 riderbenefitdetailquery = """
 SELECT rbd.detail, rb.name, rbd.rider_benefit_id, rbd.rider_id
@@ -47,8 +27,9 @@ SELECT p.id, p.name
 FROM plan AS p
 WHERE p.id in ("""
 
+
 # Use this method to cache common queries that is unlikely to change
-def get_common_data(collection, query, find=None):
+def get_common_data(collection, query, find=None) -> Union[list, dict]:
 
     from app import mongo, db
 
@@ -66,6 +47,29 @@ def get_common_data(collection, query, find=None):
     return entry
 
 
+def get_child_columns_for_premiums_table(set_num, has_rider):
+    child_columns = [
+        {
+            "name": f"set_{set_num}_plan_premium",
+            "text": "Plan Premium",
+        },
+        {
+            "name": f"set_{set_num}_total_premium",
+            "text": "Total Premium"
+        },
+        {
+            "name": f"set_{set_num}_cash_outlay",
+            "text": "Cash Outlay"
+        }
+    ]
+    if has_rider:
+        child_columns.insert(1, {
+            "name": f"set_{set_num}_rider_premium",
+            "text": "Rider Premium"
+        })
+    return child_columns
+
+
 def get_premiums(db, request):
 
     plans = request.json.get("plans")
@@ -74,32 +78,104 @@ def get_premiums(db, request):
     if not plans:
         return {"status": "error", "message": "No plans to compare"}, 400
 
-    # Get Medishield Life data
-    medishield_life = get_common_data("medishield_life", "SELECT age, amount, annual_withdrawal_limit from MediShieldLifePremium")
+    columns = [
+        {
+            "name": "age",
+            "text": "Age"
+        },
+        {
+            "name": "medishield_life_premium",
+            "text": "MediShield Life Premium"
+        },
+        {
+            "name": "annual_withdrawal_limit",
+            "text": "Annual Withdrawal Limit"
+        }
+    ]
 
-    comparisons = []
+    select_template_rider = """
+        p?.amount AS set_?_plan_premium,
+        r?.amount AS set_?_rider_premium,
+        m.amount + p?.amount + r?.amount AS set_?_total_premium,
+        GREATEST(0, p?.amount - annual_withdrawal_limit) AS set_?_cash_outlay
+    """
 
-    # Get data for each plan + rider set
-    for entry in plans:
+    select_template_no_rider = """
+        p?.amount AS set_?_plan_premium,
+        m.amount + p?.amount AS set_?_total_premium,
+        GREATEST(0, p?.amount - annual_withdrawal_limit) AS set_?_cash_outlay
+    """
 
-        plan_id = entry.get("plan_id")
-        rider_id = entry.get("rider_id")
+    from_template_rider = """
+        PlanPremium p?,
+        RiderPremium r?
+    """
 
-        plan = get_common_data("plans", "SELECT * FROM plan", {"id": plan_id})
+    from_template_no_rider = """
+        PlanPremium p?
+    """
 
-        # Standalone plan
-        if rider_id is None:
-            cursor.execute(standalone_plan_premiums_sql, (plan_id,))
-            premiums = cursor.fetchall()
-            comparisons.append({"plan": plan, "premiums": premiums})
-        # Plan + Rider
+    where_template_rider = """
+        m.age = p?.age AND
+        m.age = r?.age AND
+        p?.plan_id = %s AND
+        r?.rider_id = %s
+    """
+
+    where_template_no_rider = """
+        m.age = p?.age AND
+        p?.plan_id = %s
+    """
+
+    select_part = []
+    from_part = []
+    where_part = []
+    params_part = []
+
+    for _, plan in enumerate(plans):
+
+        plan_id = plan.get("plan_id")
+        rider_id = plan.get("rider_id")
+
+        # Get plan and rider data
+        plan = get_common_data("plans", "SELECT * FROM Plan", {"id": plan_id})
+        rider = get_common_data("riders", "SELECT * FROM Rider", {"id": rider_id}) if rider_id else None
+
+        # Add columns
+        columns.append({
+            "name": f"set_{_}",
+            "text": f"{plan.get('name')}{' + ' + rider.get('name') if rider else ''}",
+            "children": get_child_columns_for_premiums_table(_, rider is not None)
+        })
+
+        # Build sql query
+        if rider:
+            select_part.append(select_template_rider.replace("?", str(_)))
+            from_part.append(from_template_rider.replace("?", str(_)))
+            where_part.append(where_template_rider.replace("?", str(_)))
+            params_part.append(plan_id)
+            params_part.append(rider_id)
         else:
-            rider = get_common_data("riders", "SELECT * FROM rider", {"id": rider_id})
-            cursor.execute(plan_rider_premiums_sql, (plan_id, rider_id))
-            premiums = cursor.fetchall()
-            comparisons.append({"plan": plan, "rider": rider, "premiums": premiums})
+            select_part.append(select_template_no_rider.replace("?", str(_)))
+            from_part.append(from_template_no_rider.replace("?", str(_)))
+            where_part.append(where_template_no_rider.replace("?", str(_)))
+            params_part.append(plan_id)
 
-    return {"status": "success", "data": {"medishield_life": medishield_life, "comparisons": comparisons}}
+    # Combine queries
+    query = f"""
+        SELECT m.age, m.amount AS medishield_life_premium, m.annual_withdrawal_limit, {', '.join(select_part)}
+        FROM MediShieldLifePremium m, {', '.join(from_part)}
+        WHERE {' AND '.join(where_part)}
+    """
+
+    # To remove for prod
+    print(query)
+    print(params_part)
+
+    cursor.execute(query, params_part)
+    results = cursor.fetchall()
+
+    return {"status": "success", "data": {"columns": columns, "rows": results}}
 
 
 def filter_by_ward(db, db_cursor, request):
@@ -116,6 +192,7 @@ def filter_by_ward(db, db_cursor, request):
         # Use , instead of +, as e is not a string
         print("Error: ", e)
 
+
 def filter_by_company(db, db_cursor, request):
 
     selectPlan_form_data = request.json
@@ -130,6 +207,7 @@ def filter_by_company(db, db_cursor, request):
         # Use , instead of +, as e is not a string
         print("Error: ", e)
 
+
 def filter_by_policylimit(db, db_cursor, request):
 
     selectPlan_form_data = request.json
@@ -143,6 +221,7 @@ def filter_by_policylimit(db, db_cursor, request):
     except Exception as e:
         # Use , instead of +, as e is not a string
         print("Error: ", e)
+
 
 def get_plan_benefits(db_cursor, request):
     '''
@@ -231,6 +310,7 @@ def get_plan_benefits(db_cursor, request):
         return {"status": "error", "message": "Database query failure"}
 
     return {"status": "success", "data": json_data}
+
 
 def get_rider_benefits(db_cursor, request):
     '''
