@@ -125,7 +125,7 @@ def compare_premiums():
     - 200 OK: Premiums retrieved successfully
         - JSON Body:
             - "status" (str): "success"
-            - "data" (object): Object containing plan, rider and premium information
+            - "data" (object): Object containing table rows and columns
 
     Example Request:
     ---------------
@@ -148,9 +148,8 @@ def compare_premiums():
     {
         "status": "success",
         "data": {
-            "comparisons": [...]
-            "plan": {...}
-            "rider": {...}
+            "columns": [],
+            "rows": []
         }
     }
     """
