@@ -48,13 +48,13 @@ def handle_forgot_password(db, db_cursor, request, mail):
         print("Error: ", e)
         return {"status": "error", "message": "Invalid email"}, 400
 
-    msg = Message("Password Reset Link", sender="inf2003ispcompare@outlook.sg", recipients=['alnes.paronda@gmail.com'])
+    msg = Message("Password Reset Link", sender="inf2003ispcompare@outlook.sg", recipients=forgotPwd_email)
     msg.body = "You are receiving this email as you have forgotten your password. Clink on this link to reset your password: " + forgotPwd_link
     mail.send(msg)
 
     password_uuid_dict.update({str(forgotPwd_token): datetime.now()})
 
-    return 'Password reset link has been sent to your email!'
+    return {"status": "success", "message": "Password reset link has been sent to your email!"}, 200
 
 
 def handle_reset_token(reset_token, db, db_cursor, request):
@@ -95,4 +95,4 @@ def handle_reset_token(reset_token, db, db_cursor, request):
     print((datetime.now() - password_uuid_dict[reset_token]).total_seconds())
     password_uuid_dict.pop(reset_token)
 
-    return "Password has been reset."
+    return {"status": "success", "message": "Password has been reset."}, 200
