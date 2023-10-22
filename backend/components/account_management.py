@@ -147,15 +147,13 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     print("Sign up confirmation link: ", signup_confirmation_link)
 
     # Send confirmation email
-    
-    '''
+
     msg = Message("Confirmation link",
-                  sender="inf2003ispcompare@outlook.sg",
+                  sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
-    
+
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
     mail.send(msg)
-    '''
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return "Signup request received"
