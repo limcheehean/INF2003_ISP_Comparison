@@ -4,12 +4,9 @@ import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
-//import Checkbox from '@mui/joy/Checkbox';
-//import Divider from '@mui/joy/Divider';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel, { formLabelClasses } from '@mui/joy/FormLabel';
 import IconButton, { IconButtonProps } from '@mui/joy/IconButton';
-//import Link from '@mui/joy/Link';
 import Input from '@mui/joy/Input';
 import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
@@ -17,6 +14,7 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 
 interface FormElements extends HTMLFormControlsCollection {
     fullName: HTMLInputElement;
@@ -59,6 +57,34 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 }
 
 export default function SignUp() {
+
+    const handleSubmit = async (event: React.FormEvent<SignUpFormElement>) => {
+        event.preventDefault();
+        const formElements = event.currentTarget.elements;
+        const data = {
+            name: formElements.fullName.value,
+            email: formElements.email.value,
+            password: formElements.password.value,
+        };
+        alert(JSON.stringify(data, null, 2));
+
+        try {
+            const response = await axios.post('/api/signup', data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            const responseData = response.data;
+            console.log(responseData);
+
+        } catch (error) {
+            console.error('Problem with Axios operation', error);
+        }
+
+    };
+
+
     return (
         <CssVarsProvider defaultMode="dark" disableTransitionOnChange>
             <CssBaseline />
@@ -151,18 +177,7 @@ export default function SignUp() {
                             <Stack gap={1}>
                                 <Typography level="h3">Sign up</Typography>
                             </Stack>
-                            <form
-                                onSubmit={(event: React.FormEvent<SignUpFormElement>) => {
-                                    event.preventDefault();
-                                    const formElements = event.currentTarget.elements;
-                                    const data = {
-                                        fullName: formElements.fullName.value,
-                                        email: formElements.email.value,
-                                        password: formElements.password.value,
-                                    };
-                                    alert(JSON.stringify(data, null, 2));
-                                }}
-                            >
+                            <form onSubmit={handleSubmit}>
                                 <FormControl required>
                                     <FormLabel>Full Name</FormLabel>
                                     <Input type="text" name="fullName" />
