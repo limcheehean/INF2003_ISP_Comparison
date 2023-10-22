@@ -158,7 +158,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     """
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
-    return {"status": "success", "message": "Signup request received"}, 200
+    return {"status": "success", "message": "Account activation link sent to email"}, 200
 
 
 def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, signup_token):

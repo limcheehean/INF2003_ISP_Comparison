@@ -89,7 +89,7 @@ def signup():
 
     {
         "status": "success",
-        "message": "Signup successful"
+        "message": "Account activation link sent to email"
     }
 """
     return handle_signup(db, db_cursor, mail, request)
