@@ -1,4 +1,6 @@
-import * as React from 'react';
+// import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import Axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -17,9 +19,8 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
-import { Link } from 'react-router-dom';
 import Slide from '@mui/material/Slide';
-
+import { Link, useNavigate } from 'react-router-dom';
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
@@ -61,7 +62,29 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   );
 }
 
-const Login = () => {
+function Login() {
+  const navigate = useNavigate();
+
+  // State to store user input
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  const handleLogin = async () => {
+    try {
+      const requestData = {email, password}; // Combine email and password in one object
+      const requestHeaders = {'Content-Type': 'application/json'};
+
+      const response = await Axios.post('api/login', requestData, {headers: requestHeaders});
+      // Handle the response - redirect to the dashboard
+      console.log('Login successful: ', response.data);
+      // Code to redirect to the dashboard goes here
+      navigate('/forgetPassword');
+    } catch (error) {
+      // Handle other types of errors
+      console.error('Unknown error:', error);
+    }
+  };
+
   return (
 
     <CssVarsProvider defaultMode="dark" disableTransitionOnChange>
@@ -150,7 +173,7 @@ const Login = () => {
               },
             }}
           >
-            <Stack gap={4} sx={{ mb: 2 }}>
+            {/* <Stack gap={4} sx={{ mb: 2 }}>
               <Stack gap={1}>
                 <Typography level="h3">Sign in</Typography>
                 <Typography level="body-sm">
@@ -182,7 +205,7 @@ const Login = () => {
               })}
             >
               or
-            </Divider>
+            </Divider> */}
             <Stack gap={4} sx={{ mt: 2 }}>
               <form
                 onSubmit={(event: React.FormEvent<SignInFormElement>) => {
@@ -198,11 +221,11 @@ const Login = () => {
               >
                 <FormControl required>
                   <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" />
+                  <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </FormControl>
                 <FormControl required>
                   <FormLabel>Password</FormLabel>
-                  <Input type="password" name="password" />
+                  <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
@@ -217,7 +240,7 @@ const Login = () => {
                       Forgot your password?
                     </Link>
                   </Box>
-                  <Button type="submit" fullWidth>
+                  <Button onClick={handleLogin} type="submit" fullWidth>
                     Sign in
                   </Button>
                 </Stack>
