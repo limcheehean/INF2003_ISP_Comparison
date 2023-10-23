@@ -3,7 +3,7 @@ from functools import wraps
 from uuid import uuid4
 
 from bcrypt import checkpw, hashpw, gensalt
-from flask import session, url_for
+from flask import session, url_for, redirect
 
 # utility functions
 from utility import email_check, password_check, hash_password, name_check
@@ -122,7 +122,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     #   (UUID is used in the confirmation link)
     #   Python's UUID4 uses urandom (cannot be seeded)
     signup_token = uuid4()
-    signup_confirmation_link = url_for('signup_confirmation', _external=True, signup_token=str(signup_token))
+    signup_confirmation_link = url_for('/api/signup_confirmation', _external=True, signup_token=str(signup_token))
 
     token_created = datetime.now()
     # Store signup details (name, normalized email, hashed password), sign up UUID, into database
@@ -186,7 +186,7 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
                               WHERE id = %s;
                               """, user[0])
             db.commit()
-            return {"status": "success", "message": "Account successfully activated."}, 200
+            return redirect("http://localhost:3000/")
 
 
 def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
