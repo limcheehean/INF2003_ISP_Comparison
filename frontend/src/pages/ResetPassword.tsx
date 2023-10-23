@@ -17,7 +17,7 @@ import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2'
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -70,6 +70,7 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 function ResetPassword() {
 
     const { resetToken } = useParams();
+    const navigate = useNavigate();
 
     console.log(resetToken);
 
@@ -92,7 +93,11 @@ function ResetPassword() {
           text: 'Successfully reset your password',
           icon: 'success',
           confirmButtonText: 'Cool'
-        });
+        }).then(function (result) {
+          if (result.value) {
+              navigate('/');
+          }
+      })
        
         const responseData = response.data;
         console.log(responseData);
