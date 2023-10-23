@@ -74,10 +74,6 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 // This chunk handles the reset password function
 function ResetPassword() {
   
-    // const [newPassword, setNewPassword] = useState('');
-    // const [confirmPassword, setConfirmPassword] = useState('');
-    // const [resetSuccessful, setResetSuccessful] = useState(false);
-
     const { resetToken } = useParams();
 
     console.log(resetToken);
