@@ -17,15 +17,10 @@ import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import GoogleIcon from '../GoogleIcon';
 import { Link, useParams } from 'react-router-dom';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
+import Swal from 'sweetalert2'
 
 interface FormElements extends HTMLFormControlsCollection {
-  // email: HTMLInputElement;
-  // // password: HTMLInputElement;
-  // // persistent: HTMLInputElement;
 
   password: HTMLInputElement;
   confirmPassword: HTMLInputElement;
@@ -73,7 +68,7 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 
 // This chunk handles the reset password function
 function ResetPassword() {
-  
+
     const { resetToken } = useParams();
 
     console.log(resetToken);
@@ -91,9 +86,18 @@ function ResetPassword() {
             'Content-Type': 'application/json'
           }
         });
-  
+
+        Swal.fire({
+          title: 'Success',
+          text: 'Successfully reset your password',
+          icon: 'success',
+          confirmButtonText: 'Cool'
+        });
+       
         const responseData = response.data;
         console.log(responseData);
+
+
 
   
       } catch (error) {
