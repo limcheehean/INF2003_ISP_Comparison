@@ -13,14 +13,24 @@ password_uuid_dict = {}
 
 password_uuid_dict = {}
 
-def handle_forgot_password(db, db_cursor, request, mail):
+def handle_forgot_password(db, db_cursor, mail, request):
     forgotPwd_form_data = request.json
+
+    # Check if 'email' key exists in the JSON data
+    if not forgotPwd_form_data or 'email' not in forgotPwd_form_data:
+        return {"status": "error", "message": "Email is missing from the request"}, 400
+
     forgotPwd_email = forgotPwd_form_data['email']
 
     print("lel: ", forgotPwd_email)
 
+    frontend_base_url = 'localhost:3000'
+
     forgotPwd_token = uuid4()
-    forgotPwd_link = url_for('reset_password', _external=True, reset_token=str(forgotPwd_token))
+    # forgotPwd_link = url_for('reset_password', _external=True, reset_token=str(forgotPwd_token))
+    # forgotPwd_link = f'http://{frontend_base_url}{url_for("reset_password", reset_token=str(forgotPwd_token))}'
+
+    forgotPwd_link = f'http://{frontend_base_url}/resetPassword/{forgotPwd_token}'
 
     print("link: ", forgotPwd_link)
     print("token: ", forgotPwd_token)
@@ -48,9 +58,10 @@ def handle_forgot_password(db, db_cursor, request, mail):
         print("Error: ", e)
         return {"status": "error", "message": "Invalid email"}, 400
 
-    msg = Message("Password Reset Link", sender="inf2003ispcompare@outlook.sg", recipients=['alnes.paronda@gmail.com'])
+    msg = Message("Password Reset Link", sender=("ISP Comparison", "admin@ispcompare.spmovy.com"), recipients=[forgotPwd_email])
     msg.body = "You are receiving this email as you have forgotten your password. Clink on this link to reset your password: " + forgotPwd_link
     mail.send(msg)
+
 
     password_uuid_dict.update({str(forgotPwd_token): datetime.now()})
 
