@@ -185,6 +185,7 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
                               SET token = NULL, activated = True 
                               WHERE id = %s;
                               """, user[0])
+            db.commit()
             return {"status": "success", "message": "Account successfully activated."}, 200
 
 
