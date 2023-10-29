@@ -9,7 +9,7 @@ from components.password_management import handle_forgot_password, handle_reset_
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
 
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, get_plans
 from components.user_plans import update_user_plans, get_user_plan_data
 
 
@@ -311,6 +311,11 @@ def get_user_plans():
 @require_login
 def add_or_edit_user_plans():
     return update_user_plans(db, mongo, request)
+
+@app.route("/api/user_plans", methods=["Delete"])
+@require_login
+def delete_user_plans():
+    return delete_user_plans(db, mongo, request)
 
 
 if __name__ == '__main__':

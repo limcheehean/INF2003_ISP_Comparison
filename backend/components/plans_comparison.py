@@ -333,12 +333,6 @@ def get_plans(db_cursor, request):
 
     return {"status": "success", "data": json_data}
 
-
-
-#     for ward_type in ward_types:
-#         if not_first:
-#             generated_planquery += " "
-
 def get_plan_benefits(db_cursor, request):
     '''
     Duplicated over from get_rider_benefits.

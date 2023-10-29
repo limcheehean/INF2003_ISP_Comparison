@@ -118,3 +118,25 @@ def update_user_plans(db, mongo, request):
 
     db.commit()
     return {"status": "successful", "message": "User plan inserted successfully"}
+
+def delete_user_plans(db, mongo, request):
+
+    user_id = mongo.session.find_one({"session_id": session.get("uid")}).get("user_id")
+
+    try:
+        cursor = db.cursor()
+
+        sql = "DELETE FROM userplan WHERE user_id = %s "
+        values.append(user_id)
+        cursor.execute(sql, values)
+
+        db.commit()
+
+        return {"status": "successful", "message": "User plan deleted successfully"}
+
+    except Exception as e:
+        print("Error: ")
+        print(e)
+        return {"status": "error", "message": "Database query failure"}
+
+
