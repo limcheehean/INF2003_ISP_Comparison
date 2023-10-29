@@ -28,6 +28,8 @@ FROM plan AS p
 WHERE p.id in ("""
 
 
+
+
 # Use this method to cache common queries that is unlikely to change
 def get_common_data(collection, query, find=None) -> Union[list, dict]:
 
@@ -222,6 +224,120 @@ def filter_by_policylimit(db, db_cursor, request):
         # Use , instead of +, as e is not a string
         print("Error: ", e)
 
+planquery = """
+SELECT p.id, p.name, r.id, r.plan_id, r.name
+FROM plan as p
+JOIN rider as r
+    ON p.id = r.plan_id
+WHERE p.company_id in ("""
+
+
+def get_plans(db_cursor, request):
+    '''
+    To get the plans by either their Ward Type or Company ID
+
+    '''
+
+    request_data = request.json
+    company_ids = request_data["company_ids"]
+    ward_types = request_data["ward_types"]
+
+    not_first = 0
+    generated_planquery = planquery
+
+    for company_id in company_ids:
+        if not_first:
+            generated_planquery += " , %s"
+        else:
+            not_first = 1
+            generated_planquery += "%s"
+    generated_planquery += ") "
+
+
+    if len(ward_types):
+        not_first_second = 0
+        #List is not empty
+        generated_planquery += "AND p.ward_type in ("
+        for ward_type in ward_types:
+            if not_first_second:
+                generated_planquery += " , %s"
+            else:
+                not_first_second = 1
+                generated_planquery += "%s"
+        generated_planquery += ") "
+
+        print("Generated plan query 1: ", generated_planquery)
+
+        combinedTuple = company_ids + ward_types
+
+        try:
+            db_cursor.execute(generated_planquery, tuple(combinedTuple))
+            details_row_headers=[x[0] for x in db_cursor.description]
+            print("Row headers: ", details_row_headers)
+
+            queried_plan = db_cursor.fetchall()
+
+            plans = {}
+
+            print("result: ", queried_plan)
+
+            for result in queried_plan:
+                plans[result[0]] = ({
+                    "plan_id": result[0],
+                    "plan_name": result[1],
+                    "rider_id": result[2],
+                    "rider_name": result[4]
+                })
+
+            json_data = {
+                "plans": list(plans.values())
+            }
+
+        except Exception as e:
+             print("Error: ")
+             print(e)
+             return {"status": "error", "message": "Database query failure"}
+
+
+    else:
+        print("Generated plan query 2: ", generated_planquery)
+
+        try:
+            db_cursor.execute(generated_planquery, tuple(company_ids))
+            details_row_headers=[x[0] for x in db_cursor.description]
+            print("Row headers: ", details_row_headers)
+
+            queried_plan = db_cursor.fetchall()
+
+            plans = {}
+
+            print("result: ", queried_plan)
+
+            for result in queried_plan:
+                plans[result[0]] = ({
+                    "plan_id": result[0],
+                    "plan_name": result[1],
+                    "rider_id": result[3],
+                    "rider_name": result[4]
+                })
+
+            json_data = {
+                "plans": list(plans.values())
+            }
+
+        except Exception as e:
+             print("Error: ")
+             print(e)
+             return {"status": "error", "message": "Database query failure"}
+
+
+    return {"status": "success", "data": json_data}
+
+
+
+#     for ward_type in ward_types:
+#         if not_first:
+#             generated_planquery += " "
 
 def get_plan_benefits(db_cursor, request):
     '''
