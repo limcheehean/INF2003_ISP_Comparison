@@ -8,8 +8,10 @@ from components.co_payment_calculator import calculate_co_payment
 from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, get_plans
+
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits
 from components.user_plans import update_user_plans, get_user_plan_data
+
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
