@@ -22,6 +22,7 @@ import Radio from '@mui/joy/Radio';
 import Slider from '@mui/joy/Slider';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
+import { useState } from "react";
 // can remove these two
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
@@ -30,6 +31,7 @@ import { useDemoData } from '@mui/x-data-grid-generator';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
+import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
@@ -44,6 +46,8 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
+import { Wards, Companies, Plans, Riders } from "../components/CheckBoxes";
+//import "../App.css";
 
 function ColorSchemeToggle() {
   const { mode, setMode } = useColorScheme();
@@ -73,7 +77,52 @@ function ColorSchemeToggle() {
   );
 }
 
-// Navigation panel
+// Checkboxes
+
+// Define the type for the items prop
+type Item = {
+  name: string;
+};
+
+interface CheckBoxesProps {
+  items: Item[];
+}
+
+function CheckBoxes({ items }: CheckBoxesProps ) {
+  const [checkedState, setCheckedState] = useState(
+    new Array(items.length).fill(false)
+  );
+
+  const handleOnChange = (position: number) => {
+    const updatedCheckedState = checkedState.map((item, index) =>
+      index === position ? !item : item
+    );
+
+    setCheckedState(updatedCheckedState);
+  };
+
+  return (
+    <ul style={{ listStyle: 'none' }}>
+    {items.map(({ name }, index) => {
+      return (
+        <li key={index}>
+          <div className="wards-list-item">
+            <input
+              type="checkbox"
+              id={`custom-checkbox-${index}`}
+              name={name}
+              value={name}
+              checked={checkedState[index]}
+              onChange={() => handleOnChange(index)}
+            />
+            <label htmlFor={`custom-checkbox-${index}`}>{name}</label>
+          </div>
+        </li>
+      );
+    })}
+  </ul>
+  );
+}
 
 function TeamNav() {
   return (
@@ -97,35 +146,33 @@ function TeamNav() {
           }}
         >
           <ListItem>
-              <ListItemDecorator>
-                <PeopleRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>Ward</ListItemContent>
+            <ListItemDecorator sx={{ color: 'neutral.500' }}>
+              <AddBusinessIcon fontSize="small" />
+            </ListItemDecorator>
+            <ListItemContent>Company Name</ListItemContent>
           </ListItem>
+          <CheckBoxes items={Companies}/>
           <ListItem>
-            <ListItemButton>
-              <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                <ArticleRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>Plan</ListItemContent>
-              <Chip
-                variant="soft"
-                color="neutral"
-                size="sm"
-                sx={{ borderRadius: 'sm' }}
-              >
-                Beta
-              </Chip>
-            </ListItemButton>
+            <ListItemDecorator>
+              <PeopleRoundedIcon fontSize="small" />
+            </ListItemDecorator>
+            <ListItemContent>Ward</ListItemContent>
           </ListItem>
+          <CheckBoxes items={Wards}/>
           <ListItem>
-            <ListItemButton>
-              <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                <AssignmentIndRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>Rider</ListItemContent>
-            </ListItemButton>
+            <ListItemDecorator sx={{ color: 'neutral.500' }}>
+              <ArticleRoundedIcon fontSize="small" />
+            </ListItemDecorator>
+            <ListItemContent>Plans</ListItemContent>
           </ListItem>
+          <CheckBoxes items={Plans}/>
+          <ListItem>
+            <ListItemDecorator sx={{ color: 'neutral.500' }}>
+              <AssignmentIndRoundedIcon fontSize="small" />
+            </ListItemDecorator>
+            <ListItemContent>Riders</ListItemContent>
+          </ListItem>
+          <CheckBoxes items={Riders}/>
         </List>
       </ListItem>
     </List>
