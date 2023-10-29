@@ -94,9 +94,9 @@ def signup():
     return handle_signup(db, db_cursor, mail, request)
 
 
-@app.route('/join/<path:signup_token>')
+@app.route('/api/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(signup_token, db_cursor, signup_token)
+    return handle_signup_confirmation(db, db_cursor, signup_token)
 
 
 @app.route('/api/forgotPassword', methods=['POST'])

@@ -15,11 +15,15 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import {useState} from "react";
+import Alert from '@mui/joy/Alert';
+//import Checkbox from "@mui/joy/Checkbox";
 
 interface FormElements extends HTMLFormControlsCollection {
     fullName: HTMLInputElement;
     email: HTMLInputElement;
     password: HTMLInputElement;
+    confirmPassword : HTMLInputElement;
 }
 interface SignUpFormElement extends HTMLFormElement {
     readonly elements: FormElements;
@@ -58,6 +62,11 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 
 export default function SignUp() {
 
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    //const [showPassword, setshowPassword] = useState(false);
+
+
     const handleSubmit = async (event: React.FormEvent<SignUpFormElement>) => {
         event.preventDefault();
         const formElements = event.currentTarget.elements;
@@ -66,20 +75,52 @@ export default function SignUp() {
             email: formElements.email.value,
             password: formElements.password.value,
         };
-        alert(JSON.stringify(data, null, 2));
+        const password = formElements.password.value;
+        // Password validation using regex
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+        const isPasswordValid = passwordRegex.test(password);
+        const confirmPassword = formElements.confirmPassword.value;
 
-        try {
-            const response = await axios.post('/api/signup', data, {
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+        alert(JSON.stringify(data, null, 2)); // Test purpose to be removed.
 
-            const responseData = response.data;
-            console.log(responseData);
+        if (!isPasswordValid)
+        {
+            setPasswordError('Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit.');
+        }
+        else
+        {
+            setPasswordError('');
+        }
 
-        } catch (error) {
-            console.error('Problem with Axios operation', error);
+        if (isPasswordValid && password !== confirmPassword)
+        {
+            setConfirmPasswordError('Passwords do not match');
+        }
+        else
+        {
+            setConfirmPasswordError('');
+        }
+
+
+        if (!passwordError && !confirmPasswordError)
+        {
+            try {
+                const response = await axios.post('/api/signup', data, {
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const responseData = response.data;
+                console.log(responseData);
+
+            } catch (error) {
+                console.error('Problem with Axios operation', error);
+            }
+        }
+        else
+        {
+            alert("retry password")
         }
 
     };
@@ -188,9 +229,28 @@ export default function SignUp() {
                                 </FormControl>
                                 <FormControl required>
                                     <FormLabel>Password</FormLabel>
+                                    {/*<Input type={showPassword ? "text" : "password"}*/}
+                                    {/*       name="password"*/}
+                                    {/*/>*/}
                                     <Input type="password" name="password" />
                                 </FormControl>
+                                <FormControl required>
+                                    <FormLabel>Confirm Password</FormLabel>
+                                    {/*<Input type={showPassword ? "text" : "password"} name="confirmPassword" />*/}
+                                    <Input type="password" name="confirmPassword" />
+                                </FormControl>
+                                {passwordError && <Alert color="danger" variant="soft">{passwordError}</Alert>}
+                                {confirmPasswordError && <Alert color="danger" variant="soft">{confirmPasswordError}</Alert>}
                                 <Stack gap={2} sx={{ mt: 2 }}>
+                                    <Box
+                                        sx={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'center',
+                                        }}
+                                    >
+                                        {/*<Checkbox size="sm" name="passwordCheckbox" label="Show password"/>*/}
+                                    </Box>
                                     <Button type="submit" fullWidth>
                                         Sign up
                                     </Button>
