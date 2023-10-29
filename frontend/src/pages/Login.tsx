@@ -75,11 +75,11 @@ function Login() {
       const requestData = {email, password}; // Combine email and password in one object
       const requestHeaders = {'Content-Type': 'application/json'};
 
-      const response = await Axios.post('api/login', requestData, {headers: requestHeaders});
+      const response = await Axios.post('/api/login', requestData, {headers: requestHeaders});
       // Handle the response - redirect to the dashboard
       console.log('Login successful: ', response.data);
       // Code to redirect to the dashboard goes here
-      navigate('/forgetPassword');
+      navigate('/dashboard');
     } catch (error) {
       // Handle other types of errors
       console.error('Unknown error:', error);
@@ -228,6 +228,7 @@ function Login() {
                   <FormLabel>Password</FormLabel>
                   <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
+                {/* add {"message":"Invalid username or password","status":"error"} here */}
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
                     sx={{
@@ -244,6 +245,9 @@ function Login() {
                   <Button onClick={handleLogin} type="submit" fullWidth>
                     Sign in
                   </Button>
+                  <Link to="/Signup">
+                      Don't have an account? Sign up!
+                    </Link>
                 </Stack>
               </form>
             </Stack>
