@@ -122,7 +122,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     #   (UUID is used in the confirmation link)
     #   Python's UUID4 uses urandom (cannot be seeded)
     signup_token = uuid4()
-    signup_confirmation_link = url_for('/api/signup_confirmation', _external=True, signup_token=str(signup_token))
+    signup_confirmation_link = url_for('signup_confirmation', _external=True, signup_token=str(signup_token))
 
     token_created = datetime.now()
     # Store signup details (name, normalized email, hashed password), sign up UUID, into database
