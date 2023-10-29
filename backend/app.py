@@ -9,6 +9,7 @@ from components.password_management import handle_forgot_password, handle_reset_
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
 from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits
+from components.user_plans import update_user_plans
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -231,10 +232,12 @@ def rider_benefits():
     """
     return get_rider_benefits(db_cursor, request)
 
+
 @app.route("/api/get_plan_benefits", methods=["POST"])
 def plan_benefits():
 
     return get_plan_benefits(db_cursor, request)
+
 
 @app.route("/api/co_payment", methods=["POST"])
 def co_payment():
@@ -289,6 +292,12 @@ def co_payment():
     }
     """
     return calculate_co_payment(request, db)
+
+
+@app.route("/api/user_plans", methods=["POST"])
+@require_login
+def add_or_edit_user_plans():
+    return update_user_plans(db, mongo, request)
 
 
 if __name__ == '__main__':
