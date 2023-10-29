@@ -30,7 +30,7 @@ def require_login(f):
 
         # Session expired
         # TODO: Get session timeout from config file
-        if (login.get("logged_in") + timedelta(minutes=300)) < datetime.now():
+        if not login or (login.get("logged_in") + timedelta(minutes=300)) < datetime.now():
             mongo.session.delete_one({"session_id": session_id})
             return {"status": "error", "message": "Your session has timed out, please login again"}, 400
 

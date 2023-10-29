@@ -2,6 +2,56 @@ from re import match
 from flask import session
 from pymysql import IntegrityError
 
+from CustomDictCursor import CustomDictCursor
+
+get_user_plans_sql = """
+    SELECT u.insured_name,
+       u.insured_dob,
+       TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 AS age_next_birthday,
+       u.plan_id,
+       u.rider_id,
+       p.name AS plan_name,
+       r.name AS rider_name,
+       mp.amount AS medishield_life_premium,
+       pp.amount AS plan_premium,
+       rp.amount AS rider_premium,
+       mp.amount + pp.amount + COALESCE(rp.amount, 0) AS total_premium,
+       mp.amount + LEAST(annual_withdrawal_limit, pp.amount) AS payable_by_medisave,
+       GREATEST(0, pp.amount - annual_withdrawal_limit) + COALESCE(rp.amount, 0) AS payable_by_cash
+    FROM userplan u
+    LEFT JOIN plan p ON u.plan_id = p.id
+    LEFT JOIN rider r ON u.rider_id = r.id
+    LEFT JOIN medishieldlifepremium mp
+        ON TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 = mp.age
+    LEFT JOIN planpremium pp
+        ON TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 = pp.age
+        AND pp.plan_id = u.plan_id
+    LEFT JOIN riderpremium rp
+        ON TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 = rp.age
+        AND rp.rider_id = u.rider_id
+    WHERE user_id = %s
+"""
+
+
+def get_user_plan_data(db, mongo):
+
+    user_id = mongo.session.find_one({"session_id": session.get("uid")}).get("user_id")
+
+    cursor = db.cursor(CustomDictCursor)
+    cursor.execute(get_user_plans_sql, (user_id,))
+    user_plans = cursor.fetchall()
+
+    grand_total_premiums = round((sum([user_plan.get("total_premium") for user_plan in user_plans])), 2)
+    total_payable_by_medisave = round(sum([user_plan.get("payable_by_medisave") for user_plan in user_plans]), 2)
+    total_payable_by_cash = round(sum([user_plan.get("payable_by_cash") for user_plan in user_plans]), 2)
+
+    return {"status": "successful", "data": {
+        "grand_total_premiums": grand_total_premiums,
+        "total_payable_by_medisave": total_payable_by_medisave,
+        "total_payable_by_cash": total_payable_by_cash,
+        "user_plans": user_plans
+    }}
+
 
 def update_user_plans(db, mongo, request):
 
