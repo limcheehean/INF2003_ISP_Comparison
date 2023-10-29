@@ -1,4 +1,6 @@
-import * as React from 'react';
+// import * as React from 'react';
+import React, { useEffect, useState } from 'react';
+import Axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -17,8 +19,9 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Slide from '@mui/material/Slide';
+import Alert from '@mui/joy/Alert';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -61,7 +64,82 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   );
 }
 
-const Login = () => {
+function Login() {
+  const navigate = useNavigate();
+
+  // State to store user input
+  const [email, setEmail] = useState('');
+  //const [emailError, setEmailError] = useState('');
+  const [password, setPassword] = useState('');
+  //const [passwordError, setPasswordError] = useState('');
+  const [error, setError] = useState('');
+
+  // To reset previous error messages
+  // const clearErrors = () => {
+  //   setEmailError('');
+  //   setPasswordError('');
+  // };
+  
+  const handleLogin = async (event: React.FormEvent<SignInFormElement>) => {
+    event.preventDefault();
+    const formElements = event.currentTarget.elements;
+    const data = {
+      email: formElements.email.value,
+      password: formElements.password.value,
+      persistent: formElements.persistent.checked,
+    };
+    //alert(JSON.stringify(data, null, 2));
+  
+    // Clear any previous errors
+    //clearErrors();
+    setError('');
+
+    try {
+      const requestData = {email, password}; // Combine email and password in one object
+      const requestHeaders = {'Content-Type': 'application/json'};
+
+      const response = await Axios.post('/api/login', requestData, {headers: requestHeaders});
+      // Handle the response - redirect to the dashboard
+      // console.log('Login successful: ', response.data);
+      // // Code to redirect to the dashboard goes here
+      // navigate('/dashboard');
+      if (response.status === 200) {
+        // Login successful
+        console.log('Login successful: ', response.data);
+        // Code to redirect to the dashboard goes here
+        navigate('/dashboard');
+      } else {
+        // Handle other types of errors
+        console.error('Unknown error:', response);
+      }
+    } catch (error: any) { // Specify 'error' as 'any' type
+      if (error.response) {
+        // The error object has a response, meaning it's an error response from the server.
+        const { status, data } = error.response;
+
+        if (status === 400) {
+          // Bad request (e.g., email and password do not match)
+          // Assuming the API returns a message in the response
+          if (data.message === 'Invalid username or password') {
+            // setEmailError('invalid_email_password_error');
+            // setPasswordError('invalid_email_password_error');
+            setError('Invalid username or password');
+          } else {
+            // Handle other bad request errors if needed
+            // Display an appropriate error message for each case
+            console.error('Bad request error:', data);
+          }
+        } else {
+          // Handle other HTTP status codes if needed
+          console.error('HTTP error:', error.response);
+        }
+      } else {
+        // Handle network or request error
+        console.error('Network or request error:', error);
+       }
+    }
+  };
+
   return (
 
     <CssVarsProvider defaultMode="dark" disableTransitionOnChange>
@@ -150,14 +228,14 @@ const Login = () => {
               },
             }}
           >
-            <Stack gap={4} sx={{ mb: 2 }}>
+            {/* <Stack gap={4} sx={{ mb: 2 }}>
               <Stack gap={1}>
                 <Typography level="h3">Sign in</Typography>
                 <Typography level="body-sm">
                   New to company?{' '}
-                  <a href="#replace-with-a-link">
+                  <Link to="/Signup">
                     Sign up!
-                  </a>
+                  </Link>
                 </Typography>
               </Stack>
 
@@ -182,28 +260,20 @@ const Login = () => {
               })}
             >
               or
-            </Divider>
+            </Divider> */}
             <Stack gap={4} sx={{ mt: 2 }}>
-              <form
-                onSubmit={(event: React.FormEvent<SignInFormElement>) => {
-                  event.preventDefault();
-                  const formElements = event.currentTarget.elements;
-                  const data = {
-                    email: formElements.email.value,
-                    password: formElements.password.value,
-                    persistent: formElements.persistent.checked,
-                  };
-                  alert(JSON.stringify(data, null, 2));
-                }}
-              >
+              <form onSubmit={handleLogin}>
                 <FormControl required>
                   <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" />
+                  <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </FormControl>
                 <FormControl required>
                   <FormLabel>Password</FormLabel>
-                  <Input type="password" name="password" />
+                  <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
+                {/* {emailError && <Alert color="danger" variant="soft">{emailError}</Alert>}
+                {passwordError && <Alert color="danger" variant="soft">{passwordError}</Alert>} */}
+                {error && <Alert color="danger" variant="soft">{error}</Alert>}
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
                     sx={{
@@ -220,6 +290,9 @@ const Login = () => {
                   <Button type="submit" fullWidth>
                     Sign in
                   </Button>
+                  <Link to="/Signup">
+                      Don't have an account? Sign up!
+                    </Link>
                 </Stack>
               </form>
             </Stack>
