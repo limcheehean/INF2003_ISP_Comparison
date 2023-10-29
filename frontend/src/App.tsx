@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import ForgetPassword from './pages/ForgetPassword';
 import ResetPassword from './pages/ResetPassword';
 import Dashboard from "./pages/Dashboard";
+import CopaymentCalculator from "./pages/CopaymentCalculator";
 
 export default function App() {
     return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="forgetPassword" element={<ForgetPassword />}/>
         <Route path="resetPassword/:resetToken" element={<ResetPassword />}/>
         <Route path="Dashboard" element={<Dashboard />} />
+        <Route path="copaymentCalculator" element={<CopaymentCalculator />} />
       </Routes>
     </div>
     );
