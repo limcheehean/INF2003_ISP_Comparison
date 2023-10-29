@@ -1,12 +1,12 @@
 
 SECRET_KEY = 'thisissosecret'
 
-MAIL_SERVER = 'smtp.office365.com'
+MAIL_SERVER = 'smtp-relay.brevo.com'
 MAIL_PORT = 587
 MAIL_USE_TLS = true
 MAIL_USE_SSL = false
-MAIL_USERNAME = 'inf2003ispcompare@outlook.sg'
-MAIL_PASSWORD = 'P@ssw0rdP@ssw0rd'
+MAIL_USERNAME = 'lychee0504@gmail.com'
+MAIL_PASSWORD = 'xsmtpsib-e74f59fbda7561aeb07ae1a67e68170d803334dcdca91fb258b21522111f227b-XjCJSNpVFKn4DmB8'
 
 MYSQL_DATABASE_HOST = 'db.spmovy.com'
 MYSQL_DATABASE_PORT = 3306

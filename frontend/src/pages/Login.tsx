@@ -18,7 +18,7 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
 import { Link } from 'react-router-dom';
-import Slide from '@mui/material/Slide';
+//import Slide from '@mui/material/Slide';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -155,9 +155,9 @@ const Login = () => {
                 <Typography level="h3">Sign in</Typography>
                 <Typography level="body-sm">
                   New to company?{' '}
-                  <a href="#replace-with-a-link">
+                  <Link to="/Signup">
                     Sign up!
-                  </a>
+                  </Link>
                 </Typography>
               </Stack>
 

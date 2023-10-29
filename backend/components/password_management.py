@@ -48,7 +48,7 @@ def handle_forgot_password(db, db_cursor, request, mail):
         print("Error: ", e)
         return {"status": "error", "message": "Invalid email"}, 400
 
-    msg = Message("Password Reset Link", sender="inf2003ispcompare@outlook.sg", recipients=forgotPwd_email)
+    msg = Message("Password Reset Link", sender=("ISP Comparison", "admin@ispcompare.spmovy.com"), recipients=forgotPwd_email)
     msg.body = "You are receiving this email as you have forgotten your password. Clink on this link to reset your password: " + forgotPwd_link
     mail.send(msg)
 
