@@ -3,7 +3,9 @@ from functools import wraps
 from uuid import uuid4
 
 from bcrypt import checkpw, hashpw, gensalt
+from flask import redirect
 from flask import session, url_for
+from flask_mail import Message
 from flaskext.mysql import pymysql
 
 # utility functions
@@ -131,8 +133,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
         INSERT INTO USER (name, email, password_hash, activated, token, token_created)
         VALUES(%s, %s, %s, false, %s, %s)
         """
-        signup_tuple = (
-        signup_name, normalized_email, hashed_password, signup_token, token_created.strftime('%Y-%m-%d %H:%M:%S'))
+        signup_tuple = (signup_name, normalized_email, hashed_password, signup_token, token_created.strftime('%Y-%m-%d %H:%M:%S'))
 
         db_cursor.execute(parameterized_insert_query, signup_tuple)
 
@@ -146,14 +147,12 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
 
     # Send confirmation email
 
-    """
     msg = Message("Confirmation link",
-                  sender="inf2003ispcompare@outlook.sg",
+                  sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
-    
+
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
     mail.send(msg)
-    """
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
@@ -185,7 +184,8 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
                               SET token = NULL, activated = True 
                               WHERE id = %s;
                               """, user[0])
-            return {"status": "success", "message": "Account successfully activated."}, 200
+            db.commit()
+            return redirect("http://localhost:3000/")
 
 
 def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
