@@ -3,7 +3,7 @@ from functools import wraps
 from uuid import uuid4
 
 from bcrypt import checkpw, hashpw, gensalt
-from flask import session, url_for
+from flask import session, url_for, redirect
 
 # utility functions
 from utility import email_check, password_check, hash_password, name_check
@@ -147,15 +147,13 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     print("Sign up confirmation link: ", signup_confirmation_link)
 
     # Send confirmation email
-    
-    """
+
     msg = Message("Confirmation link",
-                  sender="inf2003ispcompare@outlook.sg",
+                  sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
-    
+
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
     mail.send(msg)
-    """
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
@@ -187,7 +185,8 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
                               SET token = NULL, activated = True 
                               WHERE id = %s;
                               """, user[0])
-            return {"status": "success", "message": "Account successfully activated."}, 200
+            db.commit()
+            return redirect("http://localhost:3000/")
 
 
 def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
