@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from _decimal import Decimal
 
 from pymysql.cursors import DictCursor
@@ -14,3 +16,5 @@ class CustomDictCursor(DictCursor):
             for key, value in row.items():
                 if isinstance(value, Decimal):
                     row[key] = float(value)
+                if isinstance(value, datetime):
+                    row[key] = datetime.strftime(value, "%Y-%m-%d")
