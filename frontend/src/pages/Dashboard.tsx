@@ -21,6 +21,10 @@ import RadioGroup from '@mui/joy/RadioGroup';
 import Radio from '@mui/joy/Radio';
 import Slider from '@mui/joy/Slider';
 import Sheet from '@mui/joy/Sheet';
+import Table from '@mui/joy/Table';
+// can remove these two
+import { DataGrid, GridToolbar } from '@mui/x-data-grid';
+import { useDemoData } from '@mui/x-data-grid-generator';
 
 // Icons import
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -69,6 +73,8 @@ function ColorSchemeToggle() {
   );
 }
 
+// Navigation panel
+
 function TeamNav() {
   return (
     <List size="sm" sx={{ '--ListItem-radius': '8px', '--List-gap': '4px' }}>
@@ -91,12 +97,10 @@ function TeamNav() {
           }}
         >
           <ListItem>
-            <ListItemButton selected>
               <ListItemDecorator>
                 <PeopleRoundedIcon fontSize="small" />
               </ListItemDecorator>
               <ListItemContent>Ward</ListItemContent>
-            </ListItemButton>
           </ListItem>
           <ListItem>
             <ListItemButton>
@@ -128,8 +132,26 @@ function TeamNav() {
   );
 }
 
+// Table
+function createData(
+  companyName: string,
+  ward: string,
+  plans: string,
+  riders: string,
+) {
+  return { companyName, ward, plans, riders};
+}
+
+const rows = [
+  createData('AIA', 'A', 'testing1', 'testing2'),
+  createData('Prudential', 'B1', 'testing3', 't4'),
+  createData('NTUC', 'C', 't5', 't6'),
+  createData('Great Eastern', 'Premium', 't7', 't8'),
+];
+
 export default function TeamExample() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
@@ -434,7 +456,29 @@ export default function TeamExample() {
           </Box>
         </Layout.SidePane> */}
         <Layout.Main>
-          <List
+          <Sheet variant="outlined" style={{ width: '75.2vw' }}>
+            <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
+              <thead>
+                <tr>
+                  <th style={{ width: '40%' }}>Company Name</th>
+                  <th>Ward</th>
+                  <th>Plans</th>
+                  <th>Riders</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((row) => (
+                  <tr key={row.companyName}>
+                    <th scope="row">{row.companyName}</th>
+                    <td>{row.ward}</td>
+                    <td>{row.plans}</td>
+                    <td>{row.riders}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </Sheet>
+          {/* <List
             sx={{
               display: 'grid',
               gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
@@ -535,7 +579,7 @@ export default function TeamExample() {
                 </Box>
               </Sheet>
             ))}
-          </List>
+          </List> */}
         </Layout.Main>
       </Layout.Root>
     </CssVarsProvider>
