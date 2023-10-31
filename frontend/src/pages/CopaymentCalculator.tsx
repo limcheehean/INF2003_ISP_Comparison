@@ -346,13 +346,15 @@ export default function TeamExample() {
 
                 <Layout.Main>
 
-                    <Grid container spacing={{ xs: 2, md: 5 }} sx={{ flexGrow: 1 }}>
-                        <Grid xs={12} m={4}>
-                        <Typography level="h1">Calculate Co-payment</Typography>    
+                    <Grid container>
+                        <Grid m={4}>
+                            <Typography level="h1">Calculate Copayment</Typography>
+                            <Typography level="title-md" mt={2} color='neutral'>Know your out of pocket expenses for medical services.</Typography>
                         </Grid>
+                      
                     </Grid>
 
-                  
+
                     <Sheet variant="plain" style={{ width: '75.2vw', padding: '25px', borderRadius: '25px' }}>
 
 
@@ -381,7 +383,7 @@ export default function TeamExample() {
                                         }}
                                     >
                                         <Typography level="title-lg" startDecorator={<CalculateIcon />}>
-                                            Enter billing details
+                                            Enter details of insured
                                         </Typography>
                                         <Divider inset="none" />
                                         <CardContent
