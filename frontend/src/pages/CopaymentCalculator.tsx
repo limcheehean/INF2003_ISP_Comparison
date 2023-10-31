@@ -399,12 +399,12 @@ export default function TeamExample() {
 
                                             <FormControl>
                                                 <FormLabel>Plan</FormLabel>
-                                                <Input name="plan_id" type="number" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
+                                                <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
                                                 <FormLabel>Rider</FormLabel>
-                                                <Input name="rider_id" type="number" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                                <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
