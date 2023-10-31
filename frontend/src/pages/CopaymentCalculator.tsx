@@ -21,6 +21,7 @@ import Card from '@mui/joy/Card';
 import CardContent from '@mui/joy/CardContent';
 import CardActions from '@mui/joy/CardActions';
 
+
 import Divider from '@mui/joy/Divider';
 
 import Check from '@mui/icons-material/Check';
@@ -180,20 +181,20 @@ export default function TeamExample() {
     const [ward_type, set_ward_type] = React.useState('');
     const [responseData, setResponseData] = React.useState({
         data: {
-          cash_payment: null,
-          co_insurance: null,
-          co_payment: null,
-          covered: null,
-          deductible: null,
-          over_limit: null,
-          pro_ration: null,
-          total_bill: null,
+            cash_payment: null,
+            co_insurance: null,
+            co_payment: null,
+            covered: null,
+            deductible: null,
+            over_limit: null,
+            pro_ration: null,
+            total_bill: null,
         },
-      });
-      
-            
-      
-      
+    });
+
+
+
+
 
     const handleCopaymentCalculate = async () => {
 
@@ -344,6 +345,14 @@ export default function TeamExample() {
                 </Layout.SideNav>
 
                 <Layout.Main>
+
+                    <Grid container spacing={{ xs: 2, md: 5 }} sx={{ flexGrow: 1 }}>
+                        <Grid xs={12} m={4}>
+                        <Typography level="h1">Calculate Co-payment</Typography>    
+                        </Grid>
+                    </Grid>
+
+                  
                     <Sheet variant="plain" style={{ width: '75.2vw', padding: '25px', borderRadius: '25px' }}>
 
 
@@ -372,7 +381,7 @@ export default function TeamExample() {
                                         }}
                                     >
                                         <Typography level="title-lg" startDecorator={<CalculateIcon />}>
-                                            Calculate copayment
+                                            Enter billing details
                                         </Typography>
                                         <Divider inset="none" />
                                         <CardContent
@@ -477,8 +486,8 @@ export default function TeamExample() {
                                     <Divider inset="none" />
                                     <CardActions>
                                         <Typography level="title-lg" sx={{ mr: 'auto' }}>
-                                        Total bill: $(SGD) {responseData.data.total_bill}.
-                                            
+                                            Total bill: $(SGD) {responseData.data.total_bill}.
+
                                         </Typography>
                                     </CardActions>
                                 </Card>
