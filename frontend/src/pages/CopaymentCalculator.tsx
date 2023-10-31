@@ -23,6 +23,7 @@ import CardActions from '@mui/joy/CardActions';
 
 
 import Divider from '@mui/joy/Divider';
+import Skeleton from '@mui/joy/Skeleton';
 
 import Check from '@mui/icons-material/Check';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
@@ -358,7 +359,7 @@ export default function TeamExample() {
                     <Sheet variant="plain" style={{ width: '75.2vw', padding: '25px', borderRadius: '25px' }}>
 
 
-
+                  
 
                         <Grid container spacing={2}>
                             <Grid xs={5}>
@@ -395,28 +396,28 @@ export default function TeamExample() {
                                         >
 
                                             <FormControl sx={{ gridColumn: '1/-1' }}>
-                                                <FormLabel>Total bill</FormLabel>
+                                                <FormLabel><Typography level="h4">Total bill</Typography></FormLabel>
                                                 <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Plan</FormLabel>
+                                            <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
                                                 <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Rider</FormLabel>
+                                            <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
                                                 <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>What is your age?</FormLabel>
+                                            <FormLabel><Typography level="h4">What is your age?</Typography></FormLabel>
                                                 <Input name="age" type="number" value={age} onChange={(e) => set_age(e.target.value)} placeholder="Type your age" variant="soft" />
 
                                             </FormControl>
 
                                             <FormControl>
-                                                <FormLabel>Ward Type</FormLabel>
+                                            <FormLabel><Typography level="h4">Ward Type</Typography></FormLabel>
                                                 <Input name="ward_type" value={ward_type} onChange={(e) => set_ward_type(e.target.value)} placeholder="Private, A, B1 etc." variant="soft" />
                                             </FormControl>
 
@@ -446,43 +447,43 @@ export default function TeamExample() {
                                             <ListItemDecorator>
                                                 <PaidIcon />
                                             </ListItemDecorator>
-                                            <b>Cash Payment:</b> ${responseData.data.cash_payment}
-                                            {/* 
-                                            
-                                            
-                                            {responseData.data.deductible}
-                                            {responseData.data.over_limit}
-                                            {responseData.data.pro_ration} */}
+                                            <Typography level="title-lg">Cash Payment: ${responseData.data.cash_payment}</Typography>
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <LocalHospitalIcon />
                                             </ListItemDecorator>
-                                            <b>Co Insurance:</b> ${responseData.data.co_insurance}
+
+                                            <Typography level="title-lg"> Co Insurance: ${responseData.data.co_insurance}</Typography>
+                                           
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <HealthAndSafetyIcon />
                                             </ListItemDecorator>
-                                            <b>Co payment:</b> ${responseData.data.co_payment}
+                                            <Typography level="title-lg">Co payment: ${responseData.data.co_payment}</Typography>
+                                            
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <RemoveIcon />
                                             </ListItemDecorator>
-                                            <b>Deductible:</b> ${responseData.data.deductible}
+                                            <Typography level="title-lg">Deductible: ${responseData.data.deductible}</Typography>
+                                            
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <KeyboardDoubleArrowUpIcon />
                                             </ListItemDecorator>
-                                            <b>Over limit:</b> ${responseData.data.over_limit}
+                                            <Typography level="title-lg">Over limit: ${responseData.data.over_limit}</Typography>
+                                          
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <BalanceIcon />
                                             </ListItemDecorator>
-                                            <b>Pro-ration:</b> ${responseData.data.pro_ration}
+                                            <Typography level="title-lg">Pro-ration: ${responseData.data.pro_ration}</Typography>
+                                           
                                         </ListItem>
                                     </List>
                                     <Divider inset="none" />
