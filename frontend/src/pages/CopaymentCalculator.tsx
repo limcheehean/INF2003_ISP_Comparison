@@ -22,13 +22,9 @@ import CardContent from '@mui/joy/CardContent';
 import CardActions from '@mui/joy/CardActions';
 
 import Divider from '@mui/joy/Divider';
-import Select from '@mui/joy/Select';
-import Option from '@mui/joy/Option';
 
-import InfoOutlined from '@mui/icons-material/InfoOutlined';
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import Checkbox from '@mui/joy/Checkbox';
-
+import Check from '@mui/icons-material/Check';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 
 
 // Icons import
@@ -46,6 +42,19 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import CalculateIcon from '@mui/icons-material/Calculate';
+import PaidIcon from '@mui/icons-material/Paid';
+import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
+import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
+import ShieldIcon from '@mui/icons-material/Shield';
+import RemoveIcon from '@mui/icons-material/Remove';
+import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
+import BalanceIcon from '@mui/icons-material/Balance';
+import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+
+import Grid from '@mui/system/Unstable_Grid';
+import styled from '@mui/system/styled';
+
+
 
 // custom
 import Menu from '../components/Menu';
@@ -150,6 +159,14 @@ function TeamNav() {
     );
 }
 
+const Item = styled('div')(({ theme }) => ({
+    backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+    border: '1px solid',
+    borderColor: theme.palette.mode === 'dark' ? '#444d58' : '#ced7e0',
+    padding: theme.spacing(1),
+    borderRadius: '4px',
+    textAlign: 'center',
+}));
 
 
 
@@ -161,6 +178,22 @@ export default function TeamExample() {
     const [rider_id, set_rider_id] = React.useState('');
     const [age, set_age] = React.useState('');
     const [ward_type, set_ward_type] = React.useState('');
+    const [responseData, setResponseData] = React.useState({
+        data: {
+          cash_payment: null,
+          co_insurance: null,
+          co_payment: null,
+          covered: null,
+          deductible: null,
+          over_limit: null,
+          pro_ration: null,
+          total_bill: null,
+        },
+      });
+      
+            
+      
+      
 
     const handleCopaymentCalculate = async () => {
 
@@ -180,12 +213,14 @@ export default function TeamExample() {
 
         try {
             console.log(postData);
-            const response = await axios.post('api/co_payment', postData, {headers:{'Content-Type':'application/json'}});
+            const response = await axios.post('api/co_payment', postData, { headers: { 'Content-Type': 'application/json' } });
             console.log('Response', response.data);
+            setResponseData(response.data); // Setting the response data in the state
         } catch (error) {
             console.log('Error', error);
         }
     }
+
 
 
     return (
@@ -312,77 +347,143 @@ export default function TeamExample() {
                     <Sheet variant="plain" style={{ width: '75.2vw', padding: '25px', borderRadius: '25px' }}>
 
 
-                        <form method="POST" onSubmit={(event: React.FormEvent<CalculateFormElement>) => {
-                            event.preventDefault();
-                            const formElements = event.currentTarget.elements;
-                            const data = {
-                                total_bill: formElements.total_bill.value,
-                                plan_id: formElements.plan_id.value,
-                                rider_id: formElements.rider_id.value,
-                                age: formElements.age.value,
-                                ward_type: formElements.age.value
-                            };
-                        }}
-                        >
-                            <Card
-                                variant="plain"
-                                sx={{
-                                    maxHeight: 'max-content',
-                                    maxWidth: '100%',
-                                    overflow: 'auto',
+
+
+                        <Grid container spacing={2}>
+                            <Grid xs={5}>
+                                <form method="POST" onSubmit={(event: React.FormEvent<CalculateFormElement>) => {
+                                    event.preventDefault();
+                                    const formElements = event.currentTarget.elements;
+                                    const data = {
+                                        total_bill: formElements.total_bill.value,
+                                        plan_id: formElements.plan_id.value,
+                                        rider_id: formElements.rider_id.value,
+                                        age: formElements.age.value,
+                                        ward_type: formElements.age.value
+                                    };
                                 }}
-                            >
-                                <Typography level="title-lg" startDecorator={<CalculateIcon />}>
-                                    Calculate copayment
-                                </Typography>
-                                <Divider inset="none" />
-                                <CardContent
-                                    sx={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(2, minmax(80px, 1fr))',
-                                        gap: 1.5,
-                                    }}
                                 >
+                                    <Card
+                                        variant="plain"
+                                        sx={{
+                                            maxHeight: 'max-content',
+                                            maxWidth: '100%',
+                                            overflow: 'auto',
+                                        }}
+                                    >
+                                        <Typography level="title-lg" startDecorator={<CalculateIcon />}>
+                                            Calculate copayment
+                                        </Typography>
+                                        <Divider inset="none" />
+                                        <CardContent
+                                            sx={{
+                                                display: 'grid',
+                                                gridTemplateColumns: 'repeat(2, minmax(80px, 1fr))',
+                                                gap: 1.5,
+                                            }}
+                                        >
 
-                                    <FormControl sx={{ gridColumn: '1/-1' }}>
-                                        <FormLabel>Total bill</FormLabel>
-                                        <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} /> 
-                                    </FormControl>
+                                            <FormControl sx={{ gridColumn: '1/-1' }}>
+                                                <FormLabel>Total bill</FormLabel>
+                                                <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <FormLabel>Plan</FormLabel>
-                                        <Input name="plan_id" type="number" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
-                                    </FormControl>
+                                            <FormControl>
+                                                <FormLabel>Plan</FormLabel>
+                                                <Input name="plan_id" type="number" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <FormLabel>Rider</FormLabel>
-                                        <Input name="rider_id" type="number" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
-                                    </FormControl>
+                                            <FormControl>
+                                                <FormLabel>Rider</FormLabel>
+                                                <Input name="rider_id" type="number" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                            </FormControl>
 
-                                    <FormControl>
-                                        <FormLabel>What is your age?</FormLabel>
-                                        <Input name="age" type="number" value={age} onChange={(e) => set_age(e.target.value)} placeholder="Type your age" variant="soft" />
-                                        
-                                    </FormControl>
+                                            <FormControl>
+                                                <FormLabel>What is your age?</FormLabel>
+                                                <Input name="age" type="number" value={age} onChange={(e) => set_age(e.target.value)} placeholder="Type your age" variant="soft" />
 
-                                    <FormControl>
-                                        <FormLabel>Ward Type</FormLabel>
-                                        <Input name="ward_type" value={ward_type} onChange={(e) => set_ward_type(e.target.value)} placeholder="Private, A, B1 etc." variant="soft" />
-                                    </FormControl>
+                                            </FormControl>
 
-                                 
+                                            <FormControl>
+                                                <FormLabel>Ward Type</FormLabel>
+                                                <Input name="ward_type" value={ward_type} onChange={(e) => set_ward_type(e.target.value)} placeholder="Private, A, B1 etc." variant="soft" />
+                                            </FormControl>
 
-                                    <CardActions sx={{ gridColumn: '1/-1' }}>
-                                        <Button onClick={handleCopaymentCalculate} variant="solid" color="primary">
-                                            Calculate
-                                        </Button>
+
+
+                                            <CardActions sx={{ gridColumn: '1/-1' }}>
+                                                <Button onClick={handleCopaymentCalculate} variant="solid" color="primary">
+                                                    Calculate
+                                                </Button>
+                                            </CardActions>
+
+
+                                        </CardContent>
+                                    </Card>
+
+                                </form>
+                            </Grid>
+                            <Grid xs={7}>
+                                <Card size="lg" variant="outlined">
+                                    <Chip startDecorator={<LocalAtmIcon />} size="sm" variant="outlined" color="primary">
+                                        BASIC
+                                    </Chip>
+                                    <Typography level="h2">Summary</Typography>
+                                    <Divider inset="none" />
+                                    <List size="sm" sx={{ mx: 'calc(-1 * var(--ListItem-paddingX))' }}>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <PaidIcon />
+                                            </ListItemDecorator>
+                                            <b>Cash Payment:</b> ${responseData.data.cash_payment}
+                                            {/* 
+                                            
+                                            
+                                            {responseData.data.deductible}
+                                            {responseData.data.over_limit}
+                                            {responseData.data.pro_ration} */}
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <LocalHospitalIcon />
+                                            </ListItemDecorator>
+                                            <b>Co Insurance:</b> ${responseData.data.co_insurance}
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <HealthAndSafetyIcon />
+                                            </ListItemDecorator>
+                                            <b>Co payment:</b> ${responseData.data.co_payment}
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <RemoveIcon />
+                                            </ListItemDecorator>
+                                            <b>Deductible:</b> ${responseData.data.deductible}
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <KeyboardDoubleArrowUpIcon />
+                                            </ListItemDecorator>
+                                            <b>Over limit:</b> ${responseData.data.over_limit}
+                                        </ListItem>
+                                        <ListItem>
+                                            <ListItemDecorator>
+                                                <BalanceIcon />
+                                            </ListItemDecorator>
+                                            <b>Pro-ration:</b> ${responseData.data.pro_ration}
+                                        </ListItem>
+                                    </List>
+                                    <Divider inset="none" />
+                                    <CardActions>
+                                        <Typography level="title-lg" sx={{ mr: 'auto' }}>
+                                        Total bill: $(SGD) {responseData.data.total_bill}.
+                                            
+                                        </Typography>
                                     </CardActions>
-
-
-                                </CardContent>
-                            </Card>
-
-                        </form>
+                                </Card>
+                            </Grid>
+                        </Grid>
 
 
 
