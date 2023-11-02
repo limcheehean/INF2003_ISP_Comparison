@@ -201,7 +201,7 @@ function Login() {
               <IconButton variant="soft" color="primary" size="sm">
                 <BadgeRoundedIcon />
               </IconButton>
-              <Typography level="title-lg">Company logo</Typography>
+              <Typography level="title-lg">ISP Comparison</Typography>
             </Box>
             <ColorSchemeToggle />
           </Box>
