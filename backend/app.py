@@ -9,7 +9,7 @@ from components.password_management import handle_forgot_password, handle_reset_
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
 
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, get_plans
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans
 from components.user_plans import update_user_plans, get_user_plan_data
 
 
@@ -241,10 +241,69 @@ def plan_benefits():
     return get_plan_benefits(db_cursor, request)
 
 
-@app.route("/api/get_plans", methods=["POST"])
+@app.route("/api/filter_plans", methods=["POST"])
 def plans():
+""" Filter Plans API
 
-    return get_plans(db_cursor, request)
+    This API will filter the plans shown based on the users chosen company id or ward type.
+
+    JSON Body Parameters:
+    ---------------------
+    - company_ids (list): List of objects containing company_ids
+    - ward_type (list): List of objects containing ward_types
+
+    Return Codes:
+    -------------
+    - 200 OK: Premiums retrieved successfully
+        - JSON Body:
+            - "status" (str): "success"
+            - "data" (object): Object containing table rows and columns
+
+    Example Request:
+    ---------------
+    POST /filter_plans
+    Content-Type: application/json
+    {
+        "company_ids": ["1", "2"],
+        "ward_types": []
+    }
+
+    Example Response:
+    ----------------
+    HTTP/1.1 200 OK
+    Content-Type: application/json
+
+    {
+        "status": "success",
+        "data": {
+                "details": [
+                    {
+                        "company_details": {
+                            "company_id": 1,
+                            "company_name": "AIA"
+                        },
+                        "plan_details": {
+                            "plan_co_insurance": "10.00",
+                            "plan_deductible_change_age": 81,
+                            "plan_id": 1,
+                            "plan_name": "HealthShield Gold Max A",
+                            "plan_policy_year_limit": 2000000,
+                            "plan_short_name": "A",
+                            "plan_ward_type": "Private"
+                        },
+                        "rider_details": {
+                            "rider_co_insurance_coverage": "0.95",
+                            "rider_co_payment_cap": "3000.00",
+                            "rider_deductible_coverage": "0.95",
+                            "rider_id": 1,
+                            "rider_name": "AIA Max VitalHealth A",
+                            "rider_short_name": "A"
+                        }
+                    }
+                ]}
+    }
+    """
+    return filter_plans(db_cursor, request)
 
 @app.route("/api/co_payment", methods=["POST"])
 def co_payment():
@@ -312,7 +371,7 @@ def get_user_plans():
 def add_or_edit_user_plans():
     return update_user_plans(db, mongo, request)
 
-@app.route("/api/user_plans", methods=["Delete"])
+@app.route("/api/user_plans/", methods=["Delete"])
 @require_login
 def delete_user_plans():
     return delete_user_plans(db, mongo, request)
