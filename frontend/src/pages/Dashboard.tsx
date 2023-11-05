@@ -22,7 +22,7 @@ import Radio from '@mui/joy/Radio';
 import Slider from '@mui/joy/Slider';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 // can remove these two
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
@@ -189,15 +189,83 @@ function createData(
   return { companyName, ward, plans, riders};
 }
 
-const rows = [
+const initialRows = [
   createData('AIA', 'A', 'testing1', 'testing2'),
   createData('Prudential', 'B1', 'testing3', 't4'),
   createData('NTUC', 'C', 't5', 't6'),
-  createData('Great Eastern', 'Premium', 't7', 't8'),
+  createData('Great Eastern', 'Private', 't7', 't8'),
 ];
 
 export default function TeamExample() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+
+  // To display only the checked boxes
+  // Define state to keep track of the checked checkboxes
+  // const [checkedItems, setCheckedItems] = useState({
+  //   Companies: new Set(),
+  //   Wards: new Set(),
+  //   Plans: new Set(),
+  //   Riders: new Set(),
+  // });
+  const [checkedItems, setCheckedItems] = useState(new Map());
+  const [rows, setRows] = useState(initialRows);
+
+  // Define a function to update the checked items
+  type ListName = 'Companies' | 'Wards' | 'Plans' | 'Riders';
+  type ItemName = string;
+
+  const handleCheckboxChange = (listName: ListName, itemName: ItemName) => {
+    // Update the checked items state
+    setCheckedItems((prevItems) => {
+      const updatedItems = new Map(prevItems);
+      if (updatedItems.has(listName)) {
+        const list = updatedItems.get(listName);
+        if (list) {
+          if (list.has(itemName)) {
+            list.delete(itemName);
+          } else {
+            list.add(itemName);
+          }
+        }
+      }
+      return updatedItems;
+    });
+  };
+
+  useEffect(() => {
+    console.log('Initial Rows:', initialRows);
+    // Filter and update the displayed rows based on checked items
+    const updatedRows = initialRows.filter((row) => {
+      if (
+        checkedItems.get('Companies')?.size &&
+        !checkedItems.get('Companies')?.has(row.companyName)
+      ) {
+        return false;
+      }
+      if (
+        checkedItems.get('Wards')?.size &&
+        !checkedItems.get('Wards')?.has(row.ward)
+      ) {
+        return false;
+      }
+      if (
+        checkedItems.get('Plans')?.size &&
+        !checkedItems.get('Plans')?.has(row.plans)
+      ) {
+        return false;
+      }
+      if (
+        checkedItems.get('Riders')?.size &&
+        !checkedItems.get('Riders')?.has(row.riders)
+      ) {
+        return false;
+      }
+      return true; // Default case, display the row
+    });
+  
+    console.log('Update Rows:', updatedRows);
+    setRows(updatedRows);
+  }, [checkedItems]);
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -520,7 +588,7 @@ export default function TeamExample() {
                     <td>{row.ward}</td>
                     <td>{row.plans}</td>
                     <td>{row.riders}</td>
-                  </tr>
+                </tr>
                 ))}
               </tbody>
             </Table>
