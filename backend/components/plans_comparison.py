@@ -225,14 +225,17 @@ def filter_by_policylimit(db, db_cursor, request):
         print("Error: ", e)
 
 planquery = """
-SELECT p.id, p.name, r.id, r.plan_id, r.name
+SELECT c.id, c.name, p.id, p.name, p.short_name, p.ward_type, p.policy_year_limit, p.co_insurance,p.deductible_change_age,
+r.id, r.name, r.short_name, r.deductible_coverage, r.co_insurance_coverage, r.co_payment_cap
 FROM plan as p
 JOIN rider as r
     ON p.id = r.plan_id
+JOIN company as c
+    ON p.company_id = c.id
 WHERE p.company_id in ("""
 
 
-def get_plans(db_cursor, request):
+def filter_plans(db_cursor, request):
     '''
     To get the plans by either their Ward Type or Company ID
 
@@ -277,20 +280,40 @@ def get_plans(db_cursor, request):
 
             queried_plan = db_cursor.fetchall()
 
-            plans = {}
+            details = []
+
+
 
             print("result: ", queried_plan)
 
             for result in queried_plan:
-                plans[result[0]] = ({
-                    "plan_id": result[0],
-                    "plan_name": result[1],
-                    "rider_id": result[2],
-                    "rider_name": result[4]
+                details.append({
+                    "company_details": {
+                        "company_id": result[0],
+                        "company_name": result[1]
+                    },
+                    "plan_details": {
+                        "plan_id": result[2],
+                        "plan_name": result[3],
+                        "plan_short_name": result[4],
+                        "plan_ward_type": result[5],
+                        "plan_policy_year_limit": result[6],
+                        "plan_co_insurance": result[7],
+                        "plan_deductible_change_age": result[8],
+                    },
+                    "rider_details": {
+                        "rider_id": result[9],
+                        "rider_name": result[10],
+                        "rider_short_name": result[11],
+                        "rider_deductible_coverage": result[12],
+                        "rider_co_insurance_coverage": result[13],
+                        "rider_co_payment_cap": result[14]
+                    }
                 })
 
+
             json_data = {
-                "plans": list(plans.values())
+                "details": details
             }
 
         except Exception as e:
@@ -309,20 +332,40 @@ def get_plans(db_cursor, request):
 
             queried_plan = db_cursor.fetchall()
 
-            plans = {}
+            details = []
+
+
 
             print("result: ", queried_plan)
 
             for result in queried_plan:
-                plans[result[0]] = ({
-                    "plan_id": result[0],
-                    "plan_name": result[1],
-                    "rider_id": result[3],
-                    "rider_name": result[4]
+                details.append({
+                    "company_details": {
+                        "company_id": result[0],
+                        "company_name": result[1]
+                    },
+                    "plan_details": {
+                        "plan_id": result[2],
+                        "plan_name": result[3],
+                        "plan_short_name": result[4],
+                        "plan_ward_type": result[5],
+                        "plan_policy_year_limit": result[6],
+                        "plan_co_insurance": result[7],
+                        "plan_deductible_change_age": result[8],
+                    },
+                    "rider_details": {
+                        "rider_id": result[9],
+                        "rider_name": result[10],
+                        "rider_short_name": result[11],
+                        "rider_deductible_coverage": result[12],
+                        "rider_co_insurance_coverage": result[13],
+                        "rider_co_payment_cap": result[14]
+                    }
                 })
 
+
             json_data = {
-                "plans": list(plans.values())
+                "details": details
             }
 
         except Exception as e:
