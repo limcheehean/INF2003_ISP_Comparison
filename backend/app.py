@@ -9,7 +9,7 @@ from components.password_management import handle_forgot_password, handle_reset_
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
 
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans, filter_items
 from components.user_plans import update_user_plans, get_user_plan_data
 
 
@@ -243,7 +243,7 @@ def plan_benefits():
 
 @app.route("/api/filter_plans", methods=["POST"])
 def plans():
-""" Filter Plans API
+    """ Filter Plans API
 
     This API will filter the plans shown based on the users chosen company id or ward type.
 
@@ -304,6 +304,12 @@ def plans():
     }
     """
     return filter_plans(db_cursor, request)
+
+
+@app.route("/api/get_filter", methods=["POST"])
+def get_filter():
+    return filter_items(db, request)
+
 
 @app.route("/api/co_payment", methods=["POST"])
 def co_payment():

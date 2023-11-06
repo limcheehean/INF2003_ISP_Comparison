@@ -235,6 +235,31 @@ JOIN company as c
 WHERE p.company_id in ("""
 
 
+def filter_items(db, request):
+    cursor = db.cursor(CustomDictCursor)
+
+    cursor.execute("SELECT id, name FROM Company")
+    companies = cursor.fetchall()
+
+    cursor.execute("SELECT id, name FROM Plan")
+    plans = cursor.fetchall()
+
+    cursor.execute("SELECT id, name FROM Rider")
+    riders = cursor.fetchall()
+
+    data = {
+        "wards": ["Private", "A", "B1"],
+        "companies": companies,
+        "plans": plans,
+        "riders": riders
+    }
+
+    return {"status": "success", "data": data}
+
+
+
+
+
 def filter_plans(db_cursor, request):
     '''
     To get the plans by either their Ward Type or Company ID
