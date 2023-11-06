@@ -17,17 +17,16 @@ import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import GoogleIcon from '../GoogleIcon';
-import { Link } from 'react-router-dom';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2'
 
 interface FormElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
-  // password: HTMLInputElement;
-  // persistent: HTMLInputElement;
+
+  password: HTMLInputElement;
+  confirmPassword: HTMLInputElement;
+
 }
-interface SignInFormElement extends HTMLFormElement {
+interface ResetPwFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
@@ -67,34 +66,55 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 
 
 
-// This chunk handles the forget password function
-function ForgetPassword() {
+// This chunk handles the reset password function
+function ResetPassword() {
+
+    const { resetToken } = useParams();
+    const navigate = useNavigate();
+
+    console.log(resetToken);
+
+    const handleResetPassword = async (event: React.FormEvent<ResetPwFormElement>) => {
+      event.preventDefault();
+      const formElements = event.currentTarget.elements;
+      const data = {
+        password: formElements.password.value,
+        confirmPassword: formElements.confirmPassword.value,
+      };
+      try {
+        const response = await axios.post(`/api/resetPassword/${resetToken}`, data, {
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        Swal.fire({
+          title: 'Success',
+          text: 'Successfully reset your password',
+          icon: 'success',
+          confirmButtonText: 'Cool'
+        }).then(function (result) {
+          if (result.value) {
+              navigate('/');
+          }
+      })
+       
+        const responseData = response.data;
+        console.log(responseData);
+
+
+
   
-  const [email, setEmail] = useState('');
-  // const [resetToken, setResetToken] = useState('');
-  // const [resetPassword, setResetPassword] = useState('');
-
-
-  // Checks email, if present in the backend, it should console.log the email, if not, it will show error
-  const handleForgotPassword = async () => {
-    try {
-      console.log({email});
-      const response = await axios.post('api/forgotPassword', {email}, {headers:{'Content-Type':'application/json'}});
-      console.log('Response:', response.data);
-    } catch (error) {
-      // error message if no email
-      console.error('Error:', error);
+      } catch (error) {
+        console.log('Error with resetPassword operation', error)
+      }
     }
-  };
 
-  // const handleResetPassword = async () => {
-  //   try {
-  //     const response = await axios.post(`resetPassword/${resetToken}`, {password: resetPassword});
-  //     // Handle success or error response here
-  //   } catch (error) {
-  //     // Handle network or server errors 
-  //   }
-  // };
+
+
+
+
+
 
   return (
 
@@ -188,27 +208,36 @@ function ForgetPassword() {
           >
             <Stack gap={4} sx={{ mb: 2 }}>
               <Stack gap={1}>
-                <Typography level="h3">Forgot Password?</Typography>
+                <Typography level="h3">Reset Password</Typography>
                 <Typography level="body-sm">
-                  No worries, we'll send you reset instructions.
+                  Almost there!
                 </Typography>
               </Stack>
             </Stack>
 
             <Stack gap={4} sx={{ mt: 2 }}>
-              <form
-                onSubmit={(event: React.FormEvent<SignInFormElement>) => {
-                  event.preventDefault();
-                  const formElements = event.currentTarget.elements;
-                  const data = {
-                    email: formElements.email.value,
-                  };
-                  alert(JSON.stringify(data, null, 2));
-                }}
-              >
+              <form 
+                method="POST"
+                onSubmit={handleResetPassword}>
                 <FormControl required>
-                  <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" value = {email} onChange={(e) => setEmail(e.target.value)} />
+                  <FormLabel>Enter your new password</FormLabel>
+                  {/* <Input type="password" name="password" value = {email} onChange={(e) => setEmail(e.target.value)} /> */}
+                  <Input 
+                  type="password" 
+                  name="password"
+                  placeholder="password"
+                  required
+                  />
+
+                </FormControl>
+                <FormControl required>
+                  <FormLabel>Confirm your new password</FormLabel>
+                  <Input 
+                  type="password" 
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  required
+                   />
                 </FormControl>
 
                 <Stack gap={4} sx={{ mt: 2 }}>
@@ -219,12 +248,8 @@ function ForgetPassword() {
                       alignItems: 'center',
                     }}
                   >
-
-                    <Link to="/">
-                      Back to login
-                    </Link>
                   </Box>
-                  <Button onClick={handleForgotPassword} type="submit" fullWidth>
+                  <Button type="submit" fullWidth>
                     Submit
                   </Button>
 
@@ -271,4 +296,4 @@ function ForgetPassword() {
 
 
 
-export default ForgetPassword;
+export default ResetPassword;

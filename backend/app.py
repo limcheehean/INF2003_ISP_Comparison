@@ -108,7 +108,7 @@ def forgot_password():
     return handle_forgot_password(db, db_cursor, mail, request)
 
 
-@app.route('/resetPassword/<path:reset_token>', methods=['POST'])
+@app.route('/api/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
 
