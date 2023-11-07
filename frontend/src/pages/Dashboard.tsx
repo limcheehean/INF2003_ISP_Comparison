@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
@@ -86,17 +86,17 @@ function TeamNav() {
           }}
         >
           <ListItem>
-              <ListItemDecorator>
-                <PeopleRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>Ward</ListItemContent>
+            <ListItemDecorator>
+              <PeopleRoundedIcon fontSize="small" />
+            </ListItemDecorator>
+            <ListItemContent>Ward</ListItemContent>
           </ListItem>
           <ListItem>
             <ListItemButton>
               <ListItemDecorator sx={{ color: 'neutral.500' }}>
                 <ArticleRoundedIcon fontSize="small" />
               </ListItemDecorator>
-              <ListItemContent>Plan</ListItemContent>
+              <ListItemContent>My Plans</ListItemContent>
               <Chip
                 variant="soft"
                 color="neutral"
@@ -128,7 +128,7 @@ function createData(
   plans: string,
   riders: string,
 ) {
-  return { companyName, ward, plans, riders};
+  return { companyName, ward, plans, riders };
 }
 
 const rows = [
@@ -140,6 +140,20 @@ const rows = [
 
 export default function TeamExample() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  const [userPlans, setUserPlans] = React.useState([]);
+
+  useEffect(() => {
+    // Make an API request to fetch user plans data
+    fetch('/api/user_plans') // Replace with the actual API endpoint
+      .then((response) => response.json())
+      .then((data) => {
+        setUserPlans(data); // Assuming the API response is an array of user plans
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error('Error fetching user plans:', error);
+      });
+  }, []);
 
   return (
     <CssVarsProvider disableTransitionOnChange>
@@ -455,16 +469,16 @@ export default function TeamExample() {
                   <th>Riders</th>
                 </tr>
               </thead>
-              <tbody>
-                {rows.map((row) => (
-                  <tr key={row.companyName}>
+              {/* <tbody>
+                {userPlans.map((plan) => (
+                  <tr key={plan.companyName}>
                     <th scope="row">{row.companyName}</th>
                     <td>{row.ward}</td>
                     <td>{row.plans}</td>
                     <td>{row.riders}</td>
                   </tr>
                 ))}
-              </tbody>
+              </tbody> */}
             </Table>
           </Sheet>
           {/* <List
