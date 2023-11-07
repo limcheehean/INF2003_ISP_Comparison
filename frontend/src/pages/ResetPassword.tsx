@@ -5,8 +5,6 @@ import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
-import Checkbox from '@mui/joy/Checkbox';
-import Divider from '@mui/joy/Divider';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel, { formLabelClasses } from '@mui/joy/FormLabel';
 import IconButton, { IconButtonProps } from '@mui/joy/IconButton';
@@ -18,7 +16,7 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import Swal from 'sweetalert2'
+import Swal from 'sweetalert2';
 
 interface FormElements extends HTMLFormControlsCollection {
 

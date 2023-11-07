@@ -19,8 +19,7 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
 import { Link } from 'react-router-dom';
-import MuiAlert, { AlertProps } from '@mui/material/Alert';
-import Snackbar from '@mui/material/Snackbar';
+
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
