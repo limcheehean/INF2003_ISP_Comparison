@@ -300,6 +300,7 @@ function Login() {
                     </Link>
                 </Stack>
               </form>
+              </form>
             </Stack>
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
