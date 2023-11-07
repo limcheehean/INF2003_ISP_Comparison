@@ -237,7 +237,6 @@ def rider_benefits():
 
 @app.route("/api/get_plan_benefits", methods=["POST"])
 def plan_benefits():
-
     return get_plan_benefits(db_cursor, request)
 
 
@@ -308,7 +307,7 @@ def plans():
 
 @app.route("/api/get_filter", methods=["POST"])
 def get_filter():
-    return filter_items(db, request)
+    return filter_items(db, db_cursor, request)
 
 
 @app.route("/api/co_payment", methods=["POST"])
