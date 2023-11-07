@@ -9,7 +9,7 @@ from components.password_management import handle_forgot_password, handle_reset_
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
 
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans, filter_items
 from components.user_plans import update_user_plans, get_user_plan_data
 
 
@@ -70,7 +70,7 @@ def signup():
                 - Bad password -> "Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit"
                 - Other -> "Invalid email, name, or password"
 
-    - 403 Forbidden: Existing account with the provided email already exists.
+    - 409 Forbidden: Existing account with the provided email already exists.
         - JSON Body:
             - "status" (str): "error"
             - "message" (str): "An account with this email already exists"
@@ -108,7 +108,7 @@ def forgot_password():
     return handle_forgot_password(db, db_cursor, mail, request)
 
 
-@app.route('/resetPassword/<path:reset_token>', methods=['POST'])
+@app.route('/api/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
     return handle_reset_token(reset_token, db, db_cursor, request)
 
@@ -304,6 +304,12 @@ def plans():
     }
     """
     return filter_plans(db_cursor, request)
+
+
+@app.route("/api/get_filter", methods=["POST"])
+def get_filter():
+    return filter_items(db, request)
+
 
 @app.route("/api/co_payment", methods=["POST"])
 def co_payment():

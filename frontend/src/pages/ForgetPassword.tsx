@@ -1,4 +1,5 @@
-import * as React from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -18,18 +19,20 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import GoogleIcon from '../GoogleIcon';
 import { Link } from 'react-router-dom';
-import { Slide } from '@mui/material';
 
 
 interface FormElements extends HTMLFormControlsCollection {
   email: HTMLInputElement;
-  password: HTMLInputElement;
-  persistent: HTMLInputElement;
+  // password: HTMLInputElement;
+  // persistent: HTMLInputElement;
 }
 interface SignInFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
+
+
+// This is just to toggle light/dark mode
 function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   const { mode, setMode } = useColorScheme();
   const [mounted, setMounted] = React.useState(false);
@@ -61,10 +64,41 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   );
 }
 
-const ForgetPassword = () => {
+
+
+// This chunk handles the forget password function
+function ForgetPassword() {
+  
+  const [email, setEmail] = useState('');
+  // const [resetToken, setResetToken] = useState('');
+  // const [resetPassword, setResetPassword] = useState('');
+
+
+  // Checks email, if present in the backend, it should console.log the email, if not, it will show error
+  const handleForgotPassword = async () => {
+    try {
+      console.log({email});
+      const response = await axios.post('api/forgotPassword', {email}, {headers:{'Content-Type':'application/json'}});
+      console.log('Response:', response.data);
+    } catch (error) {
+      // error message if no email
+      console.error('Error:', error);
+    }
+  };
+
+  // const handleResetPassword = async () => {
+  //   try {
+  //     const response = await axios.post(`resetPassword/${resetToken}`, {password: resetPassword});
+  //     // Handle success or error response here
+  //   } catch (error) {
+  //     // Handle network or server errors 
+  //   }
+  // };
+
   return (
 
     <CssVarsProvider defaultMode="dark" disableTransitionOnChange>
+
       <CssBaseline />
       <GlobalStyles
         styles={{
@@ -76,6 +110,7 @@ const ForgetPassword = () => {
           },
         }}
       />
+
       <Box
         sx={(theme) => ({
           width:
@@ -166,15 +201,13 @@ const ForgetPassword = () => {
                   const formElements = event.currentTarget.elements;
                   const data = {
                     email: formElements.email.value,
-                    password: formElements.password.value,
-                    persistent: formElements.persistent.checked,
                   };
                   alert(JSON.stringify(data, null, 2));
                 }}
               >
                 <FormControl required>
                   <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" />
+                  <Input type="email" name="email" value = {email} onChange={(e) => setEmail(e.target.value)} />
                 </FormControl>
 
                 <Stack gap={4} sx={{ mt: 2 }}>
@@ -190,9 +223,10 @@ const ForgetPassword = () => {
                       Back to login
                     </Link>
                   </Box>
-                  <Button type="submit" fullWidth>
-                    Sign in
+                  <Button onClick={handleForgotPassword} type="submit" fullWidth>
+                    Submit
                   </Button>
+
                 </Stack>
               </form>
             </Stack>
@@ -231,7 +265,7 @@ const ForgetPassword = () => {
     </CssVarsProvider>
 
   );
-  
+
 }
 
 

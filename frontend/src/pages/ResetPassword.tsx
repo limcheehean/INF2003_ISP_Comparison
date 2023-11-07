@@ -1,36 +1,36 @@
-// import * as React from 'react';
-import React, { useEffect, useState } from 'react';
-import Axios from 'axios';
+import React, { useState } from 'react';
+import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
 import Button from '@mui/joy/Button';
-import Checkbox from '@mui/joy/Checkbox';
 import FormControl from '@mui/joy/FormControl';
 import FormLabel, { formLabelClasses } from '@mui/joy/FormLabel';
 import IconButton, { IconButtonProps } from '@mui/joy/IconButton';
+// import Link from '@mui/joy/Link';
 import Input from '@mui/joy/Input';
 import Typography from '@mui/joy/Typography';
 import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import GoogleIcon from '../GoogleIcon';
-import { Link, useNavigate } from 'react-router-dom';
-import Slide from '@mui/material/Slide';
-import Alert from '@mui/joy/Alert';
-
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 interface FormElements extends HTMLFormControlsCollection {
-  email: HTMLInputElement;
+
   password: HTMLInputElement;
-  persistent: HTMLInputElement;
+  confirmPassword: HTMLInputElement;
+
 }
-interface SignInFormElement extends HTMLFormElement {
+interface ResetPwFormElement extends HTMLFormElement {
   readonly elements: FormElements;
 }
 
+
+
+// This is just to toggle light/dark mode
 function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   const { mode, setMode } = useColorScheme();
   const [mounted, setMounted] = React.useState(false);
@@ -62,85 +62,62 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
   );
 }
 
-function Login() {
-  const navigate = useNavigate();
 
-  // State to store user input
-  const [email, setEmail] = useState('');
-  //const [emailError, setEmailError] = useState('');
-  const [password, setPassword] = useState('');
-  //const [passwordError, setPasswordError] = useState('');
-  const [error, setError] = useState('');
 
-  // To reset previous error messages
-  // const clearErrors = () => {
-  //   setEmailError('');
-  //   setPasswordError('');
-  // };
-  
-  const handleLogin = async (event: React.FormEvent<SignInFormElement>) => {
-    event.preventDefault();
-    const formElements = event.currentTarget.elements;
-    const data = {
-      email: formElements.email.value,
-      password: formElements.password.value,
-      persistent: formElements.persistent.checked,
-    };
-    //alert(JSON.stringify(data, null, 2));
-  
-    // Clear any previous errors
-    //clearErrors();
-    setError('');
+// This chunk handles the reset password function
+function ResetPassword() {
 
-    try {
-      const requestData = {email, password}; // Combine email and password in one object
-      const requestHeaders = {'Content-Type': 'application/json'};
+    const { resetToken } = useParams();
+    const navigate = useNavigate();
 
-      const response = await Axios.post('/api/login', requestData, {headers: requestHeaders});
-      // Handle the response - redirect to the dashboard
-      // console.log('Login successful: ', response.data);
-      // // Code to redirect to the dashboard goes here
-      // navigate('/dashboard');
-      if (response.status === 200) {
-        // Login successful
-        console.log('Login successful: ', response.data);
-        // Code to redirect to the dashboard goes here
-        navigate('/dashboard');
-      } else {
-        // Handle other types of errors
-        console.error('Unknown error:', response);
-      }
-    } catch (error: any) { // Specify 'error' as 'any' type
-      if (error.response) {
-        // The error object has a response, meaning it's an error response from the server.
-        const { status, data } = error.response;
+    console.log(resetToken);
 
-        if (status === 400) {
-          // Bad request (e.g., email and password do not match)
-          // Assuming the API returns a message in the response
-          if (data.message === 'Invalid username or password') {
-            // setEmailError('invalid_email_password_error');
-            // setPasswordError('invalid_email_password_error');
-            setError('Invalid username or password');
-          } else {
-            // Handle other bad request errors if needed
-            // Display an appropriate error message for each case
-            console.error('Bad request error:', data);
+    const handleResetPassword = async (event: React.FormEvent<ResetPwFormElement>) => {
+      event.preventDefault();
+      const formElements = event.currentTarget.elements;
+      const data = {
+        password: formElements.password.value,
+        confirmPassword: formElements.confirmPassword.value,
+      };
+      try {
+        const response = await axios.post(`/api/resetPassword/${resetToken}`, data, {
+          headers: {
+            'Content-Type': 'application/json'
           }
-        } else {
-          // Handle other HTTP status codes if needed
-          console.error('HTTP error:', error.response);
-        }
-      } else {
-        // Handle network or request error
-        console.error('Network or request error:', error);
-       }
+        });
+
+        Swal.fire({
+          title: 'Success',
+          text: 'Successfully reset your password',
+          icon: 'success',
+          confirmButtonText: 'Cool'
+        }).then(function (result) {
+          if (result.value) {
+              navigate('/');
+          }
+      })
+       
+        const responseData = response.data;
+        console.log(responseData);
+
+
+
+  
+      } catch (error) {
+        console.log('Error with resetPassword operation', error)
+      }
     }
-  };
+
+
+
+
+
+
 
   return (
 
     <CssVarsProvider defaultMode="dark" disableTransitionOnChange>
+
       <CssBaseline />
       <GlobalStyles
         styles={{
@@ -152,7 +129,7 @@ function Login() {
           },
         }}
       />
-      
+
       <Box
         sx={(theme) => ({
           width:
@@ -200,7 +177,7 @@ function Login() {
               <IconButton variant="soft" color="primary" size="sm">
                 <BadgeRoundedIcon />
               </IconButton>
-              <Typography level="title-lg">ISP Comparison</Typography>
+              <Typography level="title-lg">Company logo</Typography>
             </Box>
             <ColorSchemeToggle />
           </Box>
@@ -227,55 +204,40 @@ function Login() {
               },
             }}
           >
-            {/* <Stack gap={4} sx={{ mb: 2 }}>
+            <Stack gap={4} sx={{ mb: 2 }}>
               <Stack gap={1}>
-                <Typography level="h3">Sign in</Typography>
+                <Typography level="h3">Reset Password</Typography>
                 <Typography level="body-sm">
-                  New to company?{' '}
-                  <Link to="/Signup">
-                    Sign up!
-                  </Link>
+                  Almost there!
                 </Typography>
               </Stack>
-
-              <Button
-                variant="soft"
-                color="neutral"
-                fullWidth
-                startDecorator={<GoogleIcon />}
-              >
-                Continue with Google
-              </Button>
             </Stack>
-            <Divider
-              sx={(theme) => ({
-                [theme.getColorSchemeSelector('light')]: {
-                  color: { xs: '#FFF', md: 'text.tertiary' },
-                  '--Divider-lineColor': {
-                    xs: '#FFF',
-                    md: 'var(--joy-palette-divider)',
-                  },
-                },
-              })}
-            >
-              or
-            </Divider> */}
+
             <Stack gap={4} sx={{ mt: 2 }}>
-              <form onSubmit={handleLogin}>
-              <form onSubmit={handleLogin}>
+              <form 
+                method="POST"
+                onSubmit={handleResetPassword}>
                 <FormControl required>
-                  <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                  <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                  <FormLabel>Enter your new password</FormLabel>
+                  {/* <Input type="password" name="password" value = {email} onChange={(e) => setEmail(e.target.value)} /> */}
+                  <Input 
+                  type="password" 
+                  name="password"
+                  placeholder="password"
+                  required
+                  />
+
                 </FormControl>
                 <FormControl required>
-                  <FormLabel>Password</FormLabel>
-                  <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
-                  <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
+                  <FormLabel>Confirm your new password</FormLabel>
+                  <Input 
+                  type="password" 
+                  name="confirmPassword"
+                  placeholder="Confirm Password"
+                  required
+                   />
                 </FormControl>
-                {/* {emailError && <Alert color="danger" variant="soft">{emailError}</Alert>}
-                {passwordError && <Alert color="danger" variant="soft">{passwordError}</Alert>} */}
-                {error && <Alert color="danger" variant="soft">{error}</Alert>}
+
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
                     sx={{
@@ -284,20 +246,11 @@ function Login() {
                       alignItems: 'center',
                     }}
                   >
-                    <Checkbox size="sm" label="Remember me" name="persistent" />
-                    <Link to="/forgetPassword">
-                      Forgot your password?
-                    </Link>
                   </Box>
                   <Button type="submit" fullWidth>
-                    Sign in
+                    Submit
                   </Button>
-                  <Link to="/Signup">
-                      Don't have an account? Sign up!
-                    </Link>
-                  <Link to="/Signup">
-                      Don't have an account? Sign up!
-                    </Link>
+
                 </Stack>
               </form>
             </Stack>
@@ -309,7 +262,6 @@ function Login() {
           </Box>
         </Box>
       </Box>
-      
       <Box
         sx={(theme) => ({
           height: '100%',
@@ -337,7 +289,9 @@ function Login() {
     </CssVarsProvider>
 
   );
-  
+
 }
 
-export default Login;
+
+
+export default ResetPassword;
