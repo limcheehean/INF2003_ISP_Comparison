@@ -74,6 +74,10 @@ function Login() {
   //const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
 
+
+  
+
+
   // To reset previous error messages
   // const clearErrors = () => {
   //   setEmailError('');
@@ -106,6 +110,7 @@ function Login() {
       if (response.status === 200) {
         // Login successful
         console.log('Login successful: ', response.data);
+       
         // Code to redirect to the dashboard goes here
         navigate('/dashboard');
       } else {
@@ -154,6 +159,7 @@ function Login() {
           },
         }}
       />
+      
       <Box
         sx={(theme) => ({
           width:
@@ -228,39 +234,7 @@ function Login() {
               },
             }}
           >
-            {/* <Stack gap={4} sx={{ mb: 2 }}>
-              <Stack gap={1}>
-                <Typography level="h3">Sign in</Typography>
-                <Typography level="body-sm">
-                  New to company?{' '}
-                  <Link to="/Signup">
-                    Sign up!
-                  </Link>
-                </Typography>
-              </Stack>
 
-              <Button
-                variant="soft"
-                color="neutral"
-                fullWidth
-                startDecorator={<GoogleIcon />}
-              >
-                Continue with Google
-              </Button>
-            </Stack>
-            <Divider
-              sx={(theme) => ({
-                [theme.getColorSchemeSelector('light')]: {
-                  color: { xs: '#FFF', md: 'text.tertiary' },
-                  '--Divider-lineColor': {
-                    xs: '#FFF',
-                    md: 'var(--joy-palette-divider)',
-                  },
-                },
-              })}
-            >
-              or
-            </Divider> */}
             <Stack gap={4} sx={{ mt: 2 }}>
               <form onSubmit={handleLogin}>
                 <FormControl required>
@@ -271,9 +245,10 @@ function Login() {
                   <FormLabel>Password</FormLabel>
                   <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
-                {/* {emailError && <Alert color="danger" variant="soft">{emailError}</Alert>}
-                {passwordError && <Alert color="danger" variant="soft">{passwordError}</Alert>} */}
                 {error && <Alert color="danger" variant="soft">{error}</Alert>}
+                
+                
+
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
                     sx={{
@@ -304,6 +279,7 @@ function Login() {
           </Box>
         </Box>
       </Box>
+      
       <Box
         sx={(theme) => ({
           height: '100%',
