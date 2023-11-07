@@ -106,9 +106,35 @@ function Login() {
       if (response.status === 200) {
         // Login successful
         console.log('Login successful: ', response.data);
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'signed in successfully!'
+        })
+
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+
+      //   Swal.fire({
+      //     position: 'top-end',
+      //     title: 'Success',
+      //     text: 'successfully logged in!',
+      //     icon: 'success',
+      //   }).then(function (result) {
+      //     if (result.value) {
+      //       // code to redirect to dashboard goes here
+      //         navigate('/dashboard');
+      //     }
+      // })
        
-        // Code to redirect to the dashboard goes here
-        navigate('/dashboard');
       } else {
         // Handle other types of errors
         console.error('Unknown error:', response);
