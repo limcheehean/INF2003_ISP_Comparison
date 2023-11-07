@@ -1,5 +1,9 @@
-import * as React from 'react';
-import { Checkbox } from '@mui/joy';
+import React, { useState, useEffect } from 'react';
+
+// make it a state so that the options changes as and when!!
+// function Plans() {
+//     const [, ]
+// }
 
 export const Wards = [
     {
@@ -41,18 +45,6 @@ export const Companies = [
 ];
 
 export const Plans = [
-    {
-        name: "testing1"
-    },
-    {
-        name: "testing3"
-    },
-    {
-        name: "t5"
-    },
-    {
-        name: "t7"
-    }
 ];
 
 export const Riders = [

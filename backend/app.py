@@ -243,7 +243,7 @@ def plan_benefits():
 
 @app.route("/api/filter_plans", methods=["POST"])
 def plans():
-""" Filter Plans API
+    """ Filter Plans API
 
     This API will filter the plans shown based on the users chosen company id or ward type.
 
