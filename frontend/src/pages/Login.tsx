@@ -262,15 +262,12 @@ function Login() {
             </Divider> */}
             <Stack gap={4} sx={{ mt: 2 }}>
               <form onSubmit={handleLogin}>
-              <form onSubmit={handleLogin}>
                 <FormControl required>
                   <FormLabel>Email</FormLabel>
-                  <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                   <Input type="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)} />
                 </FormControl>
                 <FormControl required>
                   <FormLabel>Password</FormLabel>
-                  <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                   <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
                 {/* {emailError && <Alert color="danger" variant="soft">{emailError}</Alert>}
@@ -294,12 +291,8 @@ function Login() {
                   </Button>
                   <Link to="/Signup">
                       Don't have an account? Sign up!
-                    </Link>
-                  <Link to="/Signup">
-                      Don't have an account? Sign up!
-                    </Link>
+                  </Link>
                 </Stack>
-              </form>
               </form>
             </Stack>
           </Box>

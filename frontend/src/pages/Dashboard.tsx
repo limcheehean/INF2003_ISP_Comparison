@@ -1,4 +1,5 @@
 import * as React from 'react';
+import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Autocomplete from '@mui/joy/Autocomplete';
@@ -46,7 +47,8 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-import { Wards, Companies, Plans, Riders } from "../components/CheckBoxes";
+import CheckBoxes from "../components/CheckBoxes";
+import { StringLiteralType } from 'typescript';
 //import "../App.css";
 
 function ColorSchemeToggle() {
@@ -77,138 +79,35 @@ function ColorSchemeToggle() {
   );
 }
 
-// Checkboxes
+// // Table
+// function createData(
+//   companyName: string,
+//   ward: string,
+//   plans: string,
+//   riders: string,
+// ) {
+//   return { companyName, ward, plans, riders};
+// }
 
-// Define the type for the items prop
-type Item = {
-  name: string;
-};
+// const initialRows = [
+//   createData('AIA', 'A', 'testing1', 'testing2'),
+//   createData('Prudential', 'B1', 'testing3', 't4'),
+//   createData('NTUC', 'C', 't5', 't6'),
+//   createData('Great Eastern', 'Private', 't7', 't8'),
+// ];
 
-interface CheckBoxesProps {
-  items: Item[];
+interface ApiData {
+  companyName: string;
+  ward: string;
+  plans: string;
+  riders: string;
 }
-
-function CheckBoxes({ items }: CheckBoxesProps ) {
-  const [checkedState, setCheckedState] = useState(
-    new Array(items.length).fill(false)
-  );
-
-  const handleOnChange = (position: number) => {
-    const updatedCheckedState = checkedState.map((item, index) =>
-      index === position ? !item : item
-    );
-
-    setCheckedState(updatedCheckedState);
-  };
-
-  return (
-    <ul style={{ listStyle: 'none' }}>
-    {items.map(({ name }, index) => {
-      return (
-        <li key={index}>
-          <div className="wards-list-item">
-            <input
-              type="checkbox"
-              id={`custom-checkbox-${index}`}
-              name={name}
-              value={name}
-              checked={checkedState[index]}
-              onChange={() => handleOnChange(index)}
-            />
-            <label htmlFor={`custom-checkbox-${index}`}>{name}</label>
-          </div>
-        </li>
-      );
-    })}
-  </ul>
-  );
-}
-
-function TeamNav() {
-  return (
-    <List size="sm" sx={{ '--ListItem-radius': '8px', '--List-gap': '4px' }}>
-      <ListItem nested>
-        <ListSubheader>
-          Browse
-          <IconButton
-            size="sm"
-            variant="plain"
-            color="primary"
-            sx={{ '--IconButton-size': '24px', ml: 'auto' }}
-          >
-            <KeyboardArrowDownRoundedIcon fontSize="small" color="primary" />
-          </IconButton>
-        </ListSubheader>
-        <List
-          aria-labelledby="nav-list-browse"
-          sx={{
-            '& .JoyListItemButton-root': { p: '8px' },
-          }}
-        >
-          <ListItem>
-            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-              <AddBusinessIcon fontSize="small" />
-            </ListItemDecorator>
-            <ListItemContent>Company Name</ListItemContent>
-          </ListItem>
-          <CheckBoxes items={Companies}/>
-          <ListItem>
-            <ListItemDecorator>
-              <PeopleRoundedIcon fontSize="small" />
-            </ListItemDecorator>
-            <ListItemContent>Ward</ListItemContent>
-          </ListItem>
-          <CheckBoxes items={Wards}/>
-          <ListItem>
-            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-              <ArticleRoundedIcon fontSize="small" />
-            </ListItemDecorator>
-            <ListItemContent>Plans</ListItemContent>
-          </ListItem>
-          <CheckBoxes items={Plans}/>
-          <ListItem>
-            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-              <AssignmentIndRoundedIcon fontSize="small" />
-            </ListItemDecorator>
-            <ListItemContent>Riders</ListItemContent>
-          </ListItem>
-          <CheckBoxes items={Riders}/>
-        </List>
-      </ListItem>
-    </List>
-  );
-}
-
-// Table
-function createData(
-  companyName: string,
-  ward: string,
-  plans: string,
-  riders: string,
-) {
-  return { companyName, ward, plans, riders};
-}
-
-const initialRows = [
-  createData('AIA', 'A', 'testing1', 'testing2'),
-  createData('Prudential', 'B1', 'testing3', 't4'),
-  createData('NTUC', 'C', 't5', 't6'),
-  createData('Great Eastern', 'Private', 't7', 't8'),
-];
 
 export default function TeamExample() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
 
-  // To display only the checked boxes
-  // Define state to keep track of the checked checkboxes
-  // const [checkedItems, setCheckedItems] = useState({
-  //   Companies: new Set(),
-  //   Wards: new Set(),
-  //   Plans: new Set(),
-  //   Riders: new Set(),
-  // });
   const [checkedItems, setCheckedItems] = useState(new Map());
-  const [rows, setRows] = useState(initialRows);
+  const [rows, setRows] = useState<ApiData[]>([]);
 
   // Define a function to update the checked items
   type ListName = 'Companies' | 'Wards' | 'Plans' | 'Riders';
@@ -232,47 +131,70 @@ export default function TeamExample() {
     });
   };
 
-  useEffect(() => {
-    console.log('Initial Rows:', initialRows);
-    // Filter and update the displayed rows based on checked items
-    const updatedRows = initialRows.filter((row) => {
-      if (
-        checkedItems.get('Companies')?.size &&
-        !checkedItems.get('Companies')?.has(row.companyName)
-      ) {
-        return false;
-      }
-      if (
-        checkedItems.get('Wards')?.size &&
-        !checkedItems.get('Wards')?.has(row.ward)
-      ) {
-        return false;
-      }
-      if (
-        checkedItems.get('Plans')?.size &&
-        !checkedItems.get('Plans')?.has(row.plans)
-      ) {
-        return false;
-      }
-      if (
-        checkedItems.get('Riders')?.size &&
-        !checkedItems.get('Riders')?.has(row.riders)
-      ) {
-        return false;
-      }
-      return true; // Default case, display the row
-    });
+  // useEffect(() => {
+  //   console.log('Initial Rows:', initialRows);
+  //   // Filter and update the displayed rows based on checked items
+  //   const updatedRows = initialRows.filter((row) => {
+  //     if (
+  //       checkedItems.get('Companies')?.size &&
+  //       !checkedItems.get('Companies')?.has(row.companyName)
+  //     ) {
+  //       return false;
+  //     }
+  //     if (
+  //       checkedItems.get('Wards')?.size &&
+  //       !checkedItems.get('Wards')?.has(row.ward)
+  //     ) {
+  //       return false;
+  //     }
+  //     if (
+  //       checkedItems.get('Plans')?.size &&
+  //       !checkedItems.get('Plans')?.has(row.plans)
+  //     ) {
+  //       return false;
+  //     }
+  //     if (
+  //       checkedItems.get('Riders')?.size &&
+  //       !checkedItems.get('Riders')?.has(row.riders)
+  //     ) {
+  //       return false;
+  //     }
+  //     return true; // Default case, display the row
+  //   });
   
-    console.log('Update Rows:', updatedRows);
-    setRows(updatedRows);
-  }, [checkedItems]);
+  //   console.log('Update Rows:', updatedRows);
+  //   setRows(updatedRows);
+  // }, [checkedItems]);
+
+  // // Create a function to fetch data from the API
+  // const fetchDataFromAPI = async () => {
+  //   try {
+  //     const response = await axios.post('/api/get_filter', {
+  //       company_ids: [],
+  //       ward_types: [],
+  //       plan_ids: [],
+  //     });
+
+  //     if (response.status === 200) {
+  //       const apiData = response.data; // Replace with the actual data structure
+  //       setRows(apiData); // Update the rows with the data from the API
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching data:", error);
+  //   }
+  // };
+
+  // // Use the useEffect hook to fetch data when the component mounts
+  // useEffect(() => {
+  //   fetchDataFromAPI();
+  // }, []);
 
   return (
     <CssVarsProvider disableTransitionOnChange>
       <CssBaseline />
       {drawerOpen && (
         <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-          <TeamNav />
+          {/* <TeamNav /> */}
         </Layout.SideDrawer>
       )}
       <Layout.Root
@@ -384,192 +306,9 @@ export default function TeamExample() {
           </Box>
         </Layout.Header>
         <Layout.SideNav>
-          <TeamNav />
+          <CheckBoxes/>
+          {/* <TeamNav /> */}
         </Layout.SideNav>
-        {/* <Layout.SidePane>
-          <Box
-            sx={{
-              p: 2,
-              pb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Typography level="title-sm">Filter by</Typography>
-            <Button size="sm" variant="plain" sx={{ fontSize: 'xs', px: 1 }}>
-              Clear filters
-            </Button>
-          </Box>
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Keywords
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Autocomplete
-                placeholder="Position, skills, etc…"
-                options={[
-                  {
-                    category: 'Position',
-                    title: 'Frontend engineer',
-                  },
-                  {
-                    category: 'Position',
-                    title: 'Backend engineer',
-                  },
-                  {
-                    category: 'Position',
-                    title: 'Product manager',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'JavaScript',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'TypeScript',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'Project management',
-                  },
-                ]}
-                groupBy={(option) => option.category}
-                getOptionLabel={(option) => option.title}
-              />
-              <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                <Chip
-                  variant="soft"
-                  size="sm"
-                  endDecorator={<ChipDelete variant="soft" />}
-                  sx={{ '--Chip-radius': (theme) => theme.vars.radius.sm }}
-                >
-                  UI designer
-                </Chip>
-              </Box>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Location
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Autocomplete
-                placeholder="Position, skills, etc…"
-                options={[
-                  // some of Thailand provinces
-                  'Bangkok',
-                  'Amnat Charoen',
-                  'Ang Thong',
-                  'Bueng Kan',
-                  'Buriram',
-                  'Chachoengsao',
-                  'Chai Nat',
-                  'Chaiyaphum',
-                  'Chanthaburi',
-                  'Chiang Mai',
-                  'Chiang Rai',
-                  'Chonburi',
-                ]}
-              />
-              <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
-                <Slider
-                  valueLabelFormat={(value) => `${value} km`}
-                  defaultValue={6}
-                  step={1}
-                  min={0}
-                  max={20}
-                  valueLabelDisplay="on"
-                />
-              </Box>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Education
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <RadioGroup name="education" defaultValue="any">
-                <Radio label="Any" value="any" size="sm" />
-                <Radio label="High School" value="high-school" size="sm" />
-                <Radio label="College" value="college" size="sm" />
-                <Radio label="Post-graduate" value="post-graduate" size="sm" />
-              </RadioGroup>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Previous experience
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowDownRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-          </Box>
-        </Layout.SidePane> */}
         <Layout.Main>
           <Sheet variant="outlined" style={{ width: '75.2vw' }}>
             <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
@@ -582,119 +321,17 @@ export default function TeamExample() {
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
-                  <tr key={row.companyName}>
+                {rows.map((row, index) => (
+                  <tr key={index}>
                     <th scope="row">{row.companyName}</th>
                     <td>{row.ward}</td>
                     <td>{row.plans}</td>
                     <td>{row.riders}</td>
-                </tr>
+                  </tr>
                 ))}
               </tbody>
             </Table>
           </Sheet>
-          {/* <List
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 2,
-            }}
-          >
-            {[...Array(3)].map((_, index) => (
-              <Sheet
-                key={index}
-                component="li"
-                variant="outlined"
-                sx={{
-                  borderRadius: 'sm',
-                  p: 2,
-                  listStyle: 'none',
-                }}
-              >
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Avatar
-                    src="https://i.pravatar.cc/40?img=6"
-                    srcSet="https://i.pravatar.cc/80?img=6 2x"
-                    sx={{ borderRadius: 'sm' }}
-                  />
-                  <div>
-                    <Typography>Andrew Smith</Typography>
-                    <Typography level="body-xs">UI Designer</Typography>
-                  </div>
-                </Box>
-                <Divider component="div" sx={{ my: 2 }} />
-                <List sx={{ '--ListItemDecorator-size': '48px' }}>
-                  <ListItem sx={{ alignItems: 'flex-start' }}>
-                    <ListItemDecorator
-                      sx={{
-                        '&:before': {
-                          content: '""',
-                          position: 'absolute',
-                          height: '100%',
-                          width: '2px',
-                          bgcolor: 'divider',
-                          left: 'calc(var(--ListItem-paddingLeft) + 15px)',
-                          top: '50%',
-                        },
-                      }}
-                    >
-                      <Avatar
-                        size="sm"
-                        src="https://www.vectorlogo.zone/logos/dribbble/dribbble-icon.svg"
-                      />
-                    </ListItemDecorator>
-                    <ListItemContent>
-                      <Typography fontSize="sm">Senior designer</Typography>
-                      <Typography level="body-xs">Dribbble</Typography>
-                    </ListItemContent>
-                    <Typography level="body-sm">2015-now</Typography>
-                  </ListItem>
-                  <ListItem sx={{ alignItems: 'flex-start' }}>
-                    <ListItemDecorator>
-                      <Avatar
-                        size="sm"
-                        src="https://www.vectorlogo.zone/logos/pinterest/pinterest-icon.svg"
-                        sx={{ backgroundColor: 'background.body' }}
-                      />
-                    </ListItemDecorator>
-                    <ListItemContent>
-                      <Typography fontSize="sm">Designer</Typography>
-                      <Typography level="body-xs">Pinterest</Typography>
-                    </ListItemContent>
-                    <Typography level="body-sm">2012-2015</Typography>
-                  </ListItem>
-                </List>
-                <Button
-                  size="sm"
-                  variant="plain"
-                  endDecorator={<KeyboardArrowRightRoundedIcon fontSize="small" />}
-                  sx={{ px: 1, mt: 1 }}
-                >
-                  Expand
-                </Button>
-                <Divider component="div" sx={{ my: 2 }} />
-                <Typography fontSize="sm">Skills tags:</Typography>
-                <Box sx={{ mt: 1.5, display: 'flex', gap: 1 }}>
-                  <Chip
-                    variant="outlined"
-                    color="neutral"
-                    size="sm"
-                    sx={{ borderRadius: 'sm' }}
-                  >
-                    UI design
-                  </Chip>
-                  <Chip
-                    variant="outlined"
-                    color="neutral"
-                    size="sm"
-                    sx={{ borderRadius: 'sm' }}
-                  >
-                    Illustration
-                  </Chip>
-                </Box>
-              </Sheet>
-            ))}
-          </List> */}
         </Layout.Main>
       </Layout.Root>
     </CssVarsProvider>
