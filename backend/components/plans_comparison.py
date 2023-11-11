@@ -236,9 +236,9 @@ def filter_items(db, db_cursor, request):
     cursor = db.cursor(CustomDictCursor)
 
     request_data = request.json
-    company_ids = request_data["company_ids"]
-    ward_types = request_data["ward_types"]
-    plan_ids = request_data["plan_ids"]
+    company_ids = request_data.get("company_ids", [])
+    ward_types = request_data.get("ward_types", [])
+    plan_ids = request_data.get("plan_ids", [])
 
 
     cursor.execute("SELECT id, name FROM Company")
