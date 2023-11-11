@@ -3,7 +3,7 @@ from functools import wraps
 from uuid import uuid4
 
 from bcrypt import checkpw, hashpw, gensalt
-from flask import redirect
+from flask import redirect, render_template
 from flask import session, url_for
 from flask_mail import Message
 from flaskext.mysql import pymysql
@@ -168,7 +168,8 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
 
     # If signup token does not exist
     if count == 0:
-        return {"status": "error", "message": "Invalid signup token."}, 403
+        #return {"status": "error", "message": "Invalid signup token."}, 403
+        return render_template('redirect_to_login.html', alert_message="Invalid signup token. Please register for an account.")
 
     else:
         user = db_cursor.fetchone()
@@ -176,7 +177,8 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
         # If signup token expired
         #   <?> Can consider deleting user data here, but it is automatically done in signup api upon re-registration,
         if (datetime.now() - token_created).total_seconds() > token_expire:
-            return {"status": "error", "message": "Confirmation link expired. Please register again."}, 403
+            #return {"status": "error", "message": "Confirmation link expired. Please register again."}, 403
+            return render_template('redirect_to_login.html', alert_message="Confirmation link expired. Please register again.")
 
         else:
             # <?> Sets signup_token to null, may use empty string if preferred
@@ -185,7 +187,8 @@ def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connec
                               WHERE id = %s;
                               """, user[0])
             db.commit()
-            return redirect("http://localhost:3000/")
+            return render_template('redirect_to_login.html', alert_message="Account activated! Please login at the login page.")
+            #return redirect("http://localhost:3000/")
 
 
 def check_user_exist(db_cursor: pymysql.Connection.cursor, email, duration_seconds=60):
