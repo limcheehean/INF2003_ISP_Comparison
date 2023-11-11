@@ -16,9 +16,17 @@ from components.user_plans import update_user_plans, get_user_plan_data, delete_
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
 mail = Mail(app)
+
+# To remove after all endpoints use the get_db() function for connection
 db = MySQL(app).connect()
 db_cursor = db.cursor()
+
+db_connection = MySQL(app)
 mongo = PyMongo(app).db
+
+
+def get_db():
+    return db_connection.connect()
 
 
 @app.route('/')
@@ -307,7 +315,7 @@ def plans():
 
 @app.route("/api/get_filter", methods=["POST"])
 def get_filter():
-    return filter_items(db, db_cursor, request)
+    return filter_items(get_db(), db_cursor, request)
 
 
 @app.route("/api/co_payment", methods=["POST"])
