@@ -74,7 +74,7 @@ def signup():
             - "status" (str): "error"
             - "message" (str): A descriptive error message.
                 - Invalid email -> "Invalid email"
-                - Invalid name -> "Invalid name"
+                - Invalid name -> "Invalid name. Name should not contain any symbols or numbers, and should contain at least 1 character."
                 - Bad password -> "Password must have at least 8 characters, 1 symbol, 1 uppercase letter, 1 lowercase letter, and 1 digit"
                 - Other -> "Invalid email, name, or password"
 

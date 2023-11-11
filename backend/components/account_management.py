@@ -90,7 +90,7 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
 
     # Name validation
     if not name_check(signup_name):
-        return {"status": "error", "message": "Invalid name"}, 400
+        return {"status": "error", "message": "Invalid name. Name should not contain any symbols or numbers, and should contain at least 1 character."}, 400
 
         # Email & password validation
     normalized_email = email_check(signup_email, deliverability=False)
