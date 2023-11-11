@@ -10,7 +10,7 @@ from components.account_management import login_user, logout_user, handle_signup
     require_login
 
 from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans, filter_items
-from components.user_plans import update_user_plans, get_user_plan_data
+from components.user_plans import update_user_plans, get_user_plan_data, delete_user_plans
 
 
 app = Flask(__name__)
@@ -376,10 +376,11 @@ def get_user_plans():
 def add_or_edit_user_plans():
     return update_user_plans(db, mongo, request)
 
-@app.route("/api/user_plans/", methods=["Delete"])
+@app.route("/api/user_plans/<path:userplan_id>", methods=["DELETE"])
 @require_login
-def delete_user_plans():
-    return delete_user_plans(db, mongo, request)
+def remove_user_plans(userplan_id):
+    print("here")
+    return delete_user_plans(db, mongo, userplan_id)
 
 
 if __name__ == '__main__':
