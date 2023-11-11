@@ -119,15 +119,22 @@ def update_user_plans(db, mongo, request):
     db.commit()
     return {"status": "successful", "message": "User plan inserted successfully"}
 
-def delete_user_plans(db, mongo, request):
+def delete_user_plans(db, mongo, userplan_id):
+
+    plan_ids = userplan_id
+
+    values = []
 
     user_id = mongo.session.find_one({"session_id": session.get("uid")}).get("user_id")
+
+    values.append(user_id)
+    values.append(plan_ids)
+
+    sql = "DELETE FROM userplan WHERE user_id = %s AND plan_id = %s"
 
     try:
         cursor = db.cursor()
 
-        sql = "DELETE FROM userplan WHERE user_id = %s "
-        values.append(user_id)
         cursor.execute(sql, values)
 
         db.commit()

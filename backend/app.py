@@ -10,15 +10,23 @@ from components.account_management import login_user, logout_user, handle_signup
     require_login
 
 from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans, filter_items
-from components.user_plans import update_user_plans, get_user_plan_data
+from components.user_plans import update_user_plans, get_user_plan_data, delete_user_plans
 
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
 mail = Mail(app)
+
+# To remove after all endpoints use the get_db() function for connection
 db = MySQL(app).connect()
 db_cursor = db.cursor()
+
+db_connection = MySQL(app)
 mongo = PyMongo(app).db
+
+
+def get_db():
+    return db_connection.connect()
 
 
 @app.route('/')
@@ -307,7 +315,7 @@ def plans():
 
 @app.route("/api/get_filter", methods=["POST"])
 def get_filter():
-    return filter_items(db, db_cursor, request)
+    return filter_items(get_db(), db_cursor, request)
 
 
 @app.route("/api/co_payment", methods=["POST"])
@@ -376,10 +384,11 @@ def get_user_plans():
 def add_or_edit_user_plans():
     return update_user_plans(db, mongo, request)
 
-@app.route("/api/user_plans/", methods=["Delete"])
+@app.route("/api/user_plans/<path:userplan_id>", methods=["DELETE"])
 @require_login
-def delete_user_plans():
-    return delete_user_plans(db, mongo, request)
+def remove_user_plans(userplan_id):
+    print("here")
+    return delete_user_plans(db, mongo, userplan_id)
 
 
 if __name__ == '__main__':
