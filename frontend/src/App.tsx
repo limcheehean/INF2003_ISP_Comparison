@@ -6,7 +6,6 @@ import ForgetPassword from './pages/ForgetPassword';
 import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CopaymentCalculator from "./pages/CopaymentCalculator";
-import SignUp from './pages/Signup';
 import Userplan from './pages/Userplan';
 
 export default function App() {
