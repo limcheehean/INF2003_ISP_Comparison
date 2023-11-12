@@ -329,7 +329,7 @@ export default function TeamExample() {
                     <td>{row.riders}</td>
                   </tr>
                 ))}
-              </tbody>
+              </tbody> */}
             </Table>
           </Sheet>
         </Layout.Main>
