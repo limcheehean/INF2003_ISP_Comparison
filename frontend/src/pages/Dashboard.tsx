@@ -86,142 +86,14 @@ interface FormElements extends HTMLFormControlsCollection {
     plan_ids: HTMLInputElement;
 }
 
-interface CalculateFormElement extends HTMLFormElement {
-    readonly elements: FormElements;
-}
-
-interface ApiResponse {
-    data: {
-        companies: { id: number; name: string }[];
-        plans: { id: number; name: string }[];
-        riders: { id: number; name: string }[];
-        wards: string[];
-    };
-    status: string;
-}
-// use useEffect and have a state for it so that the data will be displayed upon entry
-// display it in the list!! see isaac's!!! 
-
-// Table
-// function createData(
-//   companyName: string,
-//   ward: string,
-//   plans: string,
-//   riders: string,
-// ) {
-//   return { companyName, ward, plans, riders};
-// }
-
-// const initialRows = [
-//   createData('AIA', 'A', 'testing1', 'testing2'),
-//   createData('Prudential', 'B1', 'testing3', 't4'),
-//   createData('NTUC', 'C', 't5', 't6'),
-//   createData('Great Eastern', 'Private', 't7', 't8'),
-// ];
-
-interface ApiResponseTable {
-    data: {
-        columns: {
-            name: string;
-            text: string;
-            children?: {
-                name: string;
-                text: string;
-            }[];
-        }[];
-        rows: {
-            [key: string]: number | string;
-        }[];
-    };
-    status: string;
-}
-
-interface ApiData {
-    companyName: string;
-    ward: string;
-    plans: string;
-    riders: string;
-}
-
-// JH method
-// interface PlansComparison {
-//     age: number | null,
-//     medishield_life_premium: number | null,
-//     annual_withdrawallimit: number | null,
-//     set_0: Set_0[],
-//     set_1: Set_1[]
-// }
-//
-// interface Set_0 {
-//     set_0_plan_premium: number,
-//     set_0_total_premium: number,
-//     set_0_cash_outlay: number
-// }
-//
-// interface Set_1 {
-//     set_1_plan_premium: number,
-//     set_1_total_premium: number,
-//     set_1_cash_outlay: number
-// }
-
 export default function TeamExample() {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
-    const [company_ids, set_company_ids] = React.useState<string[]>([]);
-    const [ward_types, set_ward_types] = React.useState<string[]>([]);
-    const [plan_ids, set_plan_ids] = React.useState<string[]>([]);
     const [filterData, setFilterData] = React.useState<any>({});
     const [selectedFilter, setSelectedFilter] = useState<any>({});
     const [comparePremiumsData, setComparePremiumsData] = useState<any>({});
-    const [responseDataTable, setResponseDataTable] = React.useState<ApiResponseTable>({
-      data: {
-        columns: [],
-        rows: []
-      },
-      status: 'success',
-    });
-    // For table
-    const [selectedPlans, setSelectedPlans] = useState([]);
-    const [selectedRiders, setSelectedRiders] = useState([]);
-    // JH method
-    // const [selectedCompany, setSelectedCompany] = useState(null);
-    // const [selectedPlan, setSelectedPlan] = useState(null);
-    // const [selectedRider, setSelectedRider] = useState('');
-    // const [filterData, setFilterData] = useState<any>({});
-    //
-    // const [plansComparison, setplansComparison] = useState<PlansComparison>({
-    //     age: null,
-    //     medishield_life_premium: null,
-    //     annual_withdrawallimit: null,
-    //     set_0: [],
-    //     set_1: []
-    // });
 
     // CheckBoxes
     const getFilterData = async () => {
-        // const postData = {
-        //     company_ids.
-        //     ward_types,
-        //     plan_ids,
-        // }
-        // const postDataTable = {
-        //   plans: selectedPlans.map((plan_id) => ({ plan_ids: plan_id })),
-        //   riders: selectedRiders.map((rider_id) => ({ rider_ids: rider_id })),
-        // }
-        // try {
-        //   const response = await axios.post<ApiResponse>('/api/get_filter', selectedFilter, {
-        //     headers: { 'Content-Type': 'application/json' },
-        //   });
-        //   // const responseTable = await axios.post<ApiResponseTable>('/api/compare_premiums', postDataTable, {
-        //   //   headers: { 'Content-Type': 'application/json' },
-        //   // });
-        //
-        //   // Handle the data
-        //   setFilterData(response.data.data);
-        //   console.log(response.data.data);
-        //   // setResponseDataTable(responseTable.data);
-        // } catch (error) {
-        //   console.log('Error', error);
-        // }
         console.log(selectedFilter)
         console.log(filterData);
         await fetch('/api/get_filter',{
@@ -239,6 +111,8 @@ export default function TeamExample() {
             ]
         }
 
+        console.log(selectedComparePremiums)
+        console.log(comparePremiumsData)
         await fetch('/api/compare_premiums',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -247,7 +121,10 @@ export default function TeamExample() {
 
     }
 
-
+    const clearFilters = () => {
+      setFilterData({});
+      setSelectedFilter({});
+    };
 
     useEffect(() => {
 
@@ -260,144 +137,6 @@ export default function TeamExample() {
         })();
 
     }, [selectedFilter])
-
-    // JH method
-
-    // const getFilter = async () => {
-    //     const response = await fetch('/api/get_filter', {
-    //         method: 'POST',
-    //         headers: {'Content-Type': 'application/json'},
-    //         body: JSON.stringify({
-    //             "company_ids": selectedCompany ? [selectedCompany]: [],
-    //             "plan_ids": selectedPlan ? [selectedPlan]: []
-    //         })
-    //     });
-    //
-    //     if (!response.ok) {
-    //         throw new Error(`HTTP error! Status: ${response.status}`);
-    //     }
-    //
-    //     const responseData = await response.json();
-    //     console.log(responseData);
-    //     setFilterData(responseData.data)
-    // }
-    //
-    // useEffect(() => {
-    //
-    //     fetch('/api/compare_premiums', {
-    //         method: 'POST',
-    //         headers: { 'Content-Type': 'application/json'}
-    //     })
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             console.log(data.status);
-    //             console.log(data.data);
-    //             if (typeof data === 'object' && data !== null) {
-    //                 Object.keys(data.data).forEach((key) => {
-    //                     // Check the data type of each property
-    //                     console.log(`${key}: ${typeof data[key]}`);
-    //                 });
-    //             } else {
-    //                 console.error('Data is not an object.');
-    //             }
-    //
-    //             setplansComparison(data.data);
-    //
-    //             console.log('i fire once');
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching compare_premiums:', error);
-    //         });
-    //
-    //     (async() => {
-    //         await getFilter();
-    //     })();
-    //
-    // }, [selectedCompany, selectedPlan]);
-    //
-    // const [checkedItems, setCheckedItems] = useState(new Map());
-    // const [rows, setRows] = useState<ApiData[]>([]);
-    //
-    // // Define a function to update the checked items
-    // type ListName = 'Companies' | 'Wards' | 'Plans' | 'Riders';
-    // type ItemName = string;
-
-    // const handleCheckboxChange = (listName: ListName, itemName: ItemName) => {
-    //   // Update the checked items state
-    //   setCheckedItems((prevItems) => {
-    //     const updatedItems = new Map(prevItems);
-    //     if (updatedItems.has(listName)) {
-    //       const list = updatedItems.get(listName);
-    //       if (list) {
-    //         if (list.has(itemName)) {
-    //           list.delete(itemName);
-    //         } else {
-    //           list.add(itemName);
-    //         }
-    //       }
-    //     }
-    //     return updatedItems;
-    //   });
-    // };
-
-    // useEffect(() => {
-    //   console.log('Initial Rows:', initialRows);
-    //   // Filter and update the displayed rows based on checked items
-    //   const updatedRows = initialRows.filter((row) => {
-    //     if (
-    //       checkedItems.get('Companies')?.size &&
-    //       !checkedItems.get('Companies')?.has(row.companyName)
-    //     ) {
-    //       return false;
-    //     }
-    //     if (
-    //       checkedItems.get('Wards')?.size &&
-    //       !checkedItems.get('Wards')?.has(row.ward)
-    //     ) {
-    //       return false;
-    //     }
-    //     if (
-    //       checkedItems.get('Plans')?.size &&
-    //       !checkedItems.get('Plans')?.has(row.plans)
-    //     ) {
-    //       return false;
-    //     }
-    //     if (
-    //       checkedItems.get('Riders')?.size &&
-    //       !checkedItems.get('Riders')?.has(row.riders)
-    //     ) {
-    //       return false;
-    //     }
-    //     return true; // Default case, display the row
-    //   });
-
-    //   console.log('Update Rows:', updatedRows);
-    //   setRows(updatedRows);
-    // }, [checkedItems]);
-
-    // // Create a function to fetch data from the API
-    // const fetchDataFromAPI = async () => {
-    //   try {
-    //     const response = await axios.post('/api/get_filter', {
-    //       company_ids: [],
-    //       ward_types: [],
-    //       plan_ids: [],
-    //     });
-
-    //     if (response.status === 200) {
-    //       const apiData = response.data; // Replace with the actual data structure
-    //       setRows(apiData); // Update the rows with the data from the API
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching data:", error);
-    //   }
-    // };
-
-    // // Use the useEffect hook to fetch data when the component mounts
-    // useEffect(() => {
-    //   fetchDataFromAPI();
-    // }, []);
 
     return (
         <CssVarsProvider disableTransitionOnChange>
@@ -579,88 +318,74 @@ export default function TeamExample() {
                             ))}
                         </div>
                         <div>
-                            <h2>Rider IDs:</h2>
-                            {(filterData?.riders || []).map((rider: any) => (
-                                <div key={rider.id}>
-                                    <input
-                                        type="checkbox"
-                                        value={rider.id}
-                                        onChange={() => {
-                                            let selectedRiders = filterData?.rider_ids || [];
-                                            if (selectedRiders.includes(rider.id))
-                                                selectedRiders = selectedRiders.filter((item: any) => item !== rider.id);
-                                            else
-                                                selectedRiders.push(rider.id)
-                                            setSelectedFilter({...selectedFilter, rider_ids: selectedRiders})
-                                        }}
-                                    />
-                                    <label>{rider.name}</label>
-                                </div>
-                            ))}
+                          <h2>Rider IDs:</h2>
+                          {(filterData?.riders || []).map((rider: any) => (
+                            <div key={rider.id}>
+                                <input
+                                    type="checkbox"
+                                    value={rider.id}
+                                    onChange={() => {
+                                        let selectedRiders = filterData?.rider_ids || [];
+                                        if (selectedRiders.includes(rider.id))
+                                            selectedRiders = selectedRiders.filter((item: any) => item !== rider.id);
+                                        else
+                                            selectedRiders.push(rider.id)
+                                        setSelectedFilter({...selectedFilter, rider_ids: selectedRiders})
+                                    }}
+                                />
+                                <label>{rider.name}</label>
+                            </div>
+                          ))}
                         </div>
-                        <button onClick={getFilterData}>Submit</button>
+                        <button onClick={clearFilters}>Clear</button>
                     </div>
                     {/* <TeamNav /> */}
                 </Layout.SideNav>
                 <Layout.Main>
                     <Sheet variant="outlined" style={{ width: '75.2vw' }}>
-                        <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
-                            <thead>
+                      <div style={{overflowX: 'auto'}}>
+                        <Table variant="soft" borderAxis="bothBetween" style={{ minWidth: '100%' }}>
+                          <thead>
                             <tr>
-                                <th>Age</th>
-                                <th>MediShield Life Premium</th>
-                                <th>Annual Withdrawal Limit</th>
+                              {/* {(comparePremiumsData?.columns || []).map((columns: any) => (
+                                  <th key={columns.name}>{columns.text}</th>
+                              ))} */}
+                              {(comparePremiumsData?.columns || []).map((column: any) => {
+                                  if (column.children) {
+                                      return column.children.map((childColumn: any) => (
+                                          <th key={childColumn.name}>{childColumn.text}</th>
+                                      ));
+                                  } else {
+                                      return <th key={column.name}>{column.text}</th>;
+                                  }
+                              })}
                             </tr>
-                            </thead>
-                            <tbody>
-                            {responseDataTable.data.rows.map((age) => (
-                                <tr key={age.name}>
-                                    <td>Age</td>
-                                    <td>{age.name}</td>
-                                    <td>{age.text}</td>
-                                </tr>
-                            ))}
-                            {responseDataTable.data.rows.map((medishield_life_premium) => (
-                                <tr key={medishield_life_premium.name}>
-                                    <td>MediShield Life Premium</td>
-                                    <td>{medishield_life_premium.name}</td>
-                                    <td>{medishield_life_premium.text}</td>
-                                </tr>
-                            ))}
-                            {responseDataTable.data.rows.map((annual_withdrawal_limit) => (
-                                <tr key={annual_withdrawal_limit.name}>
-                                    <td>Annual Withdrawal Limit</td>
-                                    <td>{annual_withdrawal_limit.name}</td>
-                                    <td>{annual_withdrawal_limit.text}</td>
-                                </tr>
-                            ))}
-                            {/* {responseData.data.riders.map((rider) => (
-                  <tr key={rider.id}>
-                    <td>Rider ID</td>
-                    <td>{rider.id}</td>
-                    <td>{rider.name}</td>
-                  </tr>
-                ))} */}
-                            </tbody>
-                            {/* <thead>
-                <tr>
-                  <th style={{ width: '40%' }}>Company Name</th>
-                  <th>Ward</th>
-                  <th>Plans</th>
-                  <th>Riders</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((row, index) => (
-                  <tr key={index}>
-                    <th scope="row">{row.companyName}</th>
-                    <td>{row.ward}</td>
-                    <td>{row.plans}</td>
-                    <td>{row.riders}</td>
-                  </tr>
-                ))}
-              </tbody>  */}
+                          </thead>
+                          <tbody>
+                              {/* {(comparePremiumsData?.rows || []).map((row: any, index: any) => (
+                                  <tr key={index}>
+                                    {comparePremiumsData.columns.map((column: any) => (
+                                      <td key={column.name}>{row[column.name]}</td>
+                                    ))}
+                                  </tr>
+                              ))} */}
+                              {comparePremiumsData?.rows.map((row: any, rowIndex: number) => (
+                              <tr key={rowIndex}>
+                                  {(comparePremiumsData?.columns || []).map((column: any) => {
+                                      if (column.children) {
+                                          return column.children.map((childColumn: any) => (
+                                              <td key={childColumn.name}>{row[childColumn.name]}</td>
+                                          ));
+                                      } else {
+                                          return <td key={column.name}>{row[column.name]}</td>;
+                                      }
+                                  })}
+                              </tr>
+                          ))}
+                          </tbody>
                         </Table>
+                      </div>
+                        
                     </Sheet>
                 </Layout.Main>
             </Layout.Root>
