@@ -6,6 +6,8 @@ import ForgetPassword from './pages/ForgetPassword';
 import SignUp from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import CopaymentCalculator from "./pages/CopaymentCalculator";
+import SignUp from './pages/Signup';
+import Userplan from './pages/Userplan';
 
 export default function App() {
     return (
@@ -16,6 +18,8 @@ export default function App() {
         <Route path="Signup" element={<SignUp />} />
         <Route path="Dashboard" element={<Dashboard />} />
         <Route path="copaymentCalculator" element={<CopaymentCalculator />} />
+        <Route path="signUp" element={<SignUp/>}></Route>
+          <Route path="UserPlan" element={<Userplan/>}></Route>
       </Routes>
     </div>
     );
