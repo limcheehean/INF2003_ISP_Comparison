@@ -47,7 +47,7 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-import CheckBoxes from "../components/CheckBoxes";
+//import CheckBoxes from "../components/CheckBoxes";
 import { StringLiteralType } from 'typescript';
 //import "../App.css";
 
@@ -79,7 +79,30 @@ function ColorSchemeToggle() {
   );
 }
 
-// // Table
+//CHECKBOXES
+interface FormElements extends HTMLFormControlsCollection {
+  company_ids:HTMLInputElement;
+  ward_types: HTMLInputElement;
+  plan_ids: HTMLInputElement;
+}
+
+interface CalculateFormElement extends HTMLFormElement {
+  readonly elements: FormElements;
+}
+
+interface ApiResponse {
+data: {
+  companies: { id: number; name: string }[];
+  plans: { id: number; name: string }[];
+  riders: { id: number; name: string }[];
+  wards: string[];
+};
+status: string;
+}
+// use useEffect and have a state for it so that the data will be displayed upon entry
+// display it in the list!! see isaac's!!! 
+
+ // Table
 // function createData(
 //   companyName: string,
 //   ward: string,
@@ -96,6 +119,23 @@ function ColorSchemeToggle() {
 //   createData('Great Eastern', 'Private', 't7', 't8'),
 // ];
 
+interface ApiResponseTable {
+  data: {
+    columns: {
+      name: string;
+      text: string;
+      children?: {
+        name: string;
+        text: string;
+      }[];
+    }[];
+    rows: {
+      [key: string]: number | string;
+    }[];
+  };
+  status: string;
+  }
+
 interface ApiData {
   companyName: string;
   ward: string;
@@ -103,8 +143,146 @@ interface ApiData {
   riders: string;
 }
 
+// JH method
+interface PlansComparison {
+  age: number | null,
+  medishield_life_premium: number | null,
+  annual_withdrawallimit: number | null,
+  set_0: Set_0[],
+  set_1: Set_1[]
+}
+
+interface Set_0 {
+  set_0_plan_premium: number,
+  set_0_total_premium: number,
+  set_0_cash_outlay: number
+}
+
+interface Set_1 {
+  set_1_plan_premium: number,
+  set_1_total_premium: number,
+  set_1_cash_outlay: number
+}
+
 export default function TeamExample() {
   const [drawerOpen, setDrawerOpen] = React.useState(false);
+  // const [company_ids, set_company_ids] = React.useState<string[]>([]);
+  // const [ward_types, set_ward_types] = React.useState<string[]>([]);
+  // const [plan_ids, set_plan_ids] = React.useState<string[]>([]);
+  // const [responseData, setResponseData] = React.useState<ApiResponse>({
+  //   data: {
+  //     companies: [],
+  //     plans: [],
+  //     riders: [],
+  //     wards: [],
+  //   },
+  //   status: 'succeess',
+  // });
+  // const [responseDataTable, setResponseDataTable] = React.useState<ApiResponseTable>({
+  //   data: {
+  //     columns: [],
+  //     rows: []
+  //   },
+  //   status: 'success',
+  // });
+  // // For table
+  // const [selectedPlans, setSelectedPlans] = useState([]);
+  // const [selectedRiders, setSelectedRiders] = useState([]);
+  // JH method
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedRider, setSelectedRider] = useState('');
+  const [filterData, setFilterData] = useState<any>({});
+
+  const [plansComparison, setplansComparison] = useState<PlansComparison>({
+    age: null,
+    medishield_life_premium: null,
+    annual_withdrawallimit: null,
+    set_0: [],
+    set_1: []
+  });
+
+  // CheckBoxes
+  // const handleCheckboxChange = async () => {
+  //     const postData = {
+  //         company_ids,
+  //         ward_types,
+  //         plan_ids,
+  //     }
+  //     // const postDataTable = {
+  //     //   plans: selectedPlans.map((plan_id) => ({ plan_ids: plan_id })),
+  //     //   riders: selectedRiders.map((rider_id) => ({ rider_ids: rider_id })),
+  //     // }
+  //     try {
+  //       const response = await axios.post<ApiResponse>('/api/get_filter', postData, {
+  //         headers: { 'Content-Type': 'application/json' },
+  //       });
+  //       // const responseTable = await axios.post<ApiResponseTable>('/api/compare_premiums', postDataTable, {
+  //       //   headers: { 'Content-Type': 'application/json' },
+  //       // });
+
+  //       // Handle the data
+  //       setResponseData(response.data);
+  //       // setResponseDataTable(responseTable.data);
+  //     } catch (error) {
+  //       console.log('Error', error);
+  //     }
+  // };
+
+  // JH method
+
+  const getFilter = async () => {
+    const response = await fetch('/api/get_filter', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+            "company_ids": selectedCompany ? [selectedCompany]: [],
+            "plan_ids": selectedPlan ? [selectedPlan]: []
+        })
+    });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+
+    const responseData = await response.json();
+    console.log(responseData);
+    setFilterData(responseData.data)
+}
+
+useEffect(() => {
+
+  fetch('/api/compare_premiums', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json'}
+  })
+      .then((response) => response.json())
+      .then((data) => {
+          console.log(data);
+          console.log(data.status);
+          console.log(data.data);
+          if (typeof data === 'object' && data !== null) {
+              Object.keys(data.data).forEach((key) => {
+                  // Check the data type of each property
+                  console.log(`${key}: ${typeof data[key]}`);
+              });
+          } else {
+              console.error('Data is not an object.');
+          }
+
+          setplansComparison(data.data);
+
+          console.log('i fire once');
+      })
+      .catch((error) => {
+          console.error('Error fetching compare_premiums:', error);
+      });
+
+  (async() => {
+      await getFilter();
+  })();
+
+}, [selectedCompany, selectedPlan]);
 
   const [checkedItems, setCheckedItems] = useState(new Map());
   const [rows, setRows] = useState<ApiData[]>([]);
@@ -113,23 +291,23 @@ export default function TeamExample() {
   type ListName = 'Companies' | 'Wards' | 'Plans' | 'Riders';
   type ItemName = string;
 
-  const handleCheckboxChange = (listName: ListName, itemName: ItemName) => {
-    // Update the checked items state
-    setCheckedItems((prevItems) => {
-      const updatedItems = new Map(prevItems);
-      if (updatedItems.has(listName)) {
-        const list = updatedItems.get(listName);
-        if (list) {
-          if (list.has(itemName)) {
-            list.delete(itemName);
-          } else {
-            list.add(itemName);
-          }
-        }
-      }
-      return updatedItems;
-    });
-  };
+  // const handleCheckboxChange = (listName: ListName, itemName: ItemName) => {
+  //   // Update the checked items state
+  //   setCheckedItems((prevItems) => {
+  //     const updatedItems = new Map(prevItems);
+  //     if (updatedItems.has(listName)) {
+  //       const list = updatedItems.get(listName);
+  //       if (list) {
+  //         if (list.has(itemName)) {
+  //           list.delete(itemName);
+  //         } else {
+  //           list.add(itemName);
+  //         }
+  //       }
+  //     }
+  //     return updatedItems;
+  //   });
+  // };
 
   // useEffect(() => {
   //   console.log('Initial Rows:', initialRows);
@@ -306,13 +484,124 @@ export default function TeamExample() {
           </Box>
         </Layout.Header>
         <Layout.SideNav>
-          <CheckBoxes/>
+          <div>
+            <div>
+              <h2>Companies:</h2>
+              {responseData.data.companies.map((company) => (
+                <div key={company.id}>
+                  <input
+                    type="checkbox"
+                    value={company.id.toString()}
+                    onChange={() => {
+                      set_company_ids((prevIds) =>
+                        prevIds.includes(company.id.toString())
+                          ? prevIds.filter((id) => id !== company.id.toString())
+                          : [...prevIds, company.id.toString()]
+                      );
+                    }}
+                  />
+                  <label>{company.name}</label>
+                </div>
+              ))}
+            </div>
+            <div>
+              <h2>Ward Types:</h2>
+              {responseData.data.wards.map((wardType, index) => (
+                <div key={index}>
+                  <input
+                    type="checkbox"
+                    value={wardType}
+                    onChange={() => {
+                      set_ward_types((prevTypes) =>
+                        prevTypes.includes(wardType)
+                          ? prevTypes.filter((type) => type !== wardType)
+                          : [...prevTypes, wardType]
+                      );
+                    }}
+                  />
+                  <label>{wardType}</label>
+                </div>
+              ))}
+            </div>
+            <div>
+              <h2>Plan IDs:</h2>
+              {responseData.data.plans.map((plan) => (
+                <div key={plan.id}>
+                  <input
+                    type="checkbox"
+                    value={plan.id}
+                    onChange={() => {
+                      set_plan_ids((prevIds) =>
+                        prevIds.includes(plan.id.toString())
+                          ? prevIds.filter((id) => id !== plan.id.toString())
+                          : [...prevIds, plan.id.toString()]
+                      );
+                    }}
+                  />
+                  <label>{plan.name}</label>
+                </div>
+              ))}
+            </div>
+            <div>
+              <h2>Rider IDs:</h2>
+              {responseData.data.riders.map((rider) => (
+                <div key={rider.id}>
+                  <input
+                    type="checkbox"
+                    value={rider.id}
+                    onChange={() => {
+                      // Handle checkbox change if needed
+                    }}
+                  />
+                  <label>{rider.name}</label>
+                </div>
+              ))}
+            </div>
+            <button onClick={getFilter}>Submit</button>
+          </div>
           {/* <TeamNav /> */}
         </Layout.SideNav>
         <Layout.Main>
           <Sheet variant="outlined" style={{ width: '75.2vw' }}>
             <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
               <thead>
+                <tr>
+                  <th>Age</th>
+                  <th>MediShield Life Premium</th>
+                  <th>Annual Withdrawal Limit</th>
+                </tr>
+              </thead>
+              <tbody>
+                {responseDataTable.data.rows.map((age) => (
+                  <tr key={age.name}>
+                    <td>Age</td>
+                    <td>{age.name}</td>
+                    <td>{age.text}</td>
+                  </tr>
+                ))}
+                {responseDataTable.data.rows.map((medishield_life_premium) => (
+                  <tr key={medishield_life_premium.name}>
+                    <td>MediShield Life Premium</td>
+                    <td>{medishield_life_premium.name}</td>
+                    <td>{medishield_life_premium.text}</td>
+                  </tr>
+                ))}
+                {responseDataTable.data.rows.map((annual_withdrawal_limit) => (
+                  <tr key={annual_withdrawal_limit.name}>
+                    <td>Annual Withdrawal Limit</td>
+                    <td>{annual_withdrawal_limit.name}</td>
+                    <td>{annual_withdrawal_limit.text}</td>
+                  </tr>
+                ))}
+                {/* {responseData.data.riders.map((rider) => (
+                  <tr key={rider.id}>
+                    <td>Rider ID</td>
+                    <td>{rider.id}</td>
+                    <td>{rider.name}</td>
+                  </tr>
+                ))} */}
+              </tbody>
+              {/* <thead>
                 <tr>
                   <th style={{ width: '40%' }}>Company Name</th>
                   <th>Ward</th>
@@ -329,7 +618,7 @@ export default function TeamExample() {
                     <td>{row.riders}</td>
                   </tr>
                 ))}
-              </tbody> */}
+              </tbody>  */}
             </Table>
           </Sheet>
         </Layout.Main>
