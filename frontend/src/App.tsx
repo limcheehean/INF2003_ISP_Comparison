@@ -7,6 +7,8 @@ import ResetPassword from './pages/ResetPassword';
 import Dashboard from "./pages/Dashboard";
 import CopaymentCalculator from "./pages/CopaymentCalculator";
 import SignUp from './pages/Signup';
+import UserPlan1 from './pages/UserPlan1';
+import Userplan from './pages/Userplan';
 
 export default function App() {
     return (
@@ -18,6 +20,8 @@ export default function App() {
         <Route path="Dashboard" element={<Dashboard />} />
         <Route path="copaymentCalculator" element={<CopaymentCalculator />} />
         <Route path="signUp" element={<SignUp/>}></Route>
+        <Route path="UserPlan1" element={<UserPlan1/>}></Route>
+          <Route path="UserPlan" element={<Userplan/>}></Route>
       </Routes>
     </div>
     );
