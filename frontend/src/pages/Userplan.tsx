@@ -650,7 +650,7 @@ export default function TeamExample() {
                     </Modal>
 
 
-                    <Box sx={{ flexGrow: 1 , width: '75.2vw'}}>
+                    <Box sx={{ flexGrow: 1 , width: '75.2vw', margin: '10px'}}>
                         <Grid
                             container
                             spacing={2}
@@ -726,7 +726,7 @@ export default function TeamExample() {
                         </Grid>
                     </Box>
 
-                    <Box sx={{ flexGrow: 1 , width: '75.2vw'}}>
+                    <Box sx={{width: '75.2vw', margin: '10px'}}>
                         <List orientation="horizontal">
                             <ListItem>
                                 <Typography>
@@ -738,11 +738,10 @@ export default function TeamExample() {
                                     Total payable by cash: ${userPlans.total_payable_by_cash}
                                 </Typography>
                             </ListItem>
+                            <ListItem>
                                 <Typography>
                                     Total payable by medisave: ${userPlans.total_payable_by_medisave}
                                 </Typography>
-                            <ListItem>
-
                             </ListItem>
                         </List>
                     </Box>
