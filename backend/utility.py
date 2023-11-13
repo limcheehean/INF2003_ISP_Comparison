@@ -114,6 +114,7 @@ def name_check(name: str):
 
 def send_mail_async(mail, msg: Message):
     '''
+    Send email on a different thread, so as to avoid blocking API return
     '''
 
     @copy_current_request_context
