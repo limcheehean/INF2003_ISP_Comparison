@@ -9,8 +9,7 @@ from flask_mail import Message
 from flaskext.mysql import pymysql
 
 # utility functions
-from utility import email_check, password_check, name_check
-
+from utility import email_check, password_check, name_check, send_mail_async
 
 ############################
 # Authentication functions #
@@ -152,7 +151,9 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
                   recipients=[signup_email])
 
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
-    mail.send(msg)
+    #mail.send(msg)
+    
+    send_mail_async(msg)
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200

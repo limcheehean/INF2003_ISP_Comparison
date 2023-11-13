@@ -16,6 +16,11 @@ import re
 
 from bcrypt import hashpw, gensalt
 
+from flask import render_template, copy_current_request_context, current_app
+
+from flask_mail import Mail, Message
+
+import threading
 
 def email_check(email, deliverability=False):
     """Validates email address, and returns normalized email address
@@ -106,3 +111,14 @@ def name_check(name: str):
     name_ok = re.search('^[A-Za-z ]*$', name)
 
     return name_ok
+
+def send_mail_async(mail, msg: Message):
+    '''
+    '''
+
+    @copy_current_request_context
+    def send_message(msg):
+        mail.send(msg)
+
+    send_mail_thread = threading.Thread(name='send_mail_thread', target=send_message, args=(msg,))
+    send_mail_thread.start()
