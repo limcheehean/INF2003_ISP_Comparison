@@ -14,7 +14,7 @@ import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import {useState} from "react";
 import Alert from '@mui/joy/Alert';
 //import Checkbox from "@mui/joy/Checkbox";
@@ -114,8 +114,16 @@ export default function SignUp() {
                 const responseData = response.data;
                 console.log(responseData);
 
+                // Alert success message received from API
+                alert(responseData.message);
+
             } catch (error) {
                 console.error('Problem with Axios operation', error);
+
+                // Alert error message received from API
+                if (error instanceof AxiosError){
+                    alert(error.response?.data.message);
+                }
             }
         }
         else
