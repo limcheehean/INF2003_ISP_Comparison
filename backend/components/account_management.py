@@ -151,11 +151,10 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
                   recipients=[signup_email])
 
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
-    #mail.send(msg)
     
-    send_mail_async(msg)
+    #mail.send(msg)
+    send_mail_async(mail,msg)
 
-    # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
 
 

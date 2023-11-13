@@ -119,6 +119,7 @@ def send_mail_async(mail, msg: Message):
     @copy_current_request_context
     def send_message(msg):
         mail.send(msg)
+        print("Mail sent successfully")
 
     send_mail_thread = threading.Thread(name='send_mail_thread', target=send_message, args=(msg,))
     send_mail_thread.start()
