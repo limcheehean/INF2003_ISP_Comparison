@@ -27,6 +27,13 @@ import { useState, useEffect } from "react";
 // can remove these two
 import { DataGrid, GridToolbar } from '@mui/x-data-grid';
 import { useDemoData } from '@mui/x-data-grid-generator';
+import {
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Paper
+  } from "@material-ui/core";
 
 // Icons import
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -79,11 +86,70 @@ function ColorSchemeToggle() {
     );
 }
 
-//CHECKBOXES
+// CHECKBOXES
 interface FormElements extends HTMLFormControlsCollection {
     company_ids:HTMLInputElement;
     ward_types: HTMLInputElement;
     plan_ids: HTMLInputElement;
+}
+
+// LJ table
+interface Rider {
+rider_id: number;
+rider_name: string;
+}
+
+interface RiderBenefit {
+rider_benefit_id: number;
+rider_benefit_name: string;
+}
+
+interface RiderBenefitDetail {
+rider_id: number;
+rider_benefit_id: number;
+detail: string;
+}
+
+interface JsonData {
+riders: Rider[];
+rider_benefits: RiderBenefit[];
+rider_benefit_details: RiderBenefitDetail[];
+}
+
+interface TableComponentProps {
+data: JsonData;
+}
+  
+function TableComponent({ data }: TableComponentProps) {
+    return (
+        <Table variant="soft" borderAxis="bothBetween" style={{ minWidth: '100%' }}>
+            <thead>
+            <tr>
+                {(data?.riders || []).map((column: any) => (
+                    <th key={column.rider_id}>{column.rider_name}</th>
+                ))}
+            </tr>
+            </thead>
+            <tbody>
+            {(data?.rider_benefits || []).map((row: any) => (
+                <tr key={row.rider_benefit_id}>
+                <td>{row.rider_benefit_name}</td>
+                {(data?.riders || []).map((column: any) => (
+                    <td key={column.rider_id}>
+                    {
+                        data?.rider_benefit_details.find(
+                        (d) =>
+                            d.rider_id === column.rider_id &&
+                            d.rider_benefit_id === row.rider_benefit_id
+                        )?.detail
+                    }
+                    </td>
+                ))}
+                </tr>
+            ))}
+            </tbody>
+        </Table>
+    );
 }
 
 export default function TeamExample() {
@@ -91,6 +157,7 @@ export default function TeamExample() {
     const [filterData, setFilterData] = React.useState<any>({});
     const [selectedFilter, setSelectedFilter] = useState<any>({});
     const [comparePremiumsData, setComparePremiumsData] = useState<any>({});
+    const [riderBenefits, setRiderBenefits] = useState<any>({});
 
     // CheckBoxes
     const getFilterData = async () => {
@@ -112,7 +179,7 @@ export default function TeamExample() {
         }
 
         console.log(selectedComparePremiums)
-        console.log(comparePremiumsData)
+        // console.log(comparePremiumsData)
         await fetch('/api/compare_premiums',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -136,7 +203,39 @@ export default function TeamExample() {
             await getComparePremiumsData();
         })();
 
+        (async () => {
+            await getRiderBenefits();
+        })();
+
     }, [selectedFilter])
+
+    // LJ table
+    const getRiderBenefits = async () => {
+
+        const selectedRiders = {
+            "rider_ids": [
+                (selectedFilter?.rider_ids || [])[0]
+                // ...(selectedFilter?.rider_ids || []).map((rider_id: any) => ({rider_id}))
+            ]
+        }
+
+        // console.log(selectedRiders)
+        // console.log(riderBenefits)
+        // console.log(selectedFilter?.rider_ids)
+        
+        await fetch('/api/get_rider_benefits',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(selectedRiders)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const jsonData: JsonData = data.data; // Typecasting the fetched data
+            setRiderBenefits(jsonData);
+        })
+        
+
+    }
 
     return (
         <CssVarsProvider disableTransitionOnChange>
@@ -317,6 +416,26 @@ export default function TeamExample() {
                                 </div>
                             ))}
                         </div>
+                        {/* <div>
+                            <h2>Plan ID Columns:</h2>
+                            {(comparePremiumsData?.columns || []).map((column: any) => (
+                                <div key={column.name}>
+                                    <input
+                                        type="checkbox"
+                                        value={column.name}
+                                        onChange={() => {
+                                            let selectedPlansColumns = comparePremiumsData?.columns || [];
+                                            if (selectedPlansColumns.includes(column.name))
+                                                selectedPlansColumns = selectedPlansColumns.filter((item: any) => item !== column.name);
+                                            else
+                                                selectedPlansColumns.push(column.name)
+                                            setSelectedFilter({...selectedFilter, columns: selectedPlansColumns})
+                                        }}
+                                    />
+                                    <label>{column.text}</label>
+                                </div>
+                            ))}
+                        </div> */}
                         <div>
                           <h2>Rider IDs:</h2>
                           {(filterData?.riders || []).map((rider: any) => (
@@ -344,6 +463,9 @@ export default function TeamExample() {
                 <Layout.Main>
                     <Sheet variant="outlined" style={{ width: '75.2vw' }}>
                       <div style={{overflowX: 'auto'}}>
+                        {/* Rider Benefits */}
+                        <TableComponent data={riderBenefits} />
+                        {/* Compare premiums */}
                         <Table variant="soft" borderAxis="bothBetween" style={{ minWidth: '100%' }}>
                           <thead>
                             <tr>
@@ -369,7 +491,7 @@ export default function TeamExample() {
                                     ))}
                                   </tr>
                               ))} */}
-                              {comparePremiumsData?.rows.map((row: any, rowIndex: number) => (
+                              {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
                               <tr key={rowIndex}>
                                   {(comparePremiumsData?.columns || []).map((column: any) => {
                                       if (column.children) {
@@ -381,7 +503,7 @@ export default function TeamExample() {
                                       }
                                   })}
                               </tr>
-                          ))}
+                            ))}
                           </tbody>
                         </Table>
                       </div>
