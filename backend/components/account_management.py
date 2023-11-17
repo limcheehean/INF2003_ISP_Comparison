@@ -150,7 +150,22 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
                   sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
 
-    msg.body = "signup_confirmation_link is " + signup_confirmation_link
+    msg.subject = "Welcome to ISP Comparison"
+    msg.body = f"""
+    Dear {signup_name},
+    Thank you for signing up with ISP Comparison! We are excited to have you on board. To complete the registration process and start enjoying our services, please confirm your email address by clicking the link below:
+
+     {signup_confirmation_link}
+
+    Please note that this link will expire in 10 minutes for security reasons. If you don't confirm your email within this time frame, you may need to start the registration process again.
+
+    If you have not signed up for ISP Comparison, please ignore this email.
+
+    Thank you once again for choosing ISP Comparison. We look forward to serving you!
+
+    Best regards,
+    The ISP Comparison Team
+    """
     
     #mail.send(msg)
     send_mail_async(mail,msg)
