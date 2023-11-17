@@ -232,7 +232,7 @@ JOIN rider as r
 """
 
 
-def filter_items(db, db_cursor, request):
+def filter_items(db, request):
     cursor = db.cursor(CustomDictCursor)
 
     request_data = request.json
@@ -254,8 +254,6 @@ def filter_items(db, db_cursor, request):
     # Get plans
     plan_where = " AND ".join([_ for _ in [where_ward_sql, where_company_sql] if _])
     plan_sql += f" WHERE {plan_where}" if plan_where else ""
-    print(plan_sql)
-    print(tuple(company_ids + ward_types))
     cursor.execute(plan_sql, tuple(ward_types + company_ids))
     plans = cursor.fetchall()
     filtered_plan_ids = [plan.get("id") for plan in plans]

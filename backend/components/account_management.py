@@ -80,7 +80,10 @@ def logout_user(mongo):
     return {"status": "success", "message": "Logout successful"}
 
 
-def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, mail, request):
+def handle_signup(db: pymysql.Connection, mail, request):
+
+    db_cursor = db.cursor()
+
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
@@ -158,8 +161,10 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
     return {"status": "success", "message": "Account activation link sent to email"}, 200
 
 
-def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, signup_token):
+def handle_signup_confirmation(db: pymysql.Connection, signup_token):
     print("Signup token received: ", signup_token)
+
+    db_cursor = db.cursor()
 
     # How long before token expires, in seconds
     token_expire = 60 * 10
