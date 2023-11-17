@@ -170,7 +170,7 @@ export default function TeamExample() {
         }
 
         console.log(selectedComparePremiums)
-        console.log(comparePremiumsData)
+        // console.log(comparePremiumsData)
         await fetch('/api/compare_premiums',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -202,28 +202,29 @@ export default function TeamExample() {
 
     // LJ table
     const getRiderBenefits = async () => {
+        if ((selectedFilter?.rider_ids || [])){
+            console.log("Selected filter");
+            console.log(selectedFilter);
+            const selectedRiders = {
+                "rider_ids": selectedFilter?.rider_ids
+            }
 
-        const selectedRiders = {
-            "rider_ids": [
-                (selectedFilter?.rider_ids || [])[0]
-                // ...(selectedFilter?.rider_ids || []).map((rider_id: any) => ({rider_id}))
-            ]
+            // console.log(selectedRiders)
+            // console.log(riderBenefits)
+            // console.log(selectedFilter?.rider_ids)
+            
+            await fetch('/api/get_rider_benefits',{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(selectedRiders)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jsonData: JsonData = data.data; // Typecasting the fetched data
+                console.log(data.data);
+                setRiderBenefits(jsonData);
+            })
         }
-
-        console.log(selectedRiders)
-        console.log(riderBenefits)
-        console.log(selectedFilter?.rider_ids)
-        
-        await fetch('/api/get_rider_benefits',{
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(selectedRiders)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const jsonData: JsonData = data.data; // Typecasting the fetched data
-            setRiderBenefits(jsonData);
-        })
         
 
     }
@@ -435,11 +436,13 @@ export default function TeamExample() {
                                     type="checkbox"
                                     value={rider.id}
                                     onChange={() => {
-                                        let selectedRiders = filterData?.rider_ids || [];
+                                        let selectedRiders = selectedFilter?.rider_ids || [];
                                         if (selectedRiders.includes(rider.id))
                                             selectedRiders = selectedRiders.filter((item: any) => item !== rider.id);
                                         else
                                             selectedRiders.push(rider.id)
+                                        console.log("selected Riders is as follows");
+                                        console.log(selectedRiders);
                                         setSelectedFilter({...selectedFilter, rider_ids: selectedRiders})
                                     }}
                                 />
@@ -466,7 +469,7 @@ export default function TeamExample() {
                               {(comparePremiumsData?.columns || []).map((column: any) => {
                                   if (column.children) {
                                       return column.children.map((childColumn: any) => (
-                                          <th key={childColumn.name} >{childColumn.text}</th>
+                                          <th key={childColumn.name}>{childColumn.text}</th>
                                       ));
                                   } else {
                                       return <th key={column.name}>{column.text}</th>;
