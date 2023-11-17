@@ -211,28 +211,29 @@ export default function TeamExample() {
 
     // LJ table
     const getRiderBenefits = async () => {
+        if ((selectedFilter?.rider_ids || [])){
+            console.log("Selected filter");
+            console.log(selectedFilter);
+            const selectedRiders = {
+                "rider_ids": selectedFilter?.rider_ids
+            }
 
-        const selectedRiders = {
-            "rider_ids": [
-                (selectedFilter?.rider_ids || [])[0]
-                // ...(selectedFilter?.rider_ids || []).map((rider_id: any) => ({rider_id}))
-            ]
+            // console.log(selectedRiders)
+            // console.log(riderBenefits)
+            // console.log(selectedFilter?.rider_ids)
+            
+            await fetch('/api/get_rider_benefits',{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(selectedRiders)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jsonData: JsonData = data.data; // Typecasting the fetched data
+                console.log(data.data);
+                setRiderBenefits(jsonData);
+            })
         }
-
-        // console.log(selectedRiders)
-        // console.log(riderBenefits)
-        // console.log(selectedFilter?.rider_ids)
-        
-        await fetch('/api/get_rider_benefits',{
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(selectedRiders)
-        })
-        .then(response => response.json())
-        .then(data => {
-            const jsonData: JsonData = data.data; // Typecasting the fetched data
-            setRiderBenefits(jsonData);
-        })
         
 
     }
