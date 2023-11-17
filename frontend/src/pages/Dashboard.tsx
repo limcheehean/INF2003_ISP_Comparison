@@ -1,44 +1,23 @@
 import * as React from 'react';
+import { ChangeEvent, useState, useEffect } from "react";
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
-import Autocomplete from '@mui/joy/Autocomplete';
-import Avatar from '@mui/joy/Avatar';
 import Box from '@mui/joy/Box';
-import Chip from '@mui/joy/Chip';
-import ChipDelete from '@mui/joy/ChipDelete';
 import Typography from '@mui/joy/Typography';
 import Input from '@mui/joy/Input';
 import IconButton from '@mui/joy/IconButton';
-import Button from '@mui/joy/Button';
-import List from '@mui/joy/List';
-import ListSubheader from '@mui/joy/ListSubheader';
-import Divider from '@mui/joy/Divider';
-import ListItem from '@mui/joy/ListItem';
-import ListItemButton from '@mui/joy/ListItemButton';
-import ListItemDecorator from '@mui/joy/ListItemDecorator';
-import ListItemContent from '@mui/joy/ListItemContent';
-import RadioGroup from '@mui/joy/RadioGroup';
-import Radio from '@mui/joy/Radio';
-import Slider from '@mui/joy/Slider';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
-import { useState, useEffect } from "react";
-
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 // Icons import
-import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
-import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
-import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
-import AddBusinessIcon from '@mui/icons-material/AddBusiness';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
-import KeyboardArrowUpRoundedIcon from '@mui/icons-material/KeyboardArrowUpRounded';
 import MenuIcon from '@mui/icons-material/Menu';
-import KeyboardArrowRightRoundedIcon from '@mui/icons-material/KeyboardArrowRightRounded';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import BookRoundedIcon from '@mui/icons-material/BookRounded';
 
@@ -84,6 +63,27 @@ interface FormElements extends HTMLFormControlsCollection {
     plan_ids: HTMLInputElement;
 }
 
+// TABS
+// function TabPanel(props: any) {
+//     const { children, value, index, ...other } = props;
+
+//     return (
+//         <div
+//             role="tabpanel"
+//             hidden={value !== index}
+//             id={`simple-tabpanel-${index}`}
+//             aria-labelledby={`simple-tab-${index}`}
+//             {...other}
+//         >
+//             {value === index && (
+//                 <Box sx={{ p: 3 }}>
+//                     {children}
+//                 </Box>
+//             )}
+//         </div>
+//     );
+// }
+
 // LJ table
 interface Rider {
 rider_id: number;
@@ -111,11 +111,12 @@ interface TableComponentProps {
 data: JsonData;
 }
   
-function TableComponent({ data }: TableComponentProps) {
+function RiderBenefitTable({ data }: TableComponentProps) {
     return (
-        <Table variant="soft" borderAxis="bothBetween" style={{ minWidth: '100%' }}>
+        <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
             <thead>
             <tr>
+                <th>Rider Benefits</th>
                 {(data?.riders || []).map((column: any) => (
                     <th key={column.rider_id}>{column.rider_name}</th>
                 ))}
@@ -143,12 +144,77 @@ function TableComponent({ data }: TableComponentProps) {
     );
 }
 
+// Alain table
+interface Plan {
+    plan_id: number;
+    plan_name: string;
+    }
+    
+    interface PlanBenefit {
+    plan_benefit_id: number;
+    plan_benefit_name: string;
+    }
+    
+    interface PlanBenefitDetail {
+    plan_id: number;
+    plan_benefit_id: number;
+    detail: string;
+    }
+    
+    interface JsonData {
+    plans: Plan[];
+    plan_benefits: PlanBenefit[];
+    plan_benefit_details: PlanBenefitDetail[];
+    }
+    
+    interface TableComponentProps {
+    data: JsonData;
+    }
+      
+    function PlanBenefitTable({ data }: TableComponentProps) {
+        return (
+            <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
+                <thead>
+                <tr>
+                    <th>Plan Benefits</th>
+                    {(data?.plans || []).map((column: any) => (
+                        <th key={column.plan_id}>{column.plan_name}</th>
+                    ))}
+                </tr>
+                </thead>
+                <tbody>
+                {(data?.plan_benefits || []).map((row: any) => (
+                    <tr key={row.plan_benefit_id}>
+                    <td>{row.plan_benefit_name}</td>
+                    {(data?.plans || []).map((column: any) => (
+                        <td key={column.plan_id}>
+                        {
+                            data?.plan_benefit_details.find(
+                            (d) =>
+                                d.plan_id === column.plan_id &&
+                                d.plan_benefit_id === row.plan_benefit_id
+                            )?.detail
+                        }
+                        </td>
+                    ))}
+                    </tr>
+                ))}
+                </tbody>
+            </Table>
+        );
+    }
+
 export default function TeamExample() {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [filterData, setFilterData] = React.useState<any>({});
     const [selectedFilter, setSelectedFilter] = useState<any>({});
     const [comparePremiumsData, setComparePremiumsData] = useState<any>({});
     const [riderBenefits, setRiderBenefits] = useState<any>({});
+    const [planBenefits, setPlanBenefits] = useState<any>({});
+    // const [tabValue, setTabValue] = useState(0);
+    // const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    //     setTabValue(newValue);
+    // };
 
     // CheckBoxes
     const getFilterData = async () => {
@@ -183,6 +249,7 @@ export default function TeamExample() {
       setFilterData({});
       setSelectedFilter({});
       setRiderBenefits({});
+      setPlanBenefits({});
     };
 
     useEffect(() => {
@@ -197,6 +264,10 @@ export default function TeamExample() {
 
         (async () => {
             await getRiderBenefits();
+        })();
+
+        (async () => {
+            await getPlanBenefits();
         })();
 
     }, [selectedFilter])
@@ -229,6 +300,53 @@ export default function TeamExample() {
         
 
     }
+
+    // Alain table
+    const getPlanBenefits = async () => {
+        if ((selectedFilter?.plan_ids || [])){
+            console.log("Selected filter");
+            console.log(selectedFilter);
+            const selectedPlans = {
+                "plan_ids": selectedFilter?.plan_ids
+            }
+
+            // console.log(selectedPlans)
+            // console.log(planBenefits)
+            // console.log(selectedFilter?.plan_ids)
+            
+            await fetch('/api/get_plan_benefits',{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(selectedPlans)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jsonData: JsonData = data.data; // Typecasting the fetched data
+                console.log(data.data);
+                setPlanBenefits(jsonData);
+            })
+        }
+        
+
+    }
+
+    // // State to track visible columns
+    // const [visibleColumns, setVisibleColumns] = useState(() => {
+    //     // Initially, all columns are visible
+    //     const initialVisibility = {};
+    //     comparePremiumsData?.columns?.forEach((column: any) => {
+    //         initialVisibility[column.name] = true;
+    //     });
+    //     return initialVisibility;
+    // });
+
+    // // Toggle column visibility
+    // const toggleColumn = (columnName: any) => {
+    //     setVisibleColumns((prevVisibleColumns) => ({
+    //         ...prevVisibleColumns,
+    //         [columnName]: !prevVisibleColumns[columnName],
+    //     }));
+    // };
 
     return (
         <CssVarsProvider disableTransitionOnChange>
@@ -349,6 +467,11 @@ export default function TeamExample() {
                 <Layout.SideNav>
                     <div>
                         <div>
+                        <button onClick={clearFilters}>Clear</button>
+                        <button onClick={clearFilters}>Clear</button>
+                        <button onClick={clearFilters}>Clear</button>
+                        </div>
+                        <div>
                             <h2>Companies:</h2>
                             {(filterData?.companies || []).map((company: any) => (
                                 <div key={company.id}>
@@ -456,54 +579,68 @@ export default function TeamExample() {
                     {/* <TeamNav /> */}
                 </Layout.SideNav>
                 <Layout.Main>
-                    <Sheet variant="outlined" style={{ width: '75.2vw' }}>
-                      <div style={{overflowX: 'auto'}}>
-                        {/* Rider Benefits */}
-                        <TableComponent data={riderBenefits} />
-                        {/* Compare premiums */}
-                        <Table variant="soft" borderAxis="bothBetween" style={{ minWidth: '100%' }}>
-                          <thead>
-                            <tr>
-                              {/* {(comparePremiumsData?.columns || []).map((columns: any) => (
-                                  <th key={columns.name}>{columns.text}</th>
-                              ))} */}
-                              {(comparePremiumsData?.columns || []).map((column: any) => {
-                                  if (column.children) {
-                                      return column.children.map((childColumn: any) => (
-                                          <th key={childColumn.name}>{childColumn.text}</th>
-                                      ));
-                                  } else {
-                                      return <th key={column.name}>{column.text}</th>;
-                                  }
-                              })}
-                            </tr>
-                          </thead>
-                          <tbody>
-                              {/* {(comparePremiumsData?.rows || []).map((row: any, index: any) => (
-                                  <tr key={index}>
-                                    {comparePremiumsData.columns.map((column: any) => (
-                                      <td key={column.name}>{row[column.name]}</td>
+                    <Box sx={{ width: "72.5vw", overflow: 'auto' }}>
+                        <Sheet variant="outlined">
+                            {/* <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
+                                <Tab label="Comparison Table" />
+                                <Tab label="Plan Benefits" />
+                                <Tab label="Rider Benefits" />
+                            </Tabs>
+                            <TabPanel value={tabValue} index={0}> */}
+                                {/* Compare premiums */}
+                                <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
+                                <thead>
+                                    <tr>
+                                        {/* Render top-level headers */}
+                                        {comparePremiumsData?.columns?.map((column: any) => {
+                                            // Apply colSpan for parent columns that have children
+                                            const colSpan = column.children ? column.children.length : 1;
+                                            return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
+                                        })}
+                                    </tr>
+                                    {/* Render sub-headers if any columns have children */}
+                                    {comparePremiumsData?.columns?.some((column: any) => column.children) && (
+                                        <tr>
+                                            {comparePremiumsData.columns.flatMap((column: any) =>
+                                            column.children ? column.children.map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
+                                            )}
+                                        </tr>
+                                    )}
+                                </thead>
+                                <tbody>
+                                    {/* {(comparePremiumsData?.rows || []).map((row: any, index: any) => (
+                                        <tr key={index}>
+                                            {comparePremiumsData.columns.map((column: any) => (
+                                            <td key={column.name}>{row[column.name]}</td>
+                                            ))}
+                                        </tr>
+                                    ))} */}
+                                    {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
+                                    <tr key={rowIndex}>
+                                        {(comparePremiumsData?.columns || []).map((column: any) => {
+                                            if (column.children) {
+                                                return column.children.map((childColumn: any) => (
+                                                    <td key={childColumn.name}>{row[childColumn.name]}</td>
+                                                ));
+                                            } else {
+                                                return <td key={column.name}>{row[column.name]}</td>;
+                                            }
+                                        })}
+                                    </tr>
                                     ))}
-                                  </tr>
-                              ))} */}
-                              {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
-                              <tr key={rowIndex}>
-                                  {(comparePremiumsData?.columns || []).map((column: any) => {
-                                      if (column.children) {
-                                          return column.children.map((childColumn: any) => (
-                                              <td key={childColumn.name}>{row[childColumn.name]}</td>
-                                          ));
-                                      } else {
-                                          return <td key={column.name}>{row[column.name]}</td>;
-                                      }
-                                  })}
-                              </tr>
-                            ))}
-                          </tbody>
-                        </Table>
-                      </div>
-                        
-                    </Sheet>
+                                </tbody>
+                                </Table>
+                            {/* </TabPanel>
+                            <TabPanel value={tabValue} index={1}> */}
+                                {/* Plan Benefits */}
+                                <PlanBenefitTable data={planBenefits} />
+                            {/* </TabPanel>
+                            <TabPanel value={tabValue} index={2}> */}
+                                {/* Rider Benefits */}
+                                <RiderBenefitTable data={riderBenefits} />
+                            {/* </TabPanel>     */}
+                        </Sheet>
+                    </Box>
                 </Layout.Main>
             </Layout.Root>
         </CssVarsProvider>
