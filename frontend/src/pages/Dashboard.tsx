@@ -191,6 +191,7 @@ export default function TeamExample() {
     const clearFilters = () => {
       setFilterData({});
       setSelectedFilter({});
+      setRiderBenefits({});
     };
 
     useEffect(() => {
