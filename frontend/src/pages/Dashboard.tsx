@@ -445,11 +445,13 @@ export default function TeamExample() {
                                     type="checkbox"
                                     value={rider.id}
                                     onChange={() => {
-                                        let selectedRiders = filterData?.rider_ids || [];
+                                        let selectedRiders = selectedFilter?.rider_ids || [];
                                         if (selectedRiders.includes(rider.id))
                                             selectedRiders = selectedRiders.filter((item: any) => item !== rider.id);
                                         else
                                             selectedRiders.push(rider.id)
+                                        console.log("selected Riders is as follows");
+                                        console.log(selectedRiders);
                                         setSelectedFilter({...selectedFilter, rider_ids: selectedRiders})
                                     }}
                                 />
