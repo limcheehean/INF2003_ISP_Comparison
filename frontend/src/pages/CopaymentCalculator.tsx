@@ -352,14 +352,14 @@ export default function TeamExample() {
                             <Typography level="h1">Calculate Copayment</Typography>
                             <Typography level="title-md" mt={2} color='neutral'>Know your out of pocket expenses for medical services.</Typography>
                         </Grid>
-                      
+
                     </Grid>
 
 
                     <Sheet variant="plain" style={{ width: '75.2vw', padding: '25px', borderRadius: '25px' }}>
 
 
-                  
+
 
                         <Grid container spacing={2}>
                             <Grid xs={5}>
@@ -401,23 +401,23 @@ export default function TeamExample() {
                                             </FormControl>
 
                                             <FormControl>
-                                            <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
+                                                <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
                                                 <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
-                                            <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
+                                                <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
                                                 <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
                                             </FormControl>
 
                                             <FormControl>
-                                            <FormLabel><Typography level="h4">What is your age?</Typography></FormLabel>
+                                                <FormLabel><Typography level="h4">What is your age?</Typography></FormLabel>
                                                 <Input name="age" type="number" value={age} onChange={(e) => set_age(e.target.value)} placeholder="Type your age" variant="soft" />
 
                                             </FormControl>
 
                                             <FormControl>
-                                            <FormLabel><Typography level="h4">Ward Type</Typography></FormLabel>
+                                                <FormLabel><Typography level="h4">Ward Type</Typography></FormLabel>
                                                 <Input name="ward_type" value={ward_type} onChange={(e) => set_ward_type(e.target.value)} placeholder="Private, A, B1 etc." variant="soft" />
                                             </FormControl>
 
@@ -447,51 +447,111 @@ export default function TeamExample() {
                                             <ListItemDecorator>
                                                 <PaidIcon />
                                             </ListItemDecorator>
-                                            <Typography level="title-lg">Cash Payment: ${responseData.data.cash_payment}</Typography>
+
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Cash Payment: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.cash_payment}</Typography>
+                                                </Grid>
+                                            </Grid>
+
+                                           
+
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <LocalHospitalIcon />
                                             </ListItemDecorator>
 
-                                            <Typography level="title-lg"> Co Insurance: ${responseData.data.co_insurance}</Typography>
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Co Insurance: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.co_insurance}</Typography>
+                                                </Grid>
+                                            </Grid>
+
+
                                            
+
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <HealthAndSafetyIcon />
                                             </ListItemDecorator>
-                                            <Typography level="title-lg">Co payment: ${responseData.data.co_payment}</Typography>
-                                            
+
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Co payment: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.co_payment}</Typography>
+                                                </Grid>
+                                            </Grid>
+
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <RemoveIcon />
                                             </ListItemDecorator>
-                                            <Typography level="title-lg">Deductible: ${responseData.data.deductible}</Typography>
-                                            
+
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Deductible: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.deductible}</Typography>
+                                                </Grid>
+                                            </Grid>
+
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <KeyboardDoubleArrowUpIcon />
                                             </ListItemDecorator>
-                                            <Typography level="title-lg">Over limit: ${responseData.data.over_limit}</Typography>
-                                          
+
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Over limit: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.over_limit}</Typography>
+                                                </Grid>
+                                            </Grid>
+
                                         </ListItem>
                                         <ListItem>
                                             <ListItemDecorator>
                                                 <BalanceIcon />
                                             </ListItemDecorator>
-                                            <Typography level="title-lg">Pro-ration: ${responseData.data.pro_ration}</Typography>
-                                           
+
+                                            <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Pro-ration: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.pro_ration}</Typography>
+                                                </Grid>
+                                            </Grid>
+
+                                        
                                         </ListItem>
                                     </List>
                                     <Divider inset="none" />
                                     <CardActions>
-                                        <Typography level="title-lg" sx={{ mr: 'auto' }}>
-                                            Total bill: $(SGD) {responseData.data.total_bill}.
 
-                                        </Typography>
+                                    <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                                <Grid xs={12}>
+                                                    <Typography level="title-lg">Total bill: </Typography>
+                                                </Grid>
+                                                <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.total_bill}</Typography>
+                                                </Grid>
+                                            </Grid>
+
                                     </CardActions>
                                 </Card>
                             </Grid>

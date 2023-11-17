@@ -148,7 +148,7 @@ export default function TeamExample() {
       .then((response) => response.json())
       .then((data) => {
         setUserPlans(data); // Assuming the API response is an array of user plans
-        console.log(data);
+        console.log("Hello +", data);
       })
       .catch((error) => {
         console.error('Error fetching user plans:', error);
@@ -461,6 +461,8 @@ export default function TeamExample() {
         <Layout.Main>
           <Sheet variant="outlined" style={{ width: '75.2vw' }}>
             <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
+
+
               <thead>
                 <tr>
                   <th style={{ width: '40%' }}>Company Name</th>
