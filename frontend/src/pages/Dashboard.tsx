@@ -24,16 +24,7 @@ import Slider from '@mui/joy/Slider';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
 import { useState, useEffect } from "react";
-// can remove these two
-import { DataGrid, GridToolbar } from '@mui/x-data-grid';
-import { useDemoData } from '@mui/x-data-grid-generator';
-import {
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
-    Paper
-  } from "@material-ui/core";
+
 
 // Icons import
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -179,7 +170,7 @@ export default function TeamExample() {
         }
 
         console.log(selectedComparePremiums)
-        // console.log(comparePremiumsData)
+        console.log(comparePremiumsData)
         await fetch('/api/compare_premiums',{
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -219,9 +210,9 @@ export default function TeamExample() {
             ]
         }
 
-        // console.log(selectedRiders)
-        // console.log(riderBenefits)
-        // console.log(selectedFilter?.rider_ids)
+        console.log(selectedRiders)
+        console.log(riderBenefits)
+        console.log(selectedFilter?.rider_ids)
         
         await fetch('/api/get_rider_benefits',{
             method: 'POST',
@@ -475,7 +466,7 @@ export default function TeamExample() {
                               {(comparePremiumsData?.columns || []).map((column: any) => {
                                   if (column.children) {
                                       return column.children.map((childColumn: any) => (
-                                          <th key={childColumn.name}>{childColumn.text}</th>
+                                          <th key={childColumn.name} >{childColumn.text}</th>
                                       ));
                                   } else {
                                       return <th key={column.name}>{column.text}</th>;

@@ -26,7 +26,10 @@ mongo = PyMongo(app).db
 
 
 def get_db():
-    return db_connection.connect()
+    global db
+    if not db.open:
+        db = db_connection.connect()
+    return db
 
 
 @app.route('/')
@@ -164,7 +167,7 @@ def compare_premiums():
         }
     }
     """
-    return get_premiums(db, request)
+    return get_premiums(get_db(), request)
 
 
 # <?> Check if user is logged in?
@@ -240,7 +243,7 @@ def rider_benefits():
         }
     }
     """
-    return get_rider_benefits(db_cursor, request)
+    return get_rider_benefits(get_db(), request)
 
 
 @app.route("/api/get_plan_benefits", methods=["POST"])
