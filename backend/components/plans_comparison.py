@@ -827,7 +827,7 @@ def get_plan_benefits(db_cursor, request):
     return {"status": "success", "data": json_data}
 
 
-def get_rider_benefits(db, request):
+def get_rider_benefits(db_cursor, request):
     '''
     This method performs 2 queries: 
         one to get the rider benefits, while another to get the rider names. 
@@ -836,7 +836,7 @@ def get_rider_benefits(db, request):
     
     Parameterized queries are used to prevent sql injection.
     '''
-    db_cursor = db.cursor()
+    
     request_data = request.json
     rider_ids = request_data["rider_ids"]
     
