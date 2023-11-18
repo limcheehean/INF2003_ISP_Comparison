@@ -24,7 +24,6 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-//import CheckBoxes from "../components/CheckBoxes";
 import { StringLiteralType } from 'typescript';
 //import "../App.css";
 
@@ -275,75 +274,48 @@ export default function TeamExample() {
     // LJ table
     const getRiderBenefits = async () => {
 
-            const selectedRiders = {
-                "rider_ids": [
-                    ...(selectedFilter?.rider_ids || [])
-                ]
-            }
-
-            // console.log(selectedRiders)
-            // console.log(riderBenefits)
-            // console.log(selectedFilter?.rider_ids)
-            
-            await fetch('/api/get_rider_benefits',{
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(selectedRiders)
-            })
-            .then(response => response.json())
-            .then(data => {
-                const jsonData: JsonData = data.data; // Typecasting the fetched data
-                console.log(data.data);
-                setRiderBenefits(jsonData);
-            })
+        const selectedRiders = {
+            "rider_ids": [
+                ...(selectedFilter?.rider_ids || [])
+            ]
+        }
         
+        await fetch('/api/get_rider_benefits',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(selectedRiders)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const jsonData: JsonData = data.data; // Typecasting the fetched data
+            console.log(data.data);
+            setRiderBenefits(jsonData);
+        })
 
     }
 
     // Alain table
     const getPlanBenefits = async () => {
 
-            const selectedPlans = {
-                "plan_ids": [
-                    ...(selectedFilter?.plan_ids || [])
-                ]
-            }
-
-            // console.log(selectedPlans)
-            // console.log(planBenefits)
-            // console.log(selectedFilter?.plan_ids)
-            
-            await fetch('/api/get_plan_benefits',{
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(selectedPlans)
-            })
-            .then(response => response.json())
-            .then(data => {
-                const jsonData: JsonData = data.data; // Typecasting the fetched data
-                console.log(data.data);
-                setPlanBenefits(jsonData);
-            })
+        const selectedPlans = {
+            "plan_ids": [
+                ...(selectedFilter?.plan_ids || [])
+            ]
+        }
+        
+        await fetch('/api/get_plan_benefits',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(selectedPlans)
+        })
+        .then(response => response.json())
+        .then(data => {
+            const jsonData: JsonData = data.data; // Typecasting the fetched data
+            console.log(data.data);
+            setPlanBenefits(jsonData);
+        })
 
     }
-
-    // // State to track visible columns
-    // const [visibleColumns, setVisibleColumns] = useState(() => {
-    //     // Initially, all columns are visible
-    //     const initialVisibility = {};
-    //     comparePremiumsData?.columns?.forEach((column: any) => {
-    //         initialVisibility[column.name] = true;
-    //     });
-    //     return initialVisibility;
-    // });
-
-    // // Toggle column visibility
-    // const toggleColumn = (columnName: any) => {
-    //     setVisibleColumns((prevVisibleColumns) => ({
-    //         ...prevVisibleColumns,
-    //         [columnName]: !prevVisibleColumns[columnName],
-    //     }));
-    // };
 
     return (
         <CssVarsProvider disableTransitionOnChange>
@@ -528,28 +500,6 @@ export default function TeamExample() {
                                     <label>{plan.name}</label>
                                 </div>
                             ))}
-                        </div>
-                        {/* <div>
-                            <h2>Plan ID Columns:</h2>
-                            {(comparePremiumsData?.columns || []).map((column: any) => (
-                                <div key={column.name}>
-                                    <input
-                                        type="checkbox"
-                                        value={column.name}
-                                        onChange={() => {
-                                            let selectedPlansColumns = comparePremiumsData?.columns || [];
-                                            if (selectedPlansColumns.includes(column.name))
-                                                selectedPlansColumns = selectedPlansColumns.filter((item: any) => item !== column.name);
-                                            else
-                                                selectedPlansColumns.push(column.name)
-                                            setSelectedFilter({...selectedFilter, columns: selectedPlansColumns})
-                                        }}
-                                    />
-                                    <label>{column.text}</label>
-                                </div>
-                            ))}
-                        </div> */}
-                        <div>
                           <h2>Rider IDs:</h2>
                           {(filterData?.riders || []).map((rider: any) => (
                             <div key={rider.id}>
@@ -605,13 +555,6 @@ export default function TeamExample() {
                                     )}
                                 </thead>
                                 <tbody>
-                                    {/* {(comparePremiumsData?.rows || []).map((row: any, index: any) => (
-                                        <tr key={index}>
-                                            {comparePremiumsData.columns.map((column: any) => (
-                                            <td key={column.name}>{row[column.name]}</td>
-                                            ))}
-                                        </tr>
-                                    ))} */}
                                     {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
                                     <tr key={rowIndex}>
                                         {(comparePremiumsData?.columns || []).map((column: any) => {
