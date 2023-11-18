@@ -1,17 +1,15 @@
 import toml
-from flask import Flask, request, url_for
-from flask_mail import Mail, Message
+from flask import Flask, request
+from flask_mail import Mail
 from flask_pymongo import PyMongo
 from flaskext.mysql import MySQL
 
-from components.co_payment_calculator import calculate_co_payment
-from components.password_management import handle_forgot_password, handle_reset_token
 from components.account_management import login_user, logout_user, handle_signup, handle_signup_confirmation, \
     require_login
-
-from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_plans, filter_items
+from components.co_payment_calculator import calculate_co_payment
+from components.password_management import handle_forgot_password, handle_reset_token
+from components.plans_comparison import get_premiums, get_rider_benefits, get_plan_benefits, filter_items
 from components.user_plans import update_user_plans, get_user_plan_data, delete_user_plans
-
 
 app = Flask(__name__)
 app.config.from_file("config.toml", load=toml.load)
@@ -388,7 +386,6 @@ def add_or_edit_user_plans():
 @app.route("/api/user_plans/<path:userplan_id>", methods=["DELETE"])
 @require_login
 def remove_user_plans(userplan_id):
-    print("here")
     return delete_user_plans(get_db(), mongo, userplan_id)
 
 
