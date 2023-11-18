@@ -1,5 +1,4 @@
-// import * as React from 'react';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
@@ -16,10 +15,9 @@ import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import GoogleIcon from '../GoogleIcon';
 import { Link, useNavigate } from 'react-router-dom';
-import Slide from '@mui/material/Slide';
 import Alert from '@mui/joy/Alert';
+import Swal from 'sweetalert2';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -72,6 +70,10 @@ function Login() {
   //const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
 
+
+  
+
+
   // To reset previous error messages
   // const clearErrors = () => {
   //   setEmailError('');
@@ -104,8 +106,35 @@ function Login() {
       if (response.status === 200) {
         // Login successful
         console.log('Login successful: ', response.data);
-        // Code to redirect to the dashboard goes here
-        navigate('/dashboard');
+
+        const Toast = Swal.mixin({
+          toast: true,
+          position: "top-end",
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true
+        });
+        Toast.fire({
+          icon: 'success',
+          title: 'signed in successfully!'
+        })
+
+        setTimeout(() => {
+          navigate('/dashboard');
+        }, 1500);
+
+      //   Swal.fire({
+      //     position: 'top-end',
+      //     title: 'Success',
+      //     text: 'successfully logged in!',
+      //     icon: 'success',
+      //   }).then(function (result) {
+      //     if (result.value) {
+      //       // code to redirect to dashboard goes here
+      //         navigate('/dashboard');
+      //     }
+      // })
+       
       } else {
         // Handle other types of errors
         console.error('Unknown error:', response);
@@ -227,39 +256,7 @@ function Login() {
               },
             }}
           >
-            {/* <Stack gap={4} sx={{ mb: 2 }}>
-              <Stack gap={1}>
-                <Typography level="h3">Sign in</Typography>
-                <Typography level="body-sm">
-                  New to company?{' '}
-                  <Link to="/Signup">
-                    Sign up!
-                  </Link>
-                </Typography>
-              </Stack>
 
-              <Button
-                variant="soft"
-                color="neutral"
-                fullWidth
-                startDecorator={<GoogleIcon />}
-              >
-                Continue with Google
-              </Button>
-            </Stack>
-            <Divider
-              sx={(theme) => ({
-                [theme.getColorSchemeSelector('light')]: {
-                  color: { xs: '#FFF', md: 'text.tertiary' },
-                  '--Divider-lineColor': {
-                    xs: '#FFF',
-                    md: 'var(--joy-palette-divider)',
-                  },
-                },
-              })}
-            >
-              or
-            </Divider> */}
             <Stack gap={4} sx={{ mt: 2 }}>
               <form onSubmit={handleLogin}>
                 <FormControl required>
@@ -270,9 +267,10 @@ function Login() {
                   <FormLabel>Password</FormLabel>
                   <Input type="password" name="password" value={password} onChange={(e) => setPassword(e.target.value)}/>
                 </FormControl>
-                {/* {emailError && <Alert color="danger" variant="soft">{emailError}</Alert>}
-                {passwordError && <Alert color="danger" variant="soft">{passwordError}</Alert>} */}
                 {error && <Alert color="danger" variant="soft">{error}</Alert>}
+                
+                
+
                 <Stack gap={4} sx={{ mt: 2 }}>
                   <Box
                     sx={{
@@ -291,7 +289,7 @@ function Login() {
                   </Button>
                   <Link to="/Signup">
                       Don't have an account? Sign up!
-                  </Link>
+                    </Link>
                 </Stack>
               </form>
             </Stack>
