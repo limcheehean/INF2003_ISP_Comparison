@@ -386,6 +386,7 @@ def add_or_edit_user_plans():
 @app.route("/api/user_plans/<path:userplan_id>", methods=["DELETE"])
 @require_login
 def remove_user_plans(userplan_id):
+    print("here")
     return delete_user_plans(get_db(), mongo, userplan_id)
 
 

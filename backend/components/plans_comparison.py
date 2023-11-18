@@ -168,21 +168,13 @@ def get_premiums(db, request):
     """
 
     # To remove for prod
-    # print(query)
-    # print(params_part)
+    print(query)
+    print(params_part)
 
     cursor.execute(query, params_part)
     results = cursor.fetchall()
 
     return {"status": "success", "data": {"columns": columns, "rows": results}}
-
-
-planquery = """
-SELECT p.id, p.name, r.id, r.name, p.ward_type, p.company_id
-FROM plan as p
-JOIN rider as r
-    ON p.id = r.plan_id
-"""
 
 
 def filter_items(db, request):
@@ -258,8 +250,8 @@ def get_plan_benefits(db_cursor, request):
             generated_plannamequery += "%s"
     generated_planbenefitsquery += ") ORDER BY pbd.plan_id;"
     generated_plannamequery += ");"
-    # print("Generated_planbenefitsquery: ", generated_planbenefitsquery)
-    # print("Generated_plannamequery: ", generated_plannamequery)
+    print("Generated_planbenefitsquery: ", generated_planbenefitsquery)
+    print("Generated_plannamequery: ", generated_plannamequery)
 
     try:
         # Execute queries
@@ -269,14 +261,14 @@ def get_plan_benefits(db_cursor, request):
         #   Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
 
-        # print("Row headers: ", details_row_headers)
+        print("Row headers: ", details_row_headers)
 
         queried_planbenefits = db_cursor.fetchall()
 
         #   Get plan names
         db_cursor.execute(generated_plannamequery, tuple(plan_ids))
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
-        # print("Row headers: ", details_row_headers)
+        print("Row headers: ", details_row_headers)
         queried_plannames = db_cursor.fetchall()
 
         # Organize the data for table use
@@ -345,8 +337,8 @@ def get_rider_benefits(db_cursor, request):
             generated_ridernamequery += "%s"
     generated_riderbenefitsquery += ") ORDER BY rbd.rider_id;"
     generated_ridernamequery += ");"
-    # print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
-    # print("Generated_ridernamequery: ", generated_ridernamequery)
+    print("Generated_riderbenefitsquery: ", generated_riderbenefitsquery)
+    print("Generated_ridernamequery: ", generated_ridernamequery)
          
     try:
         # Execute queries 
@@ -356,14 +348,14 @@ def get_rider_benefits(db_cursor, request):
         #   Reference: https://stackoverflow.com/questions/43796423/python-converting-mysql-query-result-to-json
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
         
-        # print("Row headers: ", details_row_headers)
+        print("Row headers: ", details_row_headers)
 
         queried_riderbenefits = db_cursor.fetchall()
         
         #   Get rider names
         db_cursor.execute(generated_ridernamequery, tuple(rider_ids))
         details_row_headers=[x[0] for x in db_cursor.description] #this will extract row headers
-        # print("Row headers: ", details_row_headers)
+        print("Row headers: ", details_row_headers)
         queried_ridernames = db_cursor.fetchall()
         
         # Organize the data for table use
