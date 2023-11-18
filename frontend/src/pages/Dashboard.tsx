@@ -592,16 +592,16 @@ export default function TeamExample() {
                                 <thead>
                                     <tr>
                                         {/* Render top-level headers */}
-                                        {comparePremiumsData?.columns?.map((column: any) => {
+                                        {(comparePremiumsData?.columns || []).map((column: any) => {
                                             // Apply colSpan for parent columns that have children
                                             const colSpan = column.children ? column.children.length : 1;
                                             return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
                                         })}
                                     </tr>
                                     {/* Render sub-headers if any columns have children */}
-                                    {comparePremiumsData?.columns?.some((column: any) => column.children) && (
+                                    {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
                                         <tr>
-                                            {comparePremiumsData.columns.flatMap((column: any) =>
+                                            {(comparePremiumsData.columns|| []).flatMap((column: any) =>
                                             column.children ? column.children.map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
                                             )}
                                         </tr>
