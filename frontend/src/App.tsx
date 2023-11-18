@@ -12,15 +12,15 @@ import Userplan from './pages/Userplan';
 export default function App() {
     return (
         <div className="App">
-      <Routes>
-            <Route path="/" element={<Login />} />
-            <Route path="forgetPassword" element={<ForgetPassword />}/>
-            <Route path="resetPassword/:resetToken" element={<ResetPassword />}/>
-            <Route path="Dashboard" element={<Dashboard />} />
-            <Route path="copaymentCalculator" element={<CopaymentCalculator />} />
-            <Route path="signUp" element={<SignUp/>}></Route>
-            <Route path="UserPlan" element={<Userplan/>}></Route>
-      </Routes>
-    </div>
+            <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="forgetPassword" element={<ForgetPassword />}/>
+                <Route path="resetPassword/:resetToken" element={<ResetPassword />}/>
+                <Route path="Dashboard" element={<Dashboard />} />
+                <Route path="copaymentCalculator" element={<CopaymentCalculator />} />
+                <Route path="signUp" element={<SignUp/>}></Route>
+                <Route path="UserPlan" element={<Userplan/>}></Route>
+            </Routes>
+        </div>
     );
 }
