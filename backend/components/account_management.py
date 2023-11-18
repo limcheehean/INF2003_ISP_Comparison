@@ -9,7 +9,8 @@ from flask_mail import Message
 from flaskext.mysql import pymysql
 
 # utility functions
-from utility import email_check, password_check, name_check, send_mail_async
+from utility import email_check, password_check, name_check
+
 
 ############################
 # Authentication functions #
@@ -79,7 +80,10 @@ def logout_user(mongo):
     return {"status": "success", "message": "Logout successful"}
 
 
-def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, mail, request):
+def handle_signup(db: pymysql.Connection, mail, request):
+
+    db_cursor = db.cursor()
+
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
@@ -151,15 +155,16 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
                   recipients=[signup_email])
 
     msg.body = "signup_confirmation_link is " + signup_confirmation_link
-    
-    #mail.send(msg)
-    send_mail_async(mail,msg)
+    mail.send(msg)
 
+    # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
 
 
-def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, signup_token):
+def handle_signup_confirmation(db: pymysql.Connection, signup_token):
     print("Signup token received: ", signup_token)
+
+    db_cursor = db.cursor()
 
     # How long before token expires, in seconds
     token_expire = 60 * 10

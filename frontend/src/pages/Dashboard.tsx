@@ -1,592 +1,645 @@
-import React, { useEffect, useState } from 'react';
+import * as React from 'react';
+import { ChangeEvent, useState, useEffect } from "react";
+import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
-import Chip from '@mui/joy/Chip';
 import Typography from '@mui/joy/Typography';
 import Input from '@mui/joy/Input';
 import IconButton from '@mui/joy/IconButton';
-import List from '@mui/joy/List';
-import ListSubheader from '@mui/joy/ListSubheader';
-import ListItem from '@mui/joy/ListItem';
-import ListItemButton from '@mui/joy/ListItemButton';
-import ListItemDecorator from '@mui/joy/ListItemDecorator';
-import ListItemContent from '@mui/joy/ListItemContent';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 // Icons import
-import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
-import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
-import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
-import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
-
 import MenuIcon from '@mui/icons-material/Menu';
-
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import BookRoundedIcon from '@mui/icons-material/BookRounded';
 
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
+//import CheckBoxes from "../components/CheckBoxes";
+import { StringLiteralType } from 'typescript';
+//import "../App.css";
 
 function ColorSchemeToggle() {
-  const { mode, setMode } = useColorScheme();
-  const [mounted, setMounted] = React.useState(false);
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) {
-    return <IconButton size="sm" variant="soft" color="neutral" />;
-  }
-  return (
-    <IconButton
-      id="toggle-mode"
-      size="sm"
-      variant="soft"
-      color="neutral"
-      onClick={() => {
-        if (mode === 'light') {
-          setMode('dark');
-        } else {
-          setMode('light');
-        }
-      }}
-    >
-      {mode === 'light' ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
-    </IconButton>
-  );
-}
-
-// Navigation panel
-
-function TeamNav() {
-  return (
-    <List size="sm" sx={{ '--ListItem-radius': '8px', '--List-gap': '4px' }}>
-      <ListItem nested>
-        <ListSubheader>
-          Browse
-          <IconButton
+    const { mode, setMode } = useColorScheme();
+    const [mounted, setMounted] = React.useState(false);
+    React.useEffect(() => {
+        setMounted(true);
+    }, []);
+    if (!mounted) {
+        return <IconButton size="sm" variant="soft" color="neutral" />;
+    }
+    return (
+        <IconButton
+            id="toggle-mode"
             size="sm"
-            variant="plain"
-            color="primary"
-            sx={{ '--IconButton-size': '24px', ml: 'auto' }}
-          >
-            <KeyboardArrowDownRoundedIcon fontSize="small" color="primary" />
-          </IconButton>
-        </ListSubheader>
-        <List
-          aria-labelledby="nav-list-browse"
-          sx={{
-            '& .JoyListItemButton-root': { p: '8px' },
-          }}
+            variant="soft"
+            color="neutral"
+            onClick={() => {
+                if (mode === 'light') {
+                    setMode('dark');
+                } else {
+                    setMode('light');
+                }
+            }}
         >
-          <ListItem>
-            <ListItemDecorator>
-              <PeopleRoundedIcon fontSize="small" />
-            </ListItemDecorator>
-            <ListItemContent>Ward</ListItemContent>
-          </ListItem>
-          <ListItem>
-            <ListItemButton>
-              <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                <ArticleRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>My Plans</ListItemContent>
-              <Chip
-                variant="soft"
-                color="neutral"
-                size="sm"
-                sx={{ borderRadius: 'sm' }}
-              >
-                Beta
-              </Chip>
-            </ListItemButton>
-          </ListItem>
-          <ListItem>
-            <ListItemButton>
-              <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                <AssignmentIndRoundedIcon fontSize="small" />
-              </ListItemDecorator>
-              <ListItemContent>Rider</ListItemContent>
-            </ListItemButton>
-          </ListItem>
-        </List>
-      </ListItem>
-    </List>
-  );
+            {mode === 'light' ? <DarkModeRoundedIcon /> : <LightModeRoundedIcon />}
+        </IconButton>
+    );
 }
 
-// Table
-function createData(
-  companyName: string,
-  ward: string,
-  plans: string,
-  riders: string,
-) {
-  return { companyName, ward, plans, riders };
+// CHECKBOXES
+interface FormElements extends HTMLFormControlsCollection {
+    company_ids:HTMLInputElement;
+    ward_types: HTMLInputElement;
+    plan_ids: HTMLInputElement;
 }
 
-const rows = [
-  createData('AIA', 'A', 'testing1', 'testing2'),
-  createData('Prudential', 'B1', 'testing3', 't4'),
-  createData('NTUC', 'C', 't5', 't6'),
-  createData('Great Eastern', 'Premium', 't7', 't8'),
-];
+// TABS
+// function TabPanel(props: any) {
+//     const { children, value, index, ...other } = props;
+
+//     return (
+//         <div
+//             role="tabpanel"
+//             hidden={value !== index}
+//             id={`simple-tabpanel-${index}`}
+//             aria-labelledby={`simple-tab-${index}`}
+//             {...other}
+//         >
+//             {value === index && (
+//                 <Box sx={{ p: 3 }}>
+//                     {children}
+//                 </Box>
+//             )}
+//         </div>
+//     );
+// }
+
+// LJ table
+interface Rider {
+rider_id: number;
+rider_name: string;
+}
+
+interface RiderBenefit {
+rider_benefit_id: number;
+rider_benefit_name: string;
+}
+
+interface RiderBenefitDetail {
+rider_id: number;
+rider_benefit_id: number;
+detail: string;
+}
+
+interface JsonData {
+riders: Rider[];
+rider_benefits: RiderBenefit[];
+rider_benefit_details: RiderBenefitDetail[];
+}
+
+interface TableComponentProps {
+data: JsonData;
+}
+  
+function RiderBenefitTable({ data }: TableComponentProps) {
+    return (
+        <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
+            <thead>
+            <tr>
+                <th>Rider Benefits</th>
+                {(data?.riders || []).map((column: any) => (
+                    <th key={column.rider_id}>{column.rider_name}</th>
+                ))}
+            </tr>
+            </thead>
+            <tbody>
+            {(data?.rider_benefits || []).map((row: any) => (
+                <tr key={row.rider_benefit_id}>
+                <td>{row.rider_benefit_name}</td>
+                {(data?.riders || []).map((column: any) => (
+                    <td key={column.rider_id}>
+                    {
+                        data?.rider_benefit_details.find(
+                        (d) =>
+                            d.rider_id === column.rider_id &&
+                            d.rider_benefit_id === row.rider_benefit_id
+                        )?.detail
+                    }
+                    </td>
+                ))}
+                </tr>
+            ))}
+            </tbody>
+        </Table>
+    );
+}
+
+// Alain table
+interface Plan {
+    plan_id: number;
+    plan_name: string;
+    }
+    
+    interface PlanBenefit {
+    plan_benefit_id: number;
+    plan_benefit_name: string;
+    }
+    
+    interface PlanBenefitDetail {
+    plan_id: number;
+    plan_benefit_id: number;
+    detail: string;
+    }
+    
+    interface JsonData {
+    plans: Plan[];
+    plan_benefits: PlanBenefit[];
+    plan_benefit_details: PlanBenefitDetail[];
+    }
+    
+    interface TableComponentProps {
+    data: JsonData;
+    }
+      
+    function PlanBenefitTable({ data }: TableComponentProps) {
+        return (
+            <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
+                <thead>
+                <tr>
+                    <th>Plan Benefits</th>
+                    {(data?.plans || []).map((column: any) => (
+                        <th key={column.plan_id}>{column.plan_name}</th>
+                    ))}
+                </tr>
+                </thead>
+                <tbody>
+                {(data?.plan_benefits || []).map((row: any) => (
+                    <tr key={row.plan_benefit_id}>
+                    <td>{row.plan_benefit_name}</td>
+                    {(data?.plans || []).map((column: any) => (
+                        <td key={column.plan_id}>
+                        {
+                            data?.plan_benefit_details.find(
+                            (d) =>
+                                d.plan_id === column.plan_id &&
+                                d.plan_benefit_id === row.plan_benefit_id
+                            )?.detail
+                        }
+                        </td>
+                    ))}
+                    </tr>
+                ))}
+                </tbody>
+            </Table>
+        );
+    }
 
 export default function TeamExample() {
-  const [drawerOpen, setDrawerOpen] = React.useState(false);
-  const [userPlans, setUserPlans] = React.useState([]);
+    const [drawerOpen, setDrawerOpen] = React.useState(false);
+    const [filterData, setFilterData] = React.useState<any>({});
+    const [selectedFilter, setSelectedFilter] = useState<any>({});
+    const [comparePremiumsData, setComparePremiumsData] = useState<any>({});
+    const [riderBenefits, setRiderBenefits] = useState<any>({});
+    const [planBenefits, setPlanBenefits] = useState<any>({});
+    // const [tabValue, setTabValue] = useState(0);
+    // const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    //     setTabValue(newValue);
+    // };
 
-  useEffect(() => {
-    // Make an API request to fetch user plans data
-    fetch('/api/user_plans') // Replace with the actual API endpoint
-      .then((response) => response.json())
-      .then((data) => {
-        setUserPlans(data); // Assuming the API response is an array of user plans
-        console.log("Hello +", data);
-      })
-      .catch((error) => {
-        console.error('Error fetching user plans:', error);
-      });
-  }, []);
+    // CheckBoxes
+    const getFilterData = async () => {
+        console.log(selectedFilter)
+        console.log(filterData);
+        await fetch('/api/get_filter',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(selectedFilter)
+        }).then(response => response.json()).then(data => setFilterData(data.data));
+    };
 
-  return (
-    <CssVarsProvider disableTransitionOnChange>
-      <CssBaseline />
-      {drawerOpen && (
-        <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-          <TeamNav />
-        </Layout.SideDrawer>
-      )}
-      <Layout.Root
-        sx={{
-          ...(drawerOpen && {
-            height: '100vh',
-            overflow: 'hidden',
-          }),
-        }}
-      >
-        <Layout.Header>
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 1.5,
-            }}
-          >
-            <IconButton
-              variant="outlined"
-              size="sm"
-              onClick={() => setDrawerOpen(true)}
-              sx={{ display: { sm: 'none' } }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <IconButton
-              size="sm"
-              variant="soft"
-              sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
-            >
-              <GroupRoundedIcon />
-            </IconButton>
-            <Typography component="h1" fontWeight="xl">
-              Team
-            </Typography>
-          </Box>
-          <Input
-            size="sm"
-            variant="outlined"
-            placeholder="Search anything…"
-            startDecorator={<SearchRoundedIcon color="primary" />}
-            endDecorator={
-              <IconButton variant="outlined" color="neutral">
-                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
-                  ⌘ + k
-                </Typography>
-              </IconButton>
+    const getComparePremiumsData = async () => {
+
+        const selectedComparePremiums = {
+            "plans": [
+                ...(selectedFilter?.plan_ids || []).map((plan_id: any) => ({plan_id: plan_id}))
+            ]
+        }
+
+        console.log(selectedComparePremiums)
+        // console.log(comparePremiumsData)
+        await fetch('/api/compare_premiums',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(selectedComparePremiums)
+        }).then(response => response.json()).then(data => setComparePremiumsData(data.data));
+
+    }
+
+    const clearFilters = () => {
+      setFilterData({});
+      setSelectedFilter({});
+      setRiderBenefits({});
+      setPlanBenefits({});
+    };
+
+    useEffect(() => {
+
+        (async () => {
+            await getFilterData();
+        })();
+
+        (async () => {
+            await getComparePremiumsData();
+        })();
+
+        (async () => {
+            await getRiderBenefits();
+        })();
+
+        (async () => {
+            await getPlanBenefits();
+        })();
+
+    }, [selectedFilter])
+
+    // LJ table
+    const getRiderBenefits = async () => {
+
+            const selectedRiders = {
+                "rider_ids": [
+                    ...(selectedFilter?.rider_ids || [])
+                ]
             }
-            sx={{
-              flexBasis: '500px',
-              display: {
-                xs: 'none',
-                sm: 'flex',
-              },
-              boxShadow: 'sm',
-            }}
-          />
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
-            <IconButton
-              size="sm"
-              variant="outlined"
-              color="neutral"
-              sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
-            >
-              <SearchRoundedIcon />
-            </IconButton>
 
-            <IconButton
-              size="sm"
-              variant="soft"
-              color="neutral"
-              component="a"
-              href="/blog/first-look-at-joy/"
-            >
-              <BookRoundedIcon />
-            </IconButton>
-            <Menu
-              id="app-selector"
-              control={
-                <IconButton
-                  size="sm"
-                  variant="soft"
-                  color="neutral"
-                  aria-label="Apps"
-                >
-                  <GridViewRoundedIcon />
-                </IconButton>
-              }
-              menus={[
-                {
-                  label: 'Email',
-                  href: '/joy-ui/getting-started/templates/email/',
-                },
-                {
-                  label: 'Team',
-                  active: true,
-                  href: '/joy-ui/getting-started/templates/team/',
-                  'aria-current': 'page',
-                },
-                {
-                  label: 'Files',
-                  href: '/joy-ui/getting-started/templates/files/',
-                },
-              ]}
-            />
-            <ColorSchemeToggle />
-          </Box>
-        </Layout.Header>
-        <Layout.SideNav>
-          <TeamNav />
-        </Layout.SideNav>
-        {/* <Layout.SidePane>
-          <Box
-            sx={{
-              p: 2,
-              pb: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-            }}
-          >
-            <Typography level="title-sm">Filter by</Typography>
-            <Button size="sm" variant="plain" sx={{ fontSize: 'xs', px: 1 }}>
-              Clear filters
-            </Button>
-          </Box>
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Keywords
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Autocomplete
-                placeholder="Position, skills, etc…"
-                options={[
-                  {
-                    category: 'Position',
-                    title: 'Frontend engineer',
-                  },
-                  {
-                    category: 'Position',
-                    title: 'Backend engineer',
-                  },
-                  {
-                    category: 'Position',
-                    title: 'Product manager',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'JavaScript',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'TypeScript',
-                  },
-                  {
-                    category: 'Skill',
-                    title: 'Project management',
-                  },
-                ]}
-                groupBy={(option) => option.category}
-                getOptionLabel={(option) => option.title}
-              />
-              <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
-                <Chip
-                  variant="soft"
-                  size="sm"
-                  endDecorator={<ChipDelete variant="soft" />}
-                  sx={{ '--Chip-radius': (theme) => theme.vars.radius.sm }}
-                >
-                  UI designer
-                </Chip>
-              </Box>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Location
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <Autocomplete
-                placeholder="Position, skills, etc…"
-                options={[
-                  // some of Thailand provinces
-                  'Bangkok',
-                  'Amnat Charoen',
-                  'Ang Thong',
-                  'Bueng Kan',
-                  'Buriram',
-                  'Chachoengsao',
-                  'Chai Nat',
-                  'Chaiyaphum',
-                  'Chanthaburi',
-                  'Chiang Mai',
-                  'Chiang Rai',
-                  'Chonburi',
-                ]}
-              />
-              <Box sx={{ mt: 3, display: 'flex', gap: 1 }}>
-                <Slider
-                  valueLabelFormat={(value) => `${value} km`}
-                  defaultValue={6}
-                  step={1}
-                  min={0}
-                  max={20}
-                  valueLabelDisplay="on"
-                />
-              </Box>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Education
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowUpRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-            <Box sx={{ mt: 2 }}>
-              <RadioGroup name="education" defaultValue="any">
-                <Radio label="Any" value="any" size="sm" />
-                <Radio label="High School" value="high-school" size="sm" />
-                <Radio label="College" value="college" size="sm" />
-                <Radio label="Post-graduate" value="post-graduate" size="sm" />
-              </RadioGroup>
-            </Box>
-          </Box>
-          <Divider />
-          <Box sx={{ p: 2 }}>
-            <Box
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-              }}
-            >
-              <Typography level="body-sm" textColor="text.primary">
-                Previous experience
-              </Typography>
-              <IconButton
-                size="sm"
-                variant="plain"
-                color="primary"
-                sx={{ '--IconButton-size': '24px' }}
-              >
-                <KeyboardArrowDownRoundedIcon fontSize="small" color="primary" />
-              </IconButton>
-            </Box>
-          </Box>
-        </Layout.SidePane> */}
-        <Layout.Main>
-          <Sheet variant="outlined" style={{ width: '75.2vw' }}>
-            <Table variant="soft" borderAxis="bothBetween" style={{ width: '75vw' }}>
+            // console.log(selectedRiders)
+            // console.log(riderBenefits)
+            // console.log(selectedFilter?.rider_ids)
+            
+            await fetch('/api/get_rider_benefits',{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(selectedRiders)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jsonData: JsonData = data.data; // Typecasting the fetched data
+                console.log(data.data);
+                setRiderBenefits(jsonData);
+            })
+        
 
+    }
 
-              <thead>
-                <tr>
-                  <th style={{ width: '40%' }}>Company Name</th>
-                  <th>Ward</th>
-                  <th>Plans</th>
-                  <th>Riders</th>
-                </tr>
-              </thead>
-              {/* <tbody>
-                {userPlans.map((plan) => (
-                  <tr key={plan.companyName}>
-                    <th scope="row">{row.companyName}</th>
-                    <td>{row.ward}</td>
-                    <td>{row.plans}</td>
-                    <td>{row.riders}</td>
-                  </tr>
-                ))}
-              </tbody> */}
-            </Table>
-          </Sheet>
-          {/* <List
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-              gap: 2,
-            }}
-          >
-            {[...Array(3)].map((_, index) => (
-              <Sheet
-                key={index}
-                component="li"
-                variant="outlined"
+    // Alain table
+    const getPlanBenefits = async () => {
+
+            const selectedPlans = {
+                "plan_ids": [
+                    ...(selectedFilter?.plan_ids || [])
+                ]
+            }
+
+            // console.log(selectedPlans)
+            // console.log(planBenefits)
+            // console.log(selectedFilter?.plan_ids)
+            
+            await fetch('/api/get_plan_benefits',{
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(selectedPlans)
+            })
+            .then(response => response.json())
+            .then(data => {
+                const jsonData: JsonData = data.data; // Typecasting the fetched data
+                console.log(data.data);
+                setPlanBenefits(jsonData);
+            })
+
+    }
+
+    // // State to track visible columns
+    // const [visibleColumns, setVisibleColumns] = useState(() => {
+    //     // Initially, all columns are visible
+    //     const initialVisibility = {};
+    //     comparePremiumsData?.columns?.forEach((column: any) => {
+    //         initialVisibility[column.name] = true;
+    //     });
+    //     return initialVisibility;
+    // });
+
+    // // Toggle column visibility
+    // const toggleColumn = (columnName: any) => {
+    //     setVisibleColumns((prevVisibleColumns) => ({
+    //         ...prevVisibleColumns,
+    //         [columnName]: !prevVisibleColumns[columnName],
+    //     }));
+    // };
+
+    return (
+        <CssVarsProvider disableTransitionOnChange>
+            <CssBaseline />
+            {drawerOpen && (
+                <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
+                    {/* <TeamNav /> */}
+                </Layout.SideDrawer>
+            )}
+            <Layout.Root
                 sx={{
-                  borderRadius: 'sm',
-                  p: 2,
-                  listStyle: 'none',
+                    ...(drawerOpen && {
+                        height: '100vh',
+                        overflow: 'hidden',
+                    }),
                 }}
-              >
-                <Box sx={{ display: 'flex', gap: 2 }}>
-                  <Avatar
-                    src="https://i.pravatar.cc/40?img=6"
-                    srcSet="https://i.pravatar.cc/80?img=6 2x"
-                    sx={{ borderRadius: 'sm' }}
-                  />
-                  <div>
-                    <Typography>Andrew Smith</Typography>
-                    <Typography level="body-xs">UI Designer</Typography>
-                  </div>
-                </Box>
-                <Divider component="div" sx={{ my: 2 }} />
-                <List sx={{ '--ListItemDecorator-size': '48px' }}>
-                  <ListItem sx={{ alignItems: 'flex-start' }}>
-                    <ListItemDecorator
-                      sx={{
-                        '&:before': {
-                          content: '""',
-                          position: 'absolute',
-                          height: '100%',
-                          width: '2px',
-                          bgcolor: 'divider',
-                          left: 'calc(var(--ListItem-paddingLeft) + 15px)',
-                          top: '50%',
-                        },
-                      }}
+            >
+                <Layout.Header>
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 1.5,
+                        }}
                     >
-                      <Avatar
+                        <IconButton
+                            variant="outlined"
+                            size="sm"
+                            onClick={() => setDrawerOpen(true)}
+                            sx={{ display: { sm: 'none' } }}
+                        >
+                            <MenuIcon />
+                        </IconButton>
+                        <IconButton
+                            size="sm"
+                            variant="soft"
+                            sx={{ display: { xs: 'none', sm: 'inline-flex' } }}
+                        >
+                            <GroupRoundedIcon />
+                        </IconButton>
+                        <Typography component="h1" fontWeight="xl">
+                            Team
+                        </Typography>
+                    </Box>
+                    <Input
                         size="sm"
-                        src="https://www.vectorlogo.zone/logos/dribbble/dribbble-icon.svg"
-                      />
-                    </ListItemDecorator>
-                    <ListItemContent>
-                      <Typography fontSize="sm">Senior designer</Typography>
-                      <Typography level="body-xs">Dribbble</Typography>
-                    </ListItemContent>
-                    <Typography level="body-sm">2015-now</Typography>
-                  </ListItem>
-                  <ListItem sx={{ alignItems: 'flex-start' }}>
-                    <ListItemDecorator>
-                      <Avatar
-                        size="sm"
-                        src="https://www.vectorlogo.zone/logos/pinterest/pinterest-icon.svg"
-                        sx={{ backgroundColor: 'background.body' }}
-                      />
-                    </ListItemDecorator>
-                    <ListItemContent>
-                      <Typography fontSize="sm">Designer</Typography>
-                      <Typography level="body-xs">Pinterest</Typography>
-                    </ListItemContent>
-                    <Typography level="body-sm">2012-2015</Typography>
-                  </ListItem>
-                </List>
-                <Button
-                  size="sm"
-                  variant="plain"
-                  endDecorator={<KeyboardArrowRightRoundedIcon fontSize="small" />}
-                  sx={{ px: 1, mt: 1 }}
-                >
-                  Expand
-                </Button>
-                <Divider component="div" sx={{ my: 2 }} />
-                <Typography fontSize="sm">Skills tags:</Typography>
-                <Box sx={{ mt: 1.5, display: 'flex', gap: 1 }}>
-                  <Chip
-                    variant="outlined"
-                    color="neutral"
-                    size="sm"
-                    sx={{ borderRadius: 'sm' }}
-                  >
-                    UI design
-                  </Chip>
-                  <Chip
-                    variant="outlined"
-                    color="neutral"
-                    size="sm"
-                    sx={{ borderRadius: 'sm' }}
-                  >
-                    Illustration
-                  </Chip>
-                </Box>
-              </Sheet>
-            ))}
-          </List> */}
-        </Layout.Main>
-      </Layout.Root>
-    </CssVarsProvider>
-  );
+                        variant="outlined"
+                        placeholder="Search anything…"
+                        startDecorator={<SearchRoundedIcon color="primary" />}
+                        endDecorator={
+                            <IconButton variant="outlined" color="neutral">
+                                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
+                                    ⌘ + k
+                                </Typography>
+                            </IconButton>
+                        }
+                        sx={{
+                            flexBasis: '500px',
+                            display: {
+                                xs: 'none',
+                                sm: 'flex',
+                            },
+                            boxShadow: 'sm',
+                        }}
+                    />
+                    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
+                        <IconButton
+                            size="sm"
+                            variant="outlined"
+                            color="neutral"
+                            sx={{ display: { xs: 'inline-flex', sm: 'none' } }}
+                        >
+                            <SearchRoundedIcon />
+                        </IconButton>
+
+                        <IconButton
+                            size="sm"
+                            variant="soft"
+                            color="neutral"
+                            component="a"
+                            href="/blog/first-look-at-joy/"
+                        >
+                            <BookRoundedIcon />
+                        </IconButton>
+                        <Menu
+                            id="app-selector"
+                            control={
+                                <IconButton
+                                    size="sm"
+                                    variant="soft"
+                                    color="neutral"
+                                    aria-label="Apps"
+                                >
+                                    <GridViewRoundedIcon />
+                                </IconButton>
+                            }
+                            menus={[
+                                {
+                                    label: 'Email',
+                                    href: '/joy-ui/getting-started/templates/email/',
+                                },
+                                {
+                                    label: 'Team',
+                                    active: true,
+                                    href: '/joy-ui/getting-started/templates/team/',
+                                    'aria-current': 'page',
+                                },
+                                {
+                                    label: 'Files',
+                                    href: '/joy-ui/getting-started/templates/files/',
+                                },
+                            ]}
+                        />
+                        <ColorSchemeToggle />
+                    </Box>
+                </Layout.Header>
+                <Layout.SideNav>
+                    <div>
+                        <div>
+                        <button onClick={clearFilters}>Clear</button>
+                        <button onClick={clearFilters}>Clear</button>
+                        <button onClick={clearFilters}>Clear</button>
+                        </div>
+                        <div>
+                            <h2>Companies:</h2>
+                            {(filterData?.companies || []).map((company: any) => (
+                                <div key={company.id}>
+                                    <input
+                                        type="checkbox"
+                                        value={filterData.company}
+                                        checked={(selectedFilter?.company_ids || []).includes(company.id)}
+                                        onChange={() => {
+                                            let selectedCompanies = selectedFilter?.company_ids || [];
+                                            if (selectedCompanies.includes(company.id))
+                                                selectedCompanies = selectedCompanies.filter((item: any) => item !== company.id);
+                                            else
+                                                selectedCompanies.push(company.id)
+                                            setSelectedFilter({...selectedFilter, company_ids: selectedCompanies})
+                                        }}
+                                    />
+                                    <label>{company.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <h2>Ward Types:</h2>
+                            {(filterData?.wards || []).map((wardType: any) => (
+                                <div key={wardType}>
+                                    <input
+                                        type="checkbox"
+                                        value={wardType}
+                                        onChange={() => {
+                                            let selectedWardTypes = selectedFilter?.ward_types || [];
+                                            if (selectedWardTypes.includes(wardType))
+                                                selectedWardTypes = selectedWardTypes.filter((item: any) => item !== wardType);
+                                            else
+                                                selectedWardTypes.push(wardType)
+                                            setSelectedFilter({...selectedFilter, ward_types: selectedWardTypes})
+                                        }}
+                                    />
+                                    <label>{wardType}</label>
+                                </div>
+                            ))}
+                        </div>
+                        <div>
+                            <h2>Plan IDs:</h2>
+                            {(filterData?.plans || []).map((plan: any) => (
+                                <div key={plan.id}>
+                                    <input
+                                        type="checkbox"
+                                        value={plan.id}
+                                        onChange={() => {
+                                            let selectedPlans = selectedFilter?.plan_ids || [];
+                                            if (selectedPlans.includes(plan.id))
+                                                selectedPlans = selectedPlans.filter((item: any) => item !== plan.id);
+                                            else
+                                                selectedPlans.push(plan.id)
+                                            setSelectedFilter({...selectedFilter, plan_ids: selectedPlans})
+                                        }}
+                                    />
+                                    <label>{plan.name}</label>
+                                </div>
+                            ))}
+                        </div>
+                        {/* <div>
+                            <h2>Plan ID Columns:</h2>
+                            {(comparePremiumsData?.columns || []).map((column: any) => (
+                                <div key={column.name}>
+                                    <input
+                                        type="checkbox"
+                                        value={column.name}
+                                        onChange={() => {
+                                            let selectedPlansColumns = comparePremiumsData?.columns || [];
+                                            if (selectedPlansColumns.includes(column.name))
+                                                selectedPlansColumns = selectedPlansColumns.filter((item: any) => item !== column.name);
+                                            else
+                                                selectedPlansColumns.push(column.name)
+                                            setSelectedFilter({...selectedFilter, columns: selectedPlansColumns})
+                                        }}
+                                    />
+                                    <label>{column.text}</label>
+                                </div>
+                            ))}
+                        </div> */}
+                        <div>
+                          <h2>Rider IDs:</h2>
+                          {(filterData?.riders || []).map((rider: any) => (
+                            <div key={rider.id}>
+                                <input
+                                    type="checkbox"
+                                    value={rider.id}
+                                    onChange={() => {
+                                        let selectedRiders = selectedFilter?.rider_ids || [];
+                                        if (selectedRiders.includes(rider.id))
+                                            selectedRiders = selectedRiders.filter((item: any) => item !== rider.id);
+                                        else
+                                            selectedRiders.push(rider.id)
+                                        console.log("selected Riders is as follows");
+                                        console.log(selectedRiders);
+                                        setSelectedFilter({...selectedFilter, rider_ids: selectedRiders})
+                                    }}
+                                />
+                                <label>{rider.name}</label>
+                            </div>
+                          ))}
+                        </div>
+                        <button onClick={clearFilters}>Clear</button>
+                    </div>
+                    {/* <TeamNav /> */}
+                </Layout.SideNav>
+                <Layout.Main>
+                    <Box sx={{ width: "72.5vw", overflow: 'auto' }}>
+                        <Sheet variant="outlined">
+                            {/* <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
+                                <Tab label="Comparison Table" />
+                                <Tab label="Plan Benefits" />
+                                <Tab label="Rider Benefits" />
+                            </Tabs>
+                            <TabPanel value={tabValue} index={0}> */}
+                                {/* Compare premiums */}
+                                <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
+                                <thead>
+                                    <tr>
+                                        {/* Render top-level headers */}
+                                        {(comparePremiumsData?.columns || []).map((column: any) => {
+                                            // Apply colSpan for parent columns that have children
+                                            const colSpan = column.children ? column.children.length : 1;
+                                            return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
+                                        })}
+                                    </tr>
+                                    {/* Render sub-headers if any columns have children */}
+                                    {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
+                                        <tr>
+                                            {(comparePremiumsData.columns|| []).flatMap((column: any) =>
+                                            column.children ? column.children.map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
+                                            )}
+                                        </tr>
+                                    )}
+                                </thead>
+                                <tbody>
+                                    {/* {(comparePremiumsData?.rows || []).map((row: any, index: any) => (
+                                        <tr key={index}>
+                                            {comparePremiumsData.columns.map((column: any) => (
+                                            <td key={column.name}>{row[column.name]}</td>
+                                            ))}
+                                        </tr>
+                                    ))} */}
+                                    {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
+                                    <tr key={rowIndex}>
+                                        {(comparePremiumsData?.columns || []).map((column: any) => {
+                                            if (column.children) {
+                                                return column.children.map((childColumn: any) => (
+                                                    <td key={childColumn.name}>{row[childColumn.name]}</td>
+                                                ));
+                                            } else {
+                                                return <td key={column.name}>{row[column.name]}</td>;
+                                            }
+                                        })}
+                                    </tr>
+                                    ))}
+                                </tbody>
+                                </Table>
+                            {/* </TabPanel>
+                            <TabPanel value={tabValue} index={1}> */}
+                                {/* Plan Benefits */}
+                                <PlanBenefitTable data={planBenefits} />
+                            {/* </TabPanel>
+                            <TabPanel value={tabValue} index={2}> */}
+                                {/* Rider Benefits */}
+                                <RiderBenefitTable data={riderBenefits} />
+                            {/* </TabPanel>     */}
+                        </Sheet>
+                    </Box>
+                </Layout.Main>
+            </Layout.Root>
+        </CssVarsProvider>
+    );
 }
