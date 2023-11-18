@@ -172,9 +172,18 @@ export default function TeamExample() {
 
     const getComparePremiumsData = async () => {
 
+        const plan_ids = selectedFilter?.plan_ids || [];
+        const rider_ids = selectedFilter?.rider_ids || [];
+
+        // Only hit API if plans and riders are selected
+        if (!plan_ids)
+            return;
+
+        const riders = filterData.riders.filter((r: any) => rider_ids.includes(r.id));
+
         const selectedComparePremiums = {
             "plans": [
-                ...(selectedFilter?.plan_ids || []).map((plan_id: any) => ({plan_id: plan_id}))
+                ...(plan_ids.map((plan_id: any) => ({plan_id: plan_id, rider_id: riders.find((r: any) => r.plan_id === plan_id)})))
             ]
         }
 
