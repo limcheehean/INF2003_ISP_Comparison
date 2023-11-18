@@ -274,11 +274,11 @@ export default function TeamExample() {
 
     // LJ table
     const getRiderBenefits = async () => {
-        if ((selectedFilter?.rider_ids || [])){
-            console.log("Selected filter");
-            console.log(selectedFilter);
+
             const selectedRiders = {
-                "rider_ids": selectedFilter?.rider_ids
+                "rider_ids": [
+                    ...(selectedFilter?.rider_ids || [])
+                ]
             }
 
             // console.log(selectedRiders)
@@ -296,18 +296,17 @@ export default function TeamExample() {
                 console.log(data.data);
                 setRiderBenefits(jsonData);
             })
-        }
         
 
     }
 
     // Alain table
     const getPlanBenefits = async () => {
-        if ((selectedFilter?.plan_ids || [])){
-            console.log("Selected filter");
-            console.log(selectedFilter);
+
             const selectedPlans = {
-                "plan_ids": selectedFilter?.plan_ids
+                "plan_ids": [
+                    ...(selectedFilter?.plan_ids || [])
+                ]
             }
 
             // console.log(selectedPlans)
@@ -325,8 +324,6 @@ export default function TeamExample() {
                 console.log(data.data);
                 setPlanBenefits(jsonData);
             })
-        }
-        
 
     }
 
