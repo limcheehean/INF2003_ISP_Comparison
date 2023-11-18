@@ -13,7 +13,11 @@ password_uuid_dict = {}
 
 password_uuid_dict = {}
 
-def handle_forgot_password(db, db_cursor, mail, request):
+
+def handle_forgot_password(db, mail, request):
+
+    db_cursor = db.cursor()
+
     forgotPwd_form_data = request.json
 
     # Check if 'email' key exists in the JSON data
@@ -69,8 +73,11 @@ def handle_forgot_password(db, db_cursor, mail, request):
     return {"status": "success", "message": "Password reset link has been sent to your email!"}, 200
 
 
-def handle_reset_token(reset_token, db, db_cursor, request):
+def handle_reset_token(reset_token, db, request):
     print("UUID received: ", reset_token)
+
+    db_cursor = db.cursor()
+
     resetPwd_form_data = request.json
     reset_password = resetPwd_form_data['password']
     reset_confirm_password = resetPwd_form_data['confirmPassword']

@@ -9,7 +9,8 @@ from flask_mail import Message
 from flaskext.mysql import pymysql
 
 # utility functions
-from utility import email_check, password_check, name_check, send_mail_async
+from utility import email_check, password_check, name_check
+
 
 ############################
 # Authentication functions #
@@ -79,7 +80,10 @@ def logout_user(mongo):
     return {"status": "success", "message": "Logout successful"}
 
 
-def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, mail, request):
+def handle_signup(db: pymysql.Connection, mail, request):
+
+    db_cursor = db.cursor()
+
     signup_form_data = request.json
     signup_name = signup_form_data['name']
     signup_email = signup_form_data['email']
@@ -150,31 +154,17 @@ def handle_signup(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, 
                   sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
 
-    msg.subject = "Welcome to ISP Comparison"
-    msg.body = f"""
-    Dear {signup_name},
-    Thank you for signing up with ISP Comparison! We are excited to have you on board. To complete the registration process and start enjoying our services, please confirm your email address by clicking the link below:
+    msg.body = "signup_confirmation_link is " + signup_confirmation_link
+    mail.send(msg)
 
-     {signup_confirmation_link}
-
-    Please note that this link will expire in 10 minutes for security reasons. If you don't confirm your email within this time frame, you may need to start the registration process again.
-
-    If you have not signed up for ISP Comparison, please ignore this email.
-
-    Thank you once again for choosing ISP Comparison. We look forward to serving you!
-
-    Best regards,
-    The ISP Comparison Team
-    """
-    
-    #mail.send(msg)
-    send_mail_async(mail,msg)
-
+    # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
 
 
-def handle_signup_confirmation(db: pymysql.Connection, db_cursor: pymysql.Connection.cursor, signup_token):
+def handle_signup_confirmation(db: pymysql.Connection, signup_token):
     print("Signup token received: ", signup_token)
+
+    db_cursor = db.cursor()
 
     # How long before token expires, in seconds
     token_expire = 60 * 10

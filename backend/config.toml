@@ -1,4 +1,3 @@
-
 SECRET_KEY = 'thisissosecret'
 
 MAIL_SERVER = 'smtp-relay.brevo.com'

@@ -36,7 +36,7 @@ def hello_world():  # put application's code here
 
 @app.route("/api/login", methods=["POST"])
 def login():
-    return login_user((db_cursor, mongo), request.json)
+    return login_user((get_db().cursor(), mongo), request.json)
 
 
 @app.route("/api/logout", methods=["GET"])
@@ -103,22 +103,22 @@ def signup():
         "message": "Account activation link sent to email"
     }
 """
-    return handle_signup(db, db_cursor, mail, request)
+    return handle_signup(get_db(), mail, request)
 
 
 @app.route('/api/join/<path:signup_token>')
 def signup_confirmation(signup_token):
-    return handle_signup_confirmation(db, db_cursor, signup_token)
+    return handle_signup_confirmation(get_db(), signup_token)
 
 
 @app.route('/api/forgotPassword', methods=['POST'])
 def forgot_password():
-    return handle_forgot_password(db, db_cursor, mail, request)
+    return handle_forgot_password(get_db(), mail, request)
 
 
 @app.route('/api/resetPassword/<path:reset_token>', methods=['POST'])
 def reset_password(reset_token):
-    return handle_reset_token(reset_token, db, db_cursor, request)
+    return handle_reset_token(reset_token, get_db(), request)
 
 
 @app.route("/api/compare_premiums", methods=["POST"])
@@ -164,7 +164,7 @@ def compare_premiums():
         }
     }
     """
-    return get_premiums(db, request)
+    return get_premiums(get_db(), request)
 
 
 # <?> Check if user is logged in?
@@ -240,12 +240,12 @@ def rider_benefits():
         }
     }
     """
-    return get_rider_benefits(db_cursor, request)
+    return get_rider_benefits(get_db().cursor(), request)
 
 
 @app.route("/api/get_plan_benefits", methods=["POST"])
 def plan_benefits():
-    return get_plan_benefits(db_cursor, request)
+    return get_plan_benefits(get_db().cursor(), request)
 
 
 @app.route("/api/filter_plans", methods=["POST"])
@@ -310,12 +310,12 @@ def plans():
                 ]}
     }
     """
-    return filter_plans(db_cursor, request)
+    return filter_plans(get_db().cursor(), request)
 
 
 @app.route("/api/get_filter", methods=["POST"])
 def get_filter():
-    return filter_items(get_db(), db_cursor, request)
+    return filter_items(get_db(), request)
 
 
 @app.route("/api/co_payment", methods=["POST"])
@@ -370,25 +370,26 @@ def co_payment():
       "status": "success"
     }
     """
-    return calculate_co_payment(request, db)
+    return calculate_co_payment(request, get_db())
 
 
 @app.route("/api/user_plans", methods=["GET"])
 @require_login
 def get_user_plans():
-    return get_user_plan_data(db, mongo)
+    return get_user_plan_data(get_db(), mongo)
 
 
 @app.route("/api/user_plans", methods=["POST"])
 @require_login
 def add_or_edit_user_plans():
-    return update_user_plans(db, mongo, request)
+    return update_user_plans(get_db(), mongo, request)
+
 
 @app.route("/api/user_plans/<path:userplan_id>", methods=["DELETE"])
 @require_login
 def remove_user_plans(userplan_id):
     print("here")
-    return delete_user_plans(db, mongo, userplan_id)
+    return delete_user_plans(get_db(), mongo, userplan_id)
 
 
 if __name__ == '__main__':
