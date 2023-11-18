@@ -187,7 +187,7 @@ def filter_items(db, request):
 
     company_sql = "SELECT id, name FROM Company"
     plan_sql = "SELECT id, name FROM Plan"
-    rider_sql = "SELECT id, name FROM Rider"
+    rider_sql = "SELECT id, name, plan_id FROM Rider"
 
     where_ward_sql = f"ward_type IN ({', '.join('%s' for _ in range(len(ward_types)))})" if ward_types else None
     where_company_sql = f"company_id IN ({', '.join(['%s' for _ in range(len(company_ids))])})" if company_ids else None
@@ -205,7 +205,7 @@ def filter_items(db, request):
 
     # Get riders
     plan_ids = list(set(plan_ids) & set(filtered_plan_ids)) if plan_ids else filtered_plan_ids
-    rider_sql += f" WHERE plan_id, rider_id IN ({', '.join(['%s' for _ in range(len(plan_ids))])})" if plan_ids else ""
+    rider_sql += f" WHERE plan_id IN ({', '.join(['%s' for _ in range(len(plan_ids))])})" if plan_ids else ""
     cursor.execute(rider_sql, tuple(plan_ids))
     riders = cursor.fetchall()
 
