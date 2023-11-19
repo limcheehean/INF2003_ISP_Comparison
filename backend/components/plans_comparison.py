@@ -1,3 +1,5 @@
+from json import dumps
+from time import time
 from typing import Union
 
 from CustomDictCursor import CustomDictCursor
@@ -44,6 +46,67 @@ def get_common_data(collection, query, find=None) -> Union[list, dict]:
         entry = mongo[collection].find_one(find, {'_id': False}) if find else [item for item in mongo[collection].find({}, {'_id': False})]
 
     return entry
+
+
+def cache_set(collection, key, value):
+    from app import mongo
+    mongo[collection].insert_one({"key": dumps(key), "value": value})
+
+
+def cache_get(collection, key):
+    from app import mongo
+    return (mongo[collection].find_one({"key": dumps(key)}, {"_id": False}) or {}).get("value")
+
+
+def filter_items(db, request):
+    request_data = request.json
+
+    start = time()
+    if data := cache_get("filter_items", request_data):
+        print("filter_items cache hit")
+        return {"status": "success", "data": data}
+    print("filter_items cache miss")
+
+    cursor = db.cursor(CustomDictCursor)
+
+    company_ids = request_data.get("company_ids", [])
+    ward_types = request_data.get("ward_types", [])
+    plan_ids = request_data.get("plan_ids", [])
+
+    company_sql = "SELECT id, name FROM Company"
+    plan_sql = "SELECT id, name FROM Plan"
+    rider_sql = "SELECT id, name, plan_id FROM Rider"
+
+    where_ward_sql = f"ward_type IN ({', '.join('%s' for _ in range(len(ward_types)))})" if ward_types else None
+    where_company_sql = f"company_id IN ({', '.join(['%s' for _ in range(len(company_ids))])})" if company_ids else None
+
+    # Get companies
+    cursor.execute(company_sql)
+    companies = cursor.fetchall()
+
+    # Get plans
+    plan_where = " AND ".join([_ for _ in [where_ward_sql, where_company_sql] if _])
+    plan_sql += f" WHERE {plan_where}" if plan_where else ""
+    cursor.execute(plan_sql, tuple(ward_types + company_ids))
+    plans = cursor.fetchall()
+    filtered_plan_ids = [plan.get("id") for plan in plans]
+
+    # Get riders
+    plan_ids = list(set(plan_ids) & set(filtered_plan_ids)) if plan_ids else filtered_plan_ids
+    rider_sql += f" WHERE plan_id IN ({', '.join(['%s' for _ in range(len(plan_ids))])})" if plan_ids else ""
+    cursor.execute(rider_sql, tuple(plan_ids))
+    riders = cursor.fetchall()
+
+    data = {
+        "wards": ["Private", "A", "B1"],
+        "companies": companies,
+        "plans": plans,
+        "riders": riders
+    }
+
+    cache_set("filter_items", request_data, data)
+
+    return {"status": "success", "data": data}
 
 
 def get_child_columns_for_premiums_table(set_num, has_rider):
@@ -175,48 +238,6 @@ def get_premiums(db, request):
     results = cursor.fetchall()
 
     return {"status": "success", "data": {"columns": columns, "rows": results}}
-
-
-def filter_items(db, request):
-    cursor = db.cursor(CustomDictCursor)
-
-    request_data = request.json
-    company_ids = request_data.get("company_ids", [])
-    ward_types = request_data.get("ward_types", [])
-    plan_ids = request_data.get("plan_ids", [])
-
-    company_sql = "SELECT id, name FROM Company"
-    plan_sql = "SELECT id, name FROM Plan"
-    rider_sql = "SELECT id, name, plan_id FROM Rider"
-
-    where_ward_sql = f"ward_type IN ({', '.join('%s' for _ in range(len(ward_types)))})" if ward_types else None
-    where_company_sql = f"company_id IN ({', '.join(['%s' for _ in range(len(company_ids))])})" if company_ids else None
-
-    # Get companies
-    cursor.execute(company_sql)
-    companies = cursor.fetchall()
-
-    # Get plans
-    plan_where = " AND ".join([_ for _ in [where_ward_sql, where_company_sql] if _])
-    plan_sql += f" WHERE {plan_where}" if plan_where else ""
-    cursor.execute(plan_sql, tuple(ward_types + company_ids))
-    plans = cursor.fetchall()
-    filtered_plan_ids = [plan.get("id") for plan in plans]
-
-    # Get riders
-    plan_ids = list(set(plan_ids) & set(filtered_plan_ids)) if plan_ids else filtered_plan_ids
-    rider_sql += f" WHERE plan_id IN ({', '.join(['%s' for _ in range(len(plan_ids))])})" if plan_ids else ""
-    cursor.execute(rider_sql, tuple(plan_ids))
-    riders = cursor.fetchall()
-
-    data = {
-        "wards": ["Private", "A", "B1"],
-        "companies": companies,
-        "plans": plans,
-        "riders": riders
-    }
-
-    return {"status": "success", "data": data}
 
 
 def get_plan_benefits(db_cursor, request):
