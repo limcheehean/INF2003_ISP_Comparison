@@ -17,7 +17,9 @@ import { Link } from 'react-router-dom';
 import axios, { AxiosError } from 'axios';
 import {useState} from "react";
 import Alert from '@mui/joy/Alert';
-//import Checkbox from "@mui/joy/Checkbox";
+import Swal from 'sweetalert2';
+import CircularProgress from '@mui/joy/CircularProgress';
+import { Troubleshoot } from '@mui/icons-material';
 
 interface FormElements extends HTMLFormControlsCollection {
     fullName: HTMLInputElement;
@@ -66,6 +68,8 @@ export default function SignUp() {
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
     //const [showPassword, setshowPassword] = useState(false);
 
+    const [loading, setLoading] = useState(false);
+
 
     const handleSubmit = async (event: React.FormEvent<SignUpFormElement>) => {
         event.preventDefault();
@@ -80,8 +84,6 @@ export default function SignUp() {
         const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
         const isPasswordValid = passwordRegex.test(password);
         const confirmPassword = formElements.confirmPassword.value;
-
-        alert(JSON.stringify(data, null, 2)); // Test purpose to be removed.
 
         if (!isPasswordValid)
         {
@@ -105,6 +107,7 @@ export default function SignUp() {
         if (!passwordError && !confirmPasswordError)
         {
             try {
+                setLoading(true);
                 const response = await axios.post('/api/signup', data, {
                     headers: {
                         'Content-Type': 'application/json'
@@ -114,8 +117,17 @@ export default function SignUp() {
                 const responseData = response.data;
                 console.log(responseData);
 
-                // Alert success message received from API
-                alert(responseData.message);
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: "bottom-left",
+                    showConfirmButton: true
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'confirmation link has been sent to your email!'
+                });
+
+                
 
             } catch (error) {
                 console.error('Problem with Axios operation', error);
@@ -124,6 +136,8 @@ export default function SignUp() {
                 if (error instanceof AxiosError){
                     alert(error.response?.data.message);
                 }
+            } finally {
+                setLoading(false);
             }
         }
         else
@@ -194,7 +208,7 @@ export default function SignUp() {
                             <IconButton variant="soft" color="primary" size="sm">
                                 <BadgeRoundedIcon />
                             </IconButton>
-                            <Typography level="title-lg">Company logo</Typography>
+                            <Typography level="title-lg">ISP Comparison</Typography>
                         </Box>
                         <ColorSchemeToggle />
                     </Box>
@@ -259,8 +273,8 @@ export default function SignUp() {
                                     >
                                         {/*<Checkbox size="sm" name="passwordCheckbox" label="Show password"/>*/}
                                     </Box>
-                                    <Button type="submit" fullWidth>
-                                        Sign up
+                                    <Button disabled={loading} type="submit" fullWidth>
+                                    {loading ? <CircularProgress /> : 'Create Account'}
                                     </Button>
                                     <Link to={"/"}>
                                         Already have an account? Sign in
@@ -271,7 +285,7 @@ export default function SignUp() {
                     </Box>
                     <Box component="footer" sx={{ py: 3 }}>
                         <Typography level="body-xs" textAlign="center">
-                            © Your company {new Date().getFullYear()}
+                            © ISP Comparison {new Date().getFullYear()}
                         </Typography>
                     </Box>
                 </Box>
