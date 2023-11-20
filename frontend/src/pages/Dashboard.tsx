@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { ChangeEvent, useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -11,6 +12,7 @@ import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
+import Button from '@mui/joy/Button';
 
 // Icons import
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -20,6 +22,9 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import BookRoundedIcon from '@mui/icons-material/BookRounded';
+import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
+import CalculateIcon from '@mui/icons-material/Calculate';
+import LogoutIcon from '@mui/icons-material/Logout';
 
 // custom
 import Menu from '../components/Menu';
@@ -341,6 +346,23 @@ export default function TeamExample() {
 
     }
 
+    const navigate = useNavigate();
+
+    const navigateToCopaymentCalculator = () => {
+        // navigate to the calculator route
+        navigate('/copaymentCalculator');
+    };
+
+    const navigateToMyPlans = () => {
+        // navigate to the calculator route
+        navigate('/userplan');
+    };
+
+    const navigateToDashboard = () => {
+        // navigate to the calculator route
+        navigate('/dashboard');
+    };
+
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
@@ -385,27 +407,12 @@ export default function TeamExample() {
                             Team
                         </Typography>
                     </Box>
-                    <Input
-                        size="sm"
-                        variant="outlined"
-                        placeholder="Search anything…"
-                        startDecorator={<SearchRoundedIcon color="primary" />}
-                        endDecorator={
-                            <IconButton variant="outlined" color="neutral">
-                                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
-                                    ⌘ + k
-                                </Typography>
-                            </IconButton>
-                        }
-                        sx={{
-                            flexBasis: '500px',
-                            display: {
-                                xs: 'none',
-                                sm: 'flex',
-                            },
-                            boxShadow: 'sm',
-                        }}
-                    />
+                    <Box sx={{ display: 'flex', gap: 3 }}>
+                    <Button startDecorator={<GridViewRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToDashboard}>Dashboard</Button>
+                    <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
+                    <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
+                    </Box>
+                    
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -421,39 +428,11 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            href="/blog/first-look-at-joy/"
+                            
                         >
-                            <BookRoundedIcon />
+                            <LogoutIcon />
                         </IconButton>
-                        <Menu
-                            id="app-selector"
-                            control={
-                                <IconButton
-                                    size="sm"
-                                    variant="soft"
-                                    color="neutral"
-                                    aria-label="Apps"
-                                >
-                                    <GridViewRoundedIcon />
-                                </IconButton>
-                            }
-                            menus={[
-                                {
-                                    label: 'Email',
-                                    href: '/joy-ui/getting-started/templates/email/',
-                                },
-                                {
-                                    label: 'Team',
-                                    active: true,
-                                    href: '/joy-ui/getting-started/templates/team/',
-                                    'aria-current': 'page',
-                                },
-                                {
-                                    label: 'Files',
-                                    href: '/joy-ui/getting-started/templates/files/',
-                                },
-                            ]}
-                        />
+
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>

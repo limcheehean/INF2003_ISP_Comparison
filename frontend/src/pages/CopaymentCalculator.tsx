@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -7,7 +8,7 @@ import Button from '@mui/joy/Button';
 import Chip from '@mui/joy/Chip';
 import Typography from '@mui/joy/Typography';
 import Input from '@mui/joy/Input';
-import IconButton from '@mui/joy/IconButton';
+
 import List from '@mui/joy/List';
 import ListSubheader from '@mui/joy/ListSubheader';
 import ListItem from '@mui/joy/ListItem';
@@ -23,35 +24,30 @@ import CardActions from '@mui/joy/CardActions';
 
 
 import Divider from '@mui/joy/Divider';
-import Skeleton from '@mui/joy/Skeleton';
-
-import Check from '@mui/icons-material/Check';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-
 
 // Icons import
+import IconButton from '@mui/joy/IconButton';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import BookRoundedIcon from '@mui/icons-material/BookRounded';
 import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
 import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import PaidIcon from '@mui/icons-material/Paid';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-import ShieldIcon from '@mui/icons-material/Shield';
 import RemoveIcon from '@mui/icons-material/Remove';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import BalanceIcon from '@mui/icons-material/Balance';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import LogoutIcon from '@mui/icons-material/Logout';
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 
 import Grid from '@mui/system/Unstable_Grid';
 import styled from '@mui/system/styled';
@@ -195,7 +191,7 @@ export default function TeamExample() {
 
 
 
-
+    
 
     const handleCopaymentCalculate = async () => {
 
@@ -222,6 +218,23 @@ export default function TeamExample() {
             console.log('Error', error);
         }
     }
+
+    const navigate = useNavigate();
+
+    const navigateToCopaymentCalculator = () => {
+        // navigate to the calculator route
+        navigate('/copaymentCalculator');
+    };
+
+    const navigateToMyPlans = () => {
+        // navigate to the calculator route
+        navigate('/userplan');
+    };
+
+    const navigateToDashboard = () => {
+        // navigate to the calculator route
+        navigate('/dashboard');
+    };
 
 
 
@@ -269,27 +282,12 @@ export default function TeamExample() {
                             Team
                         </Typography>
                     </Box>
-                    <Input
-                        size="sm"
-                        variant="outlined"
-                        placeholder="Search anything…"
-                        startDecorator={<SearchRoundedIcon color="primary" />}
-                        endDecorator={
-                            <IconButton variant="outlined" color="neutral">
-                                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
-                                    ⌘ + k
-                                </Typography>
-                            </IconButton>
-                        }
-                        sx={{
-                            flexBasis: '500px',
-                            display: {
-                                xs: 'none',
-                                sm: 'flex',
-                            },
-                            boxShadow: 'sm',
-                        }}
-                    />
+                    <Box sx={{ display: 'flex', gap: 3 }}>
+                    <Button startDecorator={<GridViewRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToDashboard}>Dashboard</Button>
+                    <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
+                    <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
+                    </Box>
+                    
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -305,39 +303,11 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            href="/blog/first-look-at-joy/"
+                            
                         >
-                            <BookRoundedIcon />
+                            <LogoutIcon />
                         </IconButton>
-                        <Menu
-                            id="app-selector"
-                            control={
-                                <IconButton
-                                    size="sm"
-                                    variant="soft"
-                                    color="neutral"
-                                    aria-label="Apps"
-                                >
-                                    <GridViewRoundedIcon />
-                                </IconButton>
-                            }
-                            menus={[
-                                {
-                                    label: 'Email',
-                                    href: '/joy-ui/getting-started/templates/email/',
-                                },
-                                {
-                                    label: 'Team',
-                                    active: true,
-                                    href: '/joy-ui/getting-started/templates/team/',
-                                    'aria-current': 'page',
-                                },
-                                {
-                                    label: 'Files',
-                                    href: '/joy-ui/getting-started/templates/files/',
-                                },
-                            ]}
-                        />
+
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>
