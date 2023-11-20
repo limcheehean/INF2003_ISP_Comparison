@@ -18,6 +18,7 @@ import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link, useNavigate } from 'react-router-dom';
 import Alert from '@mui/joy/Alert';
 import Swal from 'sweetalert2';
+import CircularProgress from '@mui/joy/CircularProgress';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -70,6 +71,8 @@ function Login() {
   //const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
 
+  const [loading, setLoading] = useState(false);
+
 
   
 
@@ -95,6 +98,7 @@ function Login() {
     setError('');
 
     try {
+      setLoading(true);
       const requestData = {email, password}; // Combine email and password in one object
       const requestHeaders = {'Content-Type': 'application/json'};
 
@@ -164,6 +168,8 @@ function Login() {
         // Handle network or request error
         console.error('Network or request error:', error);
        }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -284,8 +290,8 @@ function Login() {
                       Forgot your password?
                     </Link>
                   </Box>
-                  <Button type="submit" fullWidth>
-                    Sign in
+                  <Button disabled={loading} type="submit" fullWidth>
+                  {loading ? <CircularProgress /> : 'Sign in'}
                   </Button>
                   <Link to="/Signup">
                       Don't have an account? Sign up!
