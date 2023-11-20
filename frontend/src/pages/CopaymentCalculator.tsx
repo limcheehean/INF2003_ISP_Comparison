@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -21,6 +22,8 @@ import FormLabel from '@mui/joy/FormLabel';
 import Card from '@mui/joy/Card';
 import CardContent from '@mui/joy/CardContent';
 import CardActions from '@mui/joy/CardActions';
+import Swal from 'sweetalert2';
+import CircularProgress from '@mui/joy/CircularProgress';
 
 
 import Divider from '@mui/joy/Divider';
@@ -189,6 +192,8 @@ export default function TeamExample() {
         },
     });
 
+    const [loading, setLoading] = useState(false);
+
 
 
     
@@ -210,12 +215,15 @@ export default function TeamExample() {
         }
 
         try {
+            setLoading(true);
             console.log(postData);
             const response = await axios.post('api/co_payment', postData, { headers: { 'Content-Type': 'application/json' } });
             console.log('Response', response.data);
             setResponseData(response.data); // Setting the response data in the state
         } catch (error) {
             console.log('Error', error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -394,8 +402,8 @@ export default function TeamExample() {
 
 
                                             <CardActions sx={{ gridColumn: '1/-1' }}>
-                                                <Button onClick={handleCopaymentCalculate} variant="solid" color="primary">
-                                                    Calculate
+                                                <Button onClick={handleCopaymentCalculate} disabled={loading} variant="solid" color="primary">
+                                                {loading ? <CircularProgress /> : 'Calculate'}
                                                 </Button>
                                             </CardActions>
 
