@@ -41,8 +41,6 @@ import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
-import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import PaidIcon from '@mui/icons-material/Paid';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
