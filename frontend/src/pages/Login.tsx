@@ -19,6 +19,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Alert from '@mui/joy/Alert';
 import Swal from 'sweetalert2';
 import CircularProgress from '@mui/joy/CircularProgress';
+import { useAuth } from '../components/AuthContext';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -73,7 +74,7 @@ function Login() {
 
   const [loading, setLoading] = useState(false);
 
-
+  const { login } = useAuth();
   
 
 
@@ -110,6 +111,7 @@ function Login() {
       if (response.status === 200) {
         // Login successful
         console.log('Login successful: ', response.data);
+        login();
 
         const Toast = Swal.mixin({
           toast: true,

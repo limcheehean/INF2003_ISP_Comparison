@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
@@ -60,6 +60,7 @@ import styled from '@mui/system/styled';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
+import { useAuth } from '../components/AuthContext';
 
 interface FormElements extends HTMLFormControlsCollection {
     total_bill: HTMLInputElement;
@@ -279,6 +280,32 @@ export default function TeamExample() {
         navigate('/dashboard');
     };
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'GET',
+                
+            });
+            if (response.ok) {
+                console.log('Logout successful');
+                navigate('/');
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error during logout')
+        }
+    };
+
+    const { isLoggedIn } = useAuth();
+
+    
+
+    if (!isLoggedIn) {
+        return <Navigate to="/"/>;
+        // console.log("I am supposed to be here");
+    }
+
 
 
     return (
@@ -346,7 +373,7 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-
+                            onClick={handleLogout}
                         >
                             <LogoutIcon />
                         </IconButton>
