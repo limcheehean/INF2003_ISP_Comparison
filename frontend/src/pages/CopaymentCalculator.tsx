@@ -75,6 +75,11 @@ interface CalculateFormElement extends HTMLFormElement {
     readonly elements: FormElements;
 }
 
+interface Plan {
+    plan_id: number;
+    plan_name: string;
+}
+
 function ColorSchemeToggle() {
     const { mode, setMode } = useColorScheme();
     const [mounted, setMounted] = React.useState(false);
@@ -410,20 +415,17 @@ export default function TeamExample() {
                                                 <Input name="total_bill" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
                                             </FormControl>
 
-                                            {/* <FormControl>
-                                                <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
-                                                <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
-                                            </FormControl> */}
-
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
+                                               
+
                                                 <Select
-                                                    placeholder="Select a plan"
+                                                    placeholder={selectedPlan ? "Selected Plan" : "Select a plan"}
                                                     value={selectedPlan}
                                                     onChange={(e, value: any) => {
-                                                        if (value && typeof value === 'object' && typeof value.plan_id === 'number') {
-                                                            setSelectedPlan(value.plan_id);
-                                                            console.log(value.plan_id);
+                                                        if (value && typeof value === 'number') {
+                                                            setSelectedPlan(value);
+                                                            console.log(value);
                                                         }
                                                     }}
                                                     indicator={<KeyboardArrowDown />}
@@ -435,14 +437,14 @@ export default function TeamExample() {
                                                             },
                                                         },
                                                     }}
-
                                                 >
                                                     {plans.map((plan) => (
-                                                        <Option key={plan.plan_id} value={plan}>
+                                                        <Option key={plan.plan_id} value={plan.plan_id}>
                                                             {plan.plan_name}
                                                         </Option>
                                                     ))}
                                                 </Select>
+
                                             </FormControl>
 
                                             {/* <FormControl>
@@ -453,15 +455,15 @@ export default function TeamExample() {
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
                                                 <Select
-                                                    placeholder="Select a rider"
+                                                    placeholder={selectedRider ? "Selected Plan" : "Select a plan"}
                                                     value={selectedRider}
                                                     onChange={(e, value: any) => {
-                                                        if (value && typeof value === 'object' && typeof value.rider_id === 'number') {
-                                                            setSelectedRider(value.rider_id);
-                                                            console.log(value.rider_id);
+                                                        if (value && typeof value === 'number') {
+                                                            setSelectedRider(value);
+                                                            console.log(value);
                                                         }
                                                     }}
-                                                    indicator={<KeyboardArrowDown/>}
+                                                    indicator={<KeyboardArrowDown />}
                                                     sx={{
                                                         [`& .${selectClasses.indicator}`]: {
                                                             transition: '0.2s',
@@ -472,11 +474,11 @@ export default function TeamExample() {
                                                     }}
                                                 >
                                                     {rider.map((rider) => (
-                                                        <Option key={rider.rider_id} value={rider}>
+                                                        <Option key={rider.rider_id} value={rider.rider_id}>
                                                             {rider.rider_name}
                                                         </Option>
                                                     ))}
-                                                    
+
 
                                                 </Select>
 
