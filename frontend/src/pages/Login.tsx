@@ -262,6 +262,7 @@ function Login() {
               },
             }}
           >
+            <Typography level="h2">Hello there 👋</Typography>
 
             <Stack gap={4} sx={{ mt: 2 }}>
               <form onSubmit={handleLogin}>
@@ -302,7 +303,7 @@ function Login() {
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" textAlign="center">
-              © Your company {new Date().getFullYear()}
+              © ISP Comparison {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>

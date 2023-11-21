@@ -22,9 +22,11 @@ import FormLabel from '@mui/joy/FormLabel';
 import Card from '@mui/joy/Card';
 import CardContent from '@mui/joy/CardContent';
 import CardActions from '@mui/joy/CardActions';
-import Swal from 'sweetalert2';
 import CircularProgress from '@mui/joy/CircularProgress';
-
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+import { KeyboardArrowDown } from "@mui/icons-material";
+import { selectClasses } from "@mui/joy";
 
 import Divider from '@mui/joy/Divider';
 
@@ -194,22 +196,52 @@ export default function TeamExample() {
 
     const [loading, setLoading] = useState(false);
 
+    const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+    const [plans, setPlans] = useState<any[]>([]);
+
+    const [selectedRider, setSelectedRider] = useState<number | null>(null);
+    const [rider, setRider] = useState<any[]>([]);
+
+    React.useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await fetch('/api/user_plans');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data && data.data && Array.isArray(data.data.user_plans)) {
+                    setPlans(data.data.user_plans);
+                    setRider(data.data.user_plans);
+                } else {
+                    console.error('Invalid response format:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching plans:', error);
+            }
+        };
+
+        fetchPlans();
+    }, []);
 
 
-    
+
+
+
+
 
     const handleCopaymentCalculate = async () => {
 
         const totalBill = parseInt(total_bill, 10);
-        const planId = parseInt(plan_id, 10);
-        const riderId = parseInt(rider_id, 10); // Parse as an integer
+        // const planId = parseInt(plan_id, 10);
+        // const riderId = parseInt(rider_id, 10); // Parse as an integer
         const ageValue = parseInt(age, 10); // Parse as an integer
         const wardTypeValue = ward_type; // No parsing needed
 
         const postData = {
             total_bill: totalBill,
-            plan_id: planId,
-            rider_id: riderId,
+            plan_id: selectedPlan || 0,
+            rider_id: selectedRider || 0,
             age: ageValue,
             ward_type: wardTypeValue
         }
@@ -291,11 +323,11 @@ export default function TeamExample() {
                         </Typography>
                     </Box>
                     <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Button startDecorator={<GridViewRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToDashboard}>Dashboard</Button>
-                    <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
-                    <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
+                        <Button startDecorator={<GridViewRoundedIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToDashboard}>Dashboard</Button>
+                        <Button startDecorator={<ArticleRoundedIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToMyPlans}>My Plans</Button>
+                        <Button startDecorator={<CalculateIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
                     </Box>
-                    
+
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -311,7 +343,7 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            
+
                         >
                             <LogoutIcon />
                         </IconButton>
@@ -340,7 +372,7 @@ export default function TeamExample() {
 
 
                         <Grid container spacing={2}>
-                            <Grid xs={5}>
+                            <Grid xs={6}>
                                 <form method="POST" onSubmit={(event: React.FormEvent<CalculateFormElement>) => {
                                     event.preventDefault();
                                     const formElements = event.currentTarget.elements;
@@ -378,14 +410,76 @@ export default function TeamExample() {
                                                 <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
                                             </FormControl>
 
-                                            <FormControl>
+                                            {/* <FormControl>
                                                 <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
                                                 <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
+                                            </FormControl> */}
+
+                                            <FormControl>
+                                                <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
+                                                <Select
+                                                    placeholder="Select a plan"
+                                                    value={selectedPlan}
+                                                    onChange={(e, value: any) => {
+                                                        if (value && typeof value === 'object' && typeof value.plan_id === 'number') {
+                                                            setSelectedPlan(value.plan_id);
+                                                            console.log(value.plan_id);
+                                                        }
+                                                    }}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    sx={{
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+
+                                                >
+                                                    {plans.map((plan) => (
+                                                        <Option key={plan.plan_id} value={plan}>
+                                                            {plan.plan_name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
                                             </FormControl>
+
+                                            {/* <FormControl>
+                                                <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
+                                                <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                            </FormControl> */}
 
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
-                                                <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                                <Select
+                                                    placeholder="Select a rider"
+                                                    value={selectedRider}
+                                                    onChange={(e, value: any) => {
+                                                        if (value && typeof value === 'object' && typeof value.rider_id === 'number') {
+                                                            setSelectedRider(value.rider_id);
+                                                            console.log(value.rider_id);
+                                                        }
+                                                    }}
+                                                    indicator={<KeyboardArrowDown/>}
+                                                    sx={{
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {rider.map((rider) => (
+                                                        <Option key={rider.rider_id} value={rider}>
+                                                            {rider.rider_name}
+                                                        </Option>
+                                                    ))}
+                                                    
+
+                                                </Select>
+
                                             </FormControl>
 
                                             <FormControl>
@@ -403,7 +497,7 @@ export default function TeamExample() {
 
                                             <CardActions sx={{ gridColumn: '1/-1' }}>
                                                 <Button onClick={handleCopaymentCalculate} disabled={loading} variant="solid" color="primary">
-                                                {loading ? <CircularProgress /> : 'Calculate'}
+                                                    {loading ? <CircularProgress /> : 'Calculate'}
                                                 </Button>
                                             </CardActions>
 
@@ -413,7 +507,7 @@ export default function TeamExample() {
 
                                 </form>
                             </Grid>
-                            <Grid xs={7}>
+                            <Grid xs={6}>
                                 <Card size="lg" variant="outlined">
                                     <Chip startDecorator={<LocalAtmIcon />} size="sm" variant="outlined" color="primary">
                                         BASIC
@@ -431,11 +525,11 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Cash Payment: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.cash_payment}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.cash_payment}</Typography>
                                                 </Grid>
                                             </Grid>
 
-                                           
+
 
                                         </ListItem>
                                         <ListItem>
@@ -448,12 +542,12 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Co Insurance: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.co_insurance}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.co_insurance}</Typography>
                                                 </Grid>
                                             </Grid>
 
 
-                                           
+
 
                                         </ListItem>
                                         <ListItem>
@@ -466,7 +560,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Co payment: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.co_payment}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.co_payment}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -481,7 +575,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Deductible: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.deductible}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.deductible}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -496,7 +590,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Over limit: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.over_limit}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.over_limit}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -511,24 +605,24 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Pro-ration: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.pro_ration}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.pro_ration}</Typography>
                                                 </Grid>
                                             </Grid>
 
-                                        
+
                                         </ListItem>
                                     </List>
                                     <Divider inset="none" />
                                     <CardActions>
 
-                                    <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
-                                                <Grid xs={12}>
-                                                    <Typography level="title-lg">Total bill: </Typography>
-                                                </Grid>
-                                                <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.total_bill}</Typography>
-                                                </Grid>
+                                        <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                            <Grid xs={12}>
+                                                <Typography level="title-lg">Total bill: </Typography>
                                             </Grid>
+                                            <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.total_bill}</Typography>
+                                            </Grid>
+                                        </Grid>
 
                                     </CardActions>
                                 </Card>

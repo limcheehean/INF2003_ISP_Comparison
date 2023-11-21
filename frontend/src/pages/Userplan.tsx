@@ -13,14 +13,9 @@ import ListItem from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import ListItemContent from '@mui/joy/ListItemContent';
-import Sheet from '@mui/joy/Sheet';
-import Table from '@mui/joy/Table';
 import {DialogContent, DialogTitle, DialogActions, Modal, ModalDialog, Tooltip, Select, selectClasses} from "@mui/joy";
-import Stack from "@mui/joy/Stack";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
-import Divider from '@mui/joy/Divider';
-import { visuallyHidden } from '@mui/utils';
 import Option from '@mui/joy/Option';
 
 // Icons import
@@ -34,7 +29,6 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import BookRoundedIcon from '@mui/icons-material/BookRounded';
 import {Add, Delete, KeyboardArrowDown} from "@mui/icons-material";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import LogoutIcon from '@mui/icons-material/Logout';
@@ -191,42 +185,6 @@ export default function TeamExample() {
     const [filterData, setFilterData] = useState<any>({});
 
 
-    // const data = {
-    //     company_ids : [],
-    //     ward_types: [],
-    //     plan_ids: []
-    // };
-
-
-
-
-    // useEffect(() => {
-    //     // Make an API request to fetch user plans data
-    //     fetch('/api/user_plans') // Replace with the actual API endpoint
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             console.log(data.status);
-    //             console.log(data.data);
-    //             if (typeof data === 'object' && data !== null) {
-    //                 Object.keys(data.data).forEach((key) => {
-    //                     // Check the data type of each property
-    //                     console.log(`${key}: ${typeof data[key]}`);
-    //                 });
-    //             } else {
-    //                 console.error('Data is not an object.');
-    //             }
-    //
-    //             setUserPlans(data.data);
-    //
-    //             //setUserPlans(data);
-    //             console.log('i fire once');
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching user plans:', error);
-    //         });
-    // }, []);
-
 
     const addPlan = async () => {
         const response = await fetch('/api/user_plans',{
@@ -281,6 +239,7 @@ export default function TeamExample() {
                     Object.keys(data.data).forEach((key) => {
                         // Check the data type of each property
                         console.log(`${key}: ${typeof data[key]}`);
+                        console.log('hello heee');
                     });
                 } else {
                     console.error('Data is not an object.');
@@ -300,69 +259,6 @@ export default function TeamExample() {
         (async() => {
             await getFilter();
         })();
-
-        // (async () => {
-        //     try {
-        //         const response = await fetch('/api/get_filter', {
-        //             method: 'POST',
-        //             headers: {'Content-Type': 'application/json'},
-        //             body: JSON.stringify(data),
-        //         });
-        //
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! Status: ${response.status}`);
-        //         }
-        //
-        //         const responseData = await response.json();
-        //         console.log(responseData);
-        //
-        //         if (typeof responseData === 'object' && responseData !== null) {
-        //             Object.keys(responseData.data).forEach((key) => {
-        //                 // Check the data type of each property
-        //                 console.log(`${key}: ${typeof responseData[key]}`);
-        //             });
-        //         } else {
-        //             console.error('Data is not an object.');
-        //         }
-        //
-        //
-        //         console.log(responseData.data);
-        //
-        //         if (responseData && responseData.data) {
-        //             setCompanies(responseData.data.companies);
-        //             const { companies, plans, riders, wards } = responseData.data;
-        //
-        //             if (companies) {
-        //                 console.log('Companies:', companies);
-        //                 setCompanies(companies);
-        //                 console.log("companies!!!!",companies2);
-        //                 // Use the 'companies' array in your code
-        //             }
-        //
-        //             if (plans) {
-        //                 console.log('Plans:', plans);
-        //                 // Use the 'plans' array in your code
-        //             }
-        //
-        //             if (riders) {
-        //                 console.log('Riders:', riders);
-        //
-        //                 // Use the 'riders' array in your code
-        //             }
-        //
-        //             if (wards) {
-        //                 console.log('Wards:', wards);
-        //                 // Use the 'wards' array in your code
-        //             }
-        //         } else {
-        //             console.error('Data or data properties are undefined');
-        //         }
-        //
-        //
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //     }
-        // })();
 
 
     }, [selectedCompany, selectedPlan]);
