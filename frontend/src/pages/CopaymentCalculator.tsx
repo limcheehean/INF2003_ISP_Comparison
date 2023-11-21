@@ -407,7 +407,7 @@ export default function TeamExample() {
 
                                             <FormControl sx={{ gridColumn: '1/-1' }}>
                                                 <FormLabel><Typography level="h4">Total bill</Typography></FormLabel>
-                                                <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
+                                                <Input name="total_bill" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
                                             </FormControl>
 
                                             {/* <FormControl>
