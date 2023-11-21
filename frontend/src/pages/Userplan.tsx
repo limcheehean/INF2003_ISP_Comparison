@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
 import Box from '@mui/joy/Box';
@@ -39,6 +39,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
 import Grid from "@mui/joy/Grid";
+import { useAuth } from '../components/AuthContext';
 
 function ColorSchemeToggle() {
     const { mode, setMode } = useColorScheme();
@@ -280,6 +281,30 @@ export default function TeamExample() {
         navigate('/dashboard');
     };
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'GET',
+                
+            });
+            if (response.ok) {
+                console.log('Logout successful');
+                navigate('/');
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error during logout')
+        }
+    };
+
+    const { isLoggedIn } = useAuth();
+
+    if (!isLoggedIn) {
+        return <Navigate to="/"/>;
+        // console.log("I am supposed to be here");
+    }
+
 
     return (
         <CssVarsProvider disableTransitionOnChange>
@@ -346,6 +371,7 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
+                            onClick={handleLogout}
                             
                         >
                             <LogoutIcon />

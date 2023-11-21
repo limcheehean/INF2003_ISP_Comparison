@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { ChangeEvent, useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -29,7 +29,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-import { StringLiteralType } from 'typescript';
+import { useAuth } from '../components/AuthContext';
 //import "../App.css";
 
 function ColorSchemeToggle() {
@@ -363,6 +363,31 @@ export default function TeamExample() {
         navigate('/dashboard');
     };
 
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'GET',
+                
+            });
+            if (response.ok) {
+                console.log('Logout successful');
+                navigate('/');
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error during logout')
+        }
+    };
+
+    const {isLoggedIn } = useAuth();
+
+    if (!isLoggedIn) {
+        return <Navigate to="/"/>;
+        // console.log("I am supposed to be here");
+    }
+
+
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
@@ -428,7 +453,7 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            
+                            onClick={handleLogout}
                         >
                             <LogoutIcon />
                         </IconButton>
