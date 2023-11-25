@@ -1,6 +1,6 @@
-import * as React from 'react';
+import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
+import { AuthProvider } from './components/AuthContext';
 import Login from './pages/Login';
 import ForgetPassword from './pages/ForgetPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -11,6 +11,7 @@ import Userplan from './pages/Userplan';
 
 export default function App() {
     return (
+        <AuthProvider>
         <div className="App">
             <Routes>
                 <Route path="/" element={<Login />} />
@@ -22,5 +23,6 @@ export default function App() {
                 <Route path="UserPlan" element={<Userplan/>}></Route>
             </Routes>
         </div>
+        </AuthProvider>
     );
 }

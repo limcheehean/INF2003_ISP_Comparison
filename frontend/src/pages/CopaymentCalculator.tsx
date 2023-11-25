@@ -1,4 +1,6 @@
 import * as React from 'react';
+import { useNavigate, Navigate } from 'react-router-dom';
+import { useState } from 'react';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -7,7 +9,7 @@ import Button from '@mui/joy/Button';
 import Chip from '@mui/joy/Chip';
 import Typography from '@mui/joy/Typography';
 import Input from '@mui/joy/Input';
-import IconButton from '@mui/joy/IconButton';
+
 import List from '@mui/joy/List';
 import ListSubheader from '@mui/joy/ListSubheader';
 import ListItem from '@mui/joy/ListItem';
@@ -20,38 +22,35 @@ import FormLabel from '@mui/joy/FormLabel';
 import Card from '@mui/joy/Card';
 import CardContent from '@mui/joy/CardContent';
 import CardActions from '@mui/joy/CardActions';
-
+import CircularProgress from '@mui/joy/CircularProgress';
+import Select from '@mui/joy/Select';
+import Option from '@mui/joy/Option';
+import { KeyboardArrowDown } from "@mui/icons-material";
+import { selectClasses } from "@mui/joy";
 
 import Divider from '@mui/joy/Divider';
-import Skeleton from '@mui/joy/Skeleton';
-
-import Check from '@mui/icons-material/Check';
-import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
-
 
 // Icons import
+import IconButton from '@mui/joy/IconButton';
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
 import AssignmentIndRoundedIcon from '@mui/icons-material/AssignmentIndRounded';
 import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import BookRoundedIcon from '@mui/icons-material/BookRounded';
-import AssistWalkerIcon from '@mui/icons-material/AssistWalker';
-import TwoWheelerIcon from '@mui/icons-material/TwoWheeler';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import PaidIcon from '@mui/icons-material/Paid';
 import LocalHospitalIcon from '@mui/icons-material/LocalHospital';
 import HealthAndSafetyIcon from '@mui/icons-material/HealthAndSafety';
-import ShieldIcon from '@mui/icons-material/Shield';
 import RemoveIcon from '@mui/icons-material/Remove';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
 import BalanceIcon from '@mui/icons-material/Balance';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
+import LogoutIcon from '@mui/icons-material/Logout';
+import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 
 import Grid from '@mui/system/Unstable_Grid';
 import styled from '@mui/system/styled';
@@ -61,6 +60,7 @@ import styled from '@mui/system/styled';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
+import { useAuth } from '../components/AuthContext';
 
 interface FormElements extends HTMLFormControlsCollection {
     total_bill: HTMLInputElement;
@@ -72,6 +72,11 @@ interface FormElements extends HTMLFormControlsCollection {
 
 interface CalculateFormElement extends HTMLFormElement {
     readonly elements: FormElements;
+}
+
+interface Plan {
+    plan_id: number;
+    plan_name: string;
 }
 
 function ColorSchemeToggle() {
@@ -193,6 +198,38 @@ export default function TeamExample() {
         },
     });
 
+    const [loading, setLoading] = useState(false);
+
+    const [selectedPlan, setSelectedPlan] = useState<number | null>(null);
+    const [plans, setPlans] = useState<any[]>([]);
+
+    const [selectedRider, setSelectedRider] = useState<number | null>(null);
+    const [rider, setRider] = useState<any[]>([]);
+
+    React.useEffect(() => {
+        const fetchPlans = async () => {
+            try {
+                const response = await fetch('/api/user_plans');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data && data.data && Array.isArray(data.data.user_plans)) {
+                    setPlans(data.data.user_plans);
+                    setRider(data.data.user_plans);
+                } else {
+                    console.error('Invalid response format:', data);
+                }
+            } catch (error) {
+                console.error('Error fetching plans:', error);
+            }
+        };
+
+        fetchPlans();
+    }, []);
+
+
+
 
 
 
@@ -200,27 +237,73 @@ export default function TeamExample() {
     const handleCopaymentCalculate = async () => {
 
         const totalBill = parseInt(total_bill, 10);
-        const planId = parseInt(plan_id, 10);
-        const riderId = parseInt(rider_id, 10); // Parse as an integer
+        // const planId = parseInt(plan_id, 10);
+        // const riderId = parseInt(rider_id, 10); // Parse as an integer
         const ageValue = parseInt(age, 10); // Parse as an integer
         const wardTypeValue = ward_type; // No parsing needed
 
         const postData = {
             total_bill: totalBill,
-            plan_id: planId,
-            rider_id: riderId,
+            plan_id: selectedPlan || 0,
+            rider_id: selectedRider || 0,
             age: ageValue,
             ward_type: wardTypeValue
         }
 
         try {
+            setLoading(true);
             console.log(postData);
             const response = await axios.post('api/co_payment', postData, { headers: { 'Content-Type': 'application/json' } });
             console.log('Response', response.data);
             setResponseData(response.data); // Setting the response data in the state
         } catch (error) {
             console.log('Error', error);
+        } finally {
+            setLoading(false);
         }
+    }
+
+    const navigate = useNavigate();
+
+    const navigateToCopaymentCalculator = () => {
+        // navigate to the calculator route
+        navigate('/copaymentCalculator');
+    };
+
+    const navigateToMyPlans = () => {
+        // navigate to the calculator route
+        navigate('/userplan');
+    };
+
+    const navigateToDashboard = () => {
+        // navigate to the calculator route
+        navigate('/dashboard');
+    };
+
+    const handleLogout = async () => {
+        try {
+            const response = await fetch('/api/logout', {
+                method: 'GET',
+                
+            });
+            if (response.ok) {
+                console.log('Logout successful');
+                navigate('/');
+            } else {
+                console.error('Logout failed');
+            }
+        } catch (error) {
+            console.error('Error during logout')
+        }
+    };
+
+    const { isLoggedIn } = useAuth();
+
+    
+
+    if (!isLoggedIn) {
+        return <Navigate to="/"/>;
+        // console.log("I am supposed to be here");
     }
 
 
@@ -269,27 +352,12 @@ export default function TeamExample() {
                             Team
                         </Typography>
                     </Box>
-                    <Input
-                        size="sm"
-                        variant="outlined"
-                        placeholder="Search anything…"
-                        startDecorator={<SearchRoundedIcon color="primary" />}
-                        endDecorator={
-                            <IconButton variant="outlined" color="neutral">
-                                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
-                                    ⌘ + k
-                                </Typography>
-                            </IconButton>
-                        }
-                        sx={{
-                            flexBasis: '500px',
-                            display: {
-                                xs: 'none',
-                                sm: 'flex',
-                            },
-                            boxShadow: 'sm',
-                        }}
-                    />
+                    <Box sx={{ display: 'flex', gap: 3 }}>
+                        <Button startDecorator={<GridViewRoundedIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToDashboard}>Dashboard</Button>
+                        <Button startDecorator={<ArticleRoundedIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToMyPlans}>My Plans</Button>
+                        <Button startDecorator={<CalculateIcon />} variant="plain" sx={{ color: '#455a64' }} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
+                    </Box>
+
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -305,39 +373,11 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            href="/blog/first-look-at-joy/"
+                            onClick={handleLogout}
                         >
-                            <BookRoundedIcon />
+                            <LogoutIcon />
                         </IconButton>
-                        <Menu
-                            id="app-selector"
-                            control={
-                                <IconButton
-                                    size="sm"
-                                    variant="soft"
-                                    color="neutral"
-                                    aria-label="Apps"
-                                >
-                                    <GridViewRoundedIcon />
-                                </IconButton>
-                            }
-                            menus={[
-                                {
-                                    label: 'Email',
-                                    href: '/joy-ui/getting-started/templates/email/',
-                                },
-                                {
-                                    label: 'Team',
-                                    active: true,
-                                    href: '/joy-ui/getting-started/templates/team/',
-                                    'aria-current': 'page',
-                                },
-                                {
-                                    label: 'Files',
-                                    href: '/joy-ui/getting-started/templates/files/',
-                                },
-                            ]}
-                        />
+
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>
@@ -362,7 +402,7 @@ export default function TeamExample() {
 
 
                         <Grid container spacing={2}>
-                            <Grid xs={5}>
+                            <Grid xs={6}>
                                 <form method="POST" onSubmit={(event: React.FormEvent<CalculateFormElement>) => {
                                     event.preventDefault();
                                     const formElements = event.currentTarget.elements;
@@ -397,17 +437,76 @@ export default function TeamExample() {
 
                                             <FormControl sx={{ gridColumn: '1/-1' }}>
                                                 <FormLabel><Typography level="h4">Total bill</Typography></FormLabel>
-                                                <Input name="total_bill" type="number" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
+                                                <Input name="total_bill" value={total_bill} onChange={(e) => set_total_bill(e.target.value)} variant="soft" startDecorator={{ dollar: '$(SGD)' }[currency]} />
                                             </FormControl>
 
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
-                                                <Input name="plan_id" value={plan_id} onChange={(e) => set_plan_id(e.target.value)} placeholder="AIA Max VitalHealth A" variant="soft" endDecorator={<AssistWalkerIcon />} />
+                                               
+
+                                                <Select
+                                                    placeholder={selectedPlan ? "Selected Plan" : "Select a plan"}
+                                                    value={selectedPlan}
+                                                    onChange={(e, value: any) => {
+                                                        if (value && typeof value === 'number') {
+                                                            setSelectedPlan(value);
+                                                            console.log(value);
+                                                        }
+                                                    }}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    sx={{
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {plans.map((plan) => (
+                                                        <Option key={plan.plan_id} value={plan.plan_id}>
+                                                            {plan.plan_name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+
                                             </FormControl>
+
+                                            {/* <FormControl>
+                                                <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
+                                                <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                            </FormControl> */}
 
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Rider</Typography></FormLabel>
-                                                <Input name="rider_id" value={rider_id} onChange={(e) => set_rider_id(e.target.value)} placeholder="HealthShield Gold Max A" variant="soft" endDecorator={<TwoWheelerIcon />} />
+                                                <Select
+                                                    placeholder={selectedRider ? "Selected Plan" : "Select a plan"}
+                                                    value={selectedRider}
+                                                    onChange={(e, value: any) => {
+                                                        if (value && typeof value === 'number') {
+                                                            setSelectedRider(value);
+                                                            console.log(value);
+                                                        }
+                                                    }}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    sx={{
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {rider.map((rider) => (
+                                                        <Option key={rider.rider_id} value={rider.rider_id}>
+                                                            {rider.rider_name}
+                                                        </Option>
+                                                    ))}
+
+
+                                                </Select>
+
                                             </FormControl>
 
                                             <FormControl>
@@ -424,8 +523,8 @@ export default function TeamExample() {
 
 
                                             <CardActions sx={{ gridColumn: '1/-1' }}>
-                                                <Button onClick={handleCopaymentCalculate} variant="solid" color="primary">
-                                                    Calculate
+                                                <Button onClick={handleCopaymentCalculate} disabled={loading} variant="solid" color="primary">
+                                                    {loading ? <CircularProgress /> : 'Calculate'}
                                                 </Button>
                                             </CardActions>
 
@@ -435,7 +534,7 @@ export default function TeamExample() {
 
                                 </form>
                             </Grid>
-                            <Grid xs={7}>
+                            <Grid xs={6}>
                                 <Card size="lg" variant="outlined">
                                     <Chip startDecorator={<LocalAtmIcon />} size="sm" variant="outlined" color="primary">
                                         BASIC
@@ -453,11 +552,11 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Cash Payment: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.cash_payment}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.cash_payment}</Typography>
                                                 </Grid>
                                             </Grid>
 
-                                           
+
 
                                         </ListItem>
                                         <ListItem>
@@ -470,12 +569,12 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Co Insurance: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.co_insurance}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.co_insurance}</Typography>
                                                 </Grid>
                                             </Grid>
 
 
-                                           
+
 
                                         </ListItem>
                                         <ListItem>
@@ -488,7 +587,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Co payment: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.co_payment}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.co_payment}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -503,7 +602,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Deductible: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.deductible}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.deductible}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -518,7 +617,7 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Over limit: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.over_limit}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.over_limit}</Typography>
                                                 </Grid>
                                             </Grid>
 
@@ -533,24 +632,24 @@ export default function TeamExample() {
                                                     <Typography level="title-lg">Pro-ration: </Typography>
                                                 </Grid>
                                                 <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.pro_ration}</Typography>
+                                                    <Typography level="title-lg">$ {responseData.data.pro_ration}</Typography>
                                                 </Grid>
                                             </Grid>
 
-                                        
+
                                         </ListItem>
                                     </List>
                                     <Divider inset="none" />
                                     <CardActions>
 
-                                    <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
-                                                <Grid xs={12}>
-                                                    <Typography level="title-lg">Total bill: </Typography>
-                                                </Grid>
-                                                <Grid xs={4}>
-                                                <Typography level="title-lg">$ {responseData.data.total_bill}</Typography>
-                                                </Grid>
+                                        <Grid container spacing={2} columns={16} sx={{ flexGrow: 1 }}>
+                                            <Grid xs={12}>
+                                                <Typography level="title-lg">Total bill: </Typography>
                                             </Grid>
+                                            <Grid xs={4}>
+                                                <Typography level="title-lg">$ {responseData.data.total_bill}</Typography>
+                                            </Grid>
+                                        </Grid>
 
                                     </CardActions>
                                 </Card>

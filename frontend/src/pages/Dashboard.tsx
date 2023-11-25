@@ -25,6 +25,7 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
 //import { StringLiteralType } from 'typescript';
+import { useAuth } from '../components/AuthContext';
 //import "../App.css";
 
 function ColorSchemeToggle() {

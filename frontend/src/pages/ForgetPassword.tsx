@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import GlobalStyles from '@mui/joy/GlobalStyles';
@@ -17,8 +18,8 @@ import Stack from '@mui/joy/Stack';
 import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
 import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
-import GoogleIcon from '../GoogleIcon';
-import { Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
+import CircularProgress from '@mui/joy/CircularProgress';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -70,6 +71,7 @@ function ColorSchemeToggle({ onClick, ...props }: IconButtonProps) {
 function ForgetPassword() {
   
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
   // const [resetToken, setResetToken] = useState('');
   // const [resetPassword, setResetPassword] = useState('');
 
@@ -77,23 +79,36 @@ function ForgetPassword() {
   // Checks email, if present in the backend, it should console.log the email, if not, it will show error
   const handleForgotPassword = async () => {
     try {
+      setLoading(true);
       console.log({email});
       const response = await axios.post('api/forgotPassword', {email}, {headers:{'Content-Type':'application/json'}});
       console.log('Response:', response.data);
+
+      const Toast = Swal.mixin({
+        toast: true,
+        position: "bottom-left",
+        showConfirmButton: false,
+        timer: 1500,
+        timerProgressBar: true
+      });
+      Toast.fire({
+        icon: 'success',
+        title: 'Password reset link has been sent!'
+      })
+
+      setTimeout(() => {
+        navigate('/');
+      }, 1500);
+
     } catch (error) {
       // error message if no email
       console.error('Error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const handleResetPassword = async () => {
-  //   try {
-  //     const response = await axios.post(`resetPassword/${resetToken}`, {password: resetPassword});
-  //     // Handle success or error response here
-  //   } catch (error) {
-  //     // Handle network or server errors 
-  //   }
-  // };
+  const navigate = useNavigate();
 
   return (
 
@@ -158,7 +173,7 @@ function ForgetPassword() {
               <IconButton variant="soft" color="primary" size="sm">
                 <BadgeRoundedIcon />
               </IconButton>
-              <Typography level="title-lg">Company logo</Typography>
+              <Typography level="title-lg">ISP Comparison</Typography>
             </Box>
             <ColorSchemeToggle />
           </Box>
@@ -223,8 +238,8 @@ function ForgetPassword() {
                       Back to login
                     </Link>
                   </Box>
-                  <Button onClick={handleForgotPassword} type="submit" fullWidth>
-                    Submit
+                  <Button onClick={handleForgotPassword} disabled={loading} type="submit" fullWidth>
+                    {loading ? <CircularProgress /> : 'Submit'}
                   </Button>
 
                 </Stack>
@@ -233,7 +248,7 @@ function ForgetPassword() {
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" textAlign="center">
-              © Your company {new Date().getFullYear()}
+              © ISP Comparison {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>

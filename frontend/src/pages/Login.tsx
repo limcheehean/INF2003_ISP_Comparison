@@ -18,6 +18,8 @@ import BadgeRoundedIcon from '@mui/icons-material/BadgeRounded';
 import { Link, useNavigate } from 'react-router-dom';
 import Alert from '@mui/joy/Alert';
 import Swal from 'sweetalert2';
+import CircularProgress from '@mui/joy/CircularProgress';
+import { useAuth } from '../components/AuthContext';
 
 
 interface FormElements extends HTMLFormControlsCollection {
@@ -70,7 +72,9 @@ function Login() {
   //const [passwordError, setPasswordError] = useState('');
   const [error, setError] = useState('');
 
+  const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth();
   
 
 
@@ -95,6 +99,7 @@ function Login() {
     setError('');
 
     try {
+      setLoading(true);
       const requestData = {email, password}; // Combine email and password in one object
       const requestHeaders = {'Content-Type': 'application/json'};
 
@@ -106,6 +111,7 @@ function Login() {
       if (response.status === 200) {
         // Login successful
         console.log('Login successful: ', response.data);
+        login();
 
         const Toast = Swal.mixin({
           toast: true,
@@ -164,6 +170,8 @@ function Login() {
         // Handle network or request error
         console.error('Network or request error:', error);
        }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -256,6 +264,7 @@ function Login() {
               },
             }}
           >
+            <Typography level="h2">Hello there 👋</Typography>
 
             <Stack gap={4} sx={{ mt: 2 }}>
               <form onSubmit={handleLogin}>
@@ -284,8 +293,8 @@ function Login() {
                       Forgot your password?
                     </Link>
                   </Box>
-                  <Button type="submit" fullWidth>
-                    Sign in
+                  <Button disabled={loading} type="submit" fullWidth>
+                  {loading ? <CircularProgress /> : 'Sign in'}
                   </Button>
                   <Link to="/Signup">
                       Don't have an account? Sign up!
@@ -296,7 +305,7 @@ function Login() {
           </Box>
           <Box component="footer" sx={{ py: 3 }}>
             <Typography level="body-xs" textAlign="center">
-              © Your company {new Date().getFullYear()}
+              © ISP Comparison {new Date().getFullYear()}
             </Typography>
           </Box>
         </Box>
