@@ -9,8 +9,10 @@ import Input from '@mui/joy/Input';
 import IconButton from '@mui/joy/IconButton';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
+import Tabs from '@mui/joy/Tabs';
+import TabList from '@mui/joy/TabList';
+import Tab from '@mui/joy/Tab';
+import TabPanel from '@mui/joy/TabPanel';
 
 // Icons import
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -274,6 +276,7 @@ export default function TeamExample() {
       setSelectedFilter({});
       setRiderBenefits({});
       setPlanBenefits({});
+      setComparePremiumsData({});
     };
 
     useEffect(() => {
@@ -461,11 +464,6 @@ export default function TeamExample() {
                 <Layout.SideNav>
                     <div>
                         <div>
-                        <button onClick={clearFilters}>Clear</button>
-                        <button onClick={clearFilters}>Clear</button>
-                        <button onClick={clearFilters}>Clear</button>
-                        </div>
-                        <div>
                             <h2>Companies:</h2>
                             {(filterData?.companies || []).map((company: any) => (
                                 <div key={company.id}>
@@ -552,86 +550,116 @@ export default function TeamExample() {
                 </Layout.SideNav>
                 <Layout.Main>
                     <Box sx={{ width: "72.5vw", overflow: 'auto' }}>
-                        <div>
-                            {
-                                ["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
-                                    .map(columnText =>
-                                        <div>
-                                            <input
-                                                type="checkbox"
-                                                value={columnText}
-                                                checked={selectedColumns[columnText]}
-                                                onChange={e => {
-                                                    // At least 1 must be selected
-                                                    if (!e.target.checked) {
-                                                        const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
-                                                        if (num_selected <= 1) {
-                                                            e.target.checked = true;
-                                                            return;
+                        <Tabs aria-label="Basic tabs" defaultValue={0}>
+                            <TabList>
+                                <Tab>Compare Premiums</Tab>
+                                <Tab>Plan Benefits</Tab>
+                                <Tab>Rider Benefits</Tab>
+                            </TabList>
+                            <TabPanel value={0}>
+                                <br/>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                                    {["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
+                                        .map(columnText => (
+                                            <div key={columnText}>
+                                                <input
+                                                    type="checkbox"
+                                                    value={columnText}
+                                                    checked={selectedColumns[columnText]}
+                                                    onChange={e => {
+                                                        // At least 1 must be selected
+                                                        if (!e.target.checked) {
+                                                            const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
+                                                            if (num_selected <= 1) {
+                                                                e.target.checked = true;
+                                                                return;
+                                                            }
                                                         }
-                                                    }
-                                                    setSelectedColumns({...selectedColumns, [columnText]: e.target.checked})
-                                                }}
-                                            />
-                                            <label>{columnText}</label>
-                                        </div>
-                                )
+                                                        setSelectedColumns({ ...selectedColumns, [columnText]: e.target.checked })
+                                                    }}
+                                                />
+                                                <label>{columnText}</label>
+                                            </div>
+                                        ))
+                                    }
+                                </div> <br/>
 
-                            }
-                        </div>
-                        <Sheet variant="outlined">
-                            {/* <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
-                                <Tab label="Comparison Table" />
-                                <Tab label="Plan Benefits" />
-                                <Tab label="Rider Benefits" />
-                            </Tabs>
-                            <TabPanel value={tabValue} index={0}> */}
-                                {/* Compare premiums */}
+                                {/* <div>
+                                    {
+                                        ["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
+                                            .map(columnText =>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={columnText}
+                                                        checked={selectedColumns[columnText]}
+                                                        onChange={e => {
+                                                            // At least 1 must be selected
+                                                            if (!e.target.checked) {
+                                                                const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
+                                                                if (num_selected <= 1) {
+                                                                    e.target.checked = true;
+                                                                    return;
+                                                                }
+                                                            }
+                                                            setSelectedColumns({...selectedColumns, [columnText]: e.target.checked})
+                                                        }}
+                                                    />
+                                                    <label>{columnText}</label>
+                                                </div>
+                                        )
+
+                                    }
+                                </div> */}
+                                <Sheet variant="outlined">
                                 <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
-                                <thead>
-                                    <tr>
-                                        {/* Render top-level headers */}
-                                        {(comparePremiumsData?.columns || []).map((column: any) => {
-                                            // Apply colSpan for parent columns that have children
-                                            const colSpan = column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).length : 1;
-                                            return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
-                                        })}
-                                    </tr>
-                                    {/* Render sub-headers if any columns have children */}
-                                    {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
+                                    <thead>
                                         <tr>
-                                            {(comparePremiumsData.columns|| []).flatMap((column: any) =>
-                                            column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
-                                            )}
+                                            {/* Render top-level headers */}
+                                            {(comparePremiumsData?.columns || []).map((column: any) => {
+                                                // Apply colSpan for parent columns that have children
+                                                const colSpan = column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).length : 1;
+                                                return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
+                                            })}
                                         </tr>
-                                    )}
-                                </thead>
-                                <tbody>
-                                    {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
-                                    <tr key={rowIndex}>
-                                        {(comparePremiumsData?.columns || []).map((column: any) => {
-                                            if (column.children) {
-                                                return column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => (
-                                                    <td key={childColumn.name}>{row[childColumn.name]}</td>
-                                                ));
-                                            } else {
-                                                return <td key={column.name}>{row[column.name]}</td>;
-                                            }
-                                        })}
-                                    </tr>
-                                    ))}
-                                </tbody>
-                                </Table>
-                            {/* </TabPanel>
-                            <TabPanel value={tabValue} index={1}> */}
-                                {/* Plan Benefits */}
-                                <PlanBenefitTable data={planBenefits} />
-                            {/* </TabPanel>
-                            <TabPanel value={tabValue} index={2}> */}
-                                {/* Rider Benefits */}
-                                <RiderBenefitTable data={riderBenefits} />
-                            {/* </TabPanel>     */}
-                        </Sheet>
+                                        {/* Render sub-headers if any columns have children */}
+                                        {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
+                                            <tr>
+                                                {(comparePremiumsData.columns|| []).flatMap((column: any) =>
+                                                column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
+                                                )}
+                                            </tr>
+                                        )}
+                                    </thead>
+                                    <tbody>
+                                        {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
+                                        <tr key={rowIndex}>
+                                            {(comparePremiumsData?.columns || []).map((column: any) => {
+                                                if (column.children) {
+                                                    return column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => (
+                                                        <td key={childColumn.name}>{row[childColumn.name]}</td>
+                                                    ));
+                                                } else {
+                                                    return <td key={column.name}>{row[column.name]}</td>;
+                                                }
+                                            })}
+                                        </tr>
+                                        ))}
+                                    </tbody>
+                                    </Table>
+                                </Sheet>
+                            </TabPanel>
+                            <TabPanel value={1}>
+                                <Sheet variant='outlined'>
+                                    <PlanBenefitTable data={planBenefits} />
+                                </Sheet>
+                            </TabPanel>
+                            <TabPanel value={2}>
+                                <Sheet variant='outlined'>
+                                    <RiderBenefitTable data={riderBenefits} />
+                                </Sheet>
+                            </TabPanel>
+                        </Tabs>
                     </Box>
                 </Layout.Main>
             </Layout.Root>
