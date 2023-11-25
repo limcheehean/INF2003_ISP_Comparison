@@ -13,10 +13,12 @@ import ListItem from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import ListItemContent from '@mui/joy/ListItemContent';
-import {DialogContent, DialogTitle, DialogActions, Modal, ModalDialog, Tooltip, Select, selectClasses} from "@mui/joy";
+import {DialogContent, DialogTitle, DialogActions, Modal, ModalDialog, Select, selectClasses} from "@mui/joy";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
+import Divider from '@mui/joy/Divider';
 import Option from '@mui/joy/Option';
+import Grid from "@mui/joy/Grid";
 
 // Icons import
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -29,16 +31,15 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import {Add, Delete, KeyboardArrowDown} from "@mui/icons-material";
+import {Add, Delete, Edit, KeyboardArrowDown} from "@mui/icons-material";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import LogoutIcon from '@mui/icons-material/Logout';
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 
 
 
 // custom
-import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-import Grid from "@mui/joy/Grid";
 import { useAuth } from '../components/AuthContext';
 
 function ColorSchemeToggle() {
@@ -165,11 +166,9 @@ export default function TeamExample() {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
     const [openAddPlan, setopenAddPlan] = useState<boolean>(false);
     const [openDeletePlan, setDeletePlan] = useState<boolean>(false);
+    const [openEditPlan, setEditPlan] = useState<boolean>(false);
     const [planToDeleteIndex, setPlanToDeleteIndex] = useState(null);
-    const [planToDelete, setPlanToDelete] = useState({
-        plan_id: null,
-        user_id: null
-    })
+    const [planToDelete, setPlanToDelete] = useState<number>();
     const [userPlans, setUserPlans] = useState<UserPlans>({
         grand_total_premiums: null,
         total_payable_by_cash: null,
@@ -185,6 +184,32 @@ export default function TeamExample() {
     const [selectedRider, setSelectedRider] = useState('');
     const [filterData, setFilterData] = useState<any>({});
 
+    // useEffect(() => {
+    //     // Make an API request to fetch user plans data
+    //     fetch('/api/user_plans') // Replace with the actual API endpoint
+    //         .then((response) => response.json())
+    //         .then((data) => {
+    //             console.log(data);
+    //             console.log(data.status);
+    //             console.log(data.data);
+    //             if (typeof data === 'object' && data !== null) {
+    //                 Object.keys(data.data).forEach((key) => {
+    //                     // Check the data type of each property
+    //                     console.log(`${key}: ${typeof data[key]}`);
+    //                 });
+    //             } else {
+    //                 console.error('Data is not an object.');
+    //             }
+    //
+    //             setUserPlans(data.data);
+    //
+    //             //setUserPlans(data);
+    //             console.log('i fire once');
+    //         })
+    //         .catch((error) => {
+    //             console.error('Error fetching user plans:', error);
+    //         });
+    // }, []);
 
 
     const addPlan = async () => {
@@ -205,9 +230,25 @@ export default function TeamExample() {
 
         const responseData = await response.json();
         console.log(responseData);
+
+        fetchUserPlans();
     }
 
+    const deletePlan = async (userPlanID: number) => {
+        const response = await fetch(`/api/user_plans/${userPlanID}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        fetchUserPlans();
+    }
 
     const getFilter = async () => {
         const response = await fetch('/api/get_filter', {
@@ -228,23 +269,13 @@ export default function TeamExample() {
         setFilterData(responseData.data)
     }
 
-    useEffect(() => {
-
+    const fetchUserPlans = () => {
         fetch('/api/user_plans') // Replace with the actual API endpoint
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
                 console.log(data.status);
                 console.log(data.data);
-                if (typeof data === 'object' && data !== null) {
-                    Object.keys(data.data).forEach((key) => {
-                        // Check the data type of each property
-                        console.log(`${key}: ${typeof data[key]}`);
-                        console.log('hello heee');
-                    });
-                } else {
-                    console.error('Data is not an object.');
-                }
 
                 setUserPlans(data.data);
 
@@ -253,13 +284,95 @@ export default function TeamExample() {
             .catch((error) => {
                 console.error('Error fetching user plans:', error);
             });
+    }
+
+    useEffect(() => {
 
 
+        // fetch('/api/user_plans') // Replace with the actual API endpoint
+        //     .then((response) => response.json())
+        //     .then((data) => {
+        //         console.log(data);
+        //         console.log(data.status);
+        //         console.log(data.data);
+        //
+        //         setUserPlans(data.data);
+        //
+        //         console.log('i fire once');
+        //     })
+        //     .catch((error) => {
+        //         console.error('Error fetching user plans:', error);
+        //     });
+
+        fetchUserPlans();
 
 
         (async() => {
             await getFilter();
         })();
+
+        // (async () => {
+        //     try {
+        //         const response = await fetch('/api/get_filter', {
+        //             method: 'POST',
+        //             headers: {'Content-Type': 'application/json'},
+        //             body: JSON.stringify(data),
+        //         });
+        //
+        //         if (!response.ok) {
+        //             throw new Error(`HTTP error! Status: ${response.status}`);
+        //         }
+        //
+        //         const responseData = await response.json();
+        //         console.log(responseData);
+        //
+        //         if (typeof responseData === 'object' && responseData !== null) {
+        //             Object.keys(responseData.data).forEach((key) => {
+        //                 // Check the data type of each property
+        //                 console.log(`${key}: ${typeof responseData[key]}`);
+        //             });
+        //         } else {
+        //             console.error('Data is not an object.');
+        //         }
+        //
+        //
+        //         console.log(responseData.data);
+        //
+        //         if (responseData && responseData.data) {
+        //             setCompanies(responseData.data.companies);
+        //             const { companies, plans, riders, wards } = responseData.data;
+        //
+        //             if (companies) {
+        //                 console.log('Companies:', companies);
+        //                 setCompanies(companies);
+        //                 console.log("companies!!!!",companies2);
+        //                 // Use the 'companies' array in your code
+        //             }
+        //
+        //             if (plans) {
+        //                 console.log('Plans:', plans);
+        //                 // Use the 'plans' array in your code
+        //             }
+        //
+        //             if (riders) {
+        //                 console.log('Riders:', riders);
+        //
+        //                 // Use the 'riders' array in your code
+        //             }
+        //
+        //             if (wards) {
+        //                 console.log('Wards:', wards);
+        //                 // Use the 'wards' array in your code
+        //             }
+        //         } else {
+        //             console.error('Data or data properties are undefined');
+        //         }
+        //
+        //
+        //     } catch (error) {
+        //         console.error('Error:', error);
+        //     }
+        // })();
 
 
     }, [selectedCompany, selectedPlan]);
@@ -285,7 +398,7 @@ export default function TeamExample() {
         try {
             const response = await fetch('/api/logout', {
                 method: 'GET',
-                
+
             });
             if (response.ok) {
                 console.log('Logout successful');
@@ -355,7 +468,7 @@ export default function TeamExample() {
                     <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
                     <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
                     </Box>
-                    
+
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -372,7 +485,7 @@ export default function TeamExample() {
                             color="neutral"
                             component="a"
                             onClick={handleLogout}
-                            
+
                         >
                             <LogoutIcon />
                         </IconButton>
@@ -410,7 +523,10 @@ export default function TeamExample() {
                                 onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
                                     event.preventDefault();
                                     await addPlan();
-                                    setopenAddPlan(false);
+                                    setopenAddPlan(false)
+                                    setSelectedCompany(null); // Clear selectedCompany
+                                    setSelectedPlan(null); // Clear selectedPlan
+                                    setSelectedRider(''); // Clear selectedRider
 
                                 }}
                             >
@@ -542,6 +658,33 @@ export default function TeamExample() {
                     </Modal>
 
 
+                    <Modal open={openDeletePlan} onClose={() => {
+                        setDeletePlan(false);
+                    }}>
+                        <ModalDialog variant="outlined" role="alertdialog">
+                            <DialogTitle>
+                                <WarningRoundedIcon />
+                                Confirmation
+                            </DialogTitle>
+                            <Divider />
+                            <DialogContent>
+                                Are you sure you want to delete this plan?
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="solid" color="danger" onClick={() => {
+                                    setDeletePlan(false);
+                                    deletePlan(planToDelete!);
+                                    console.log("plan to delete NOW", planToDelete);
+                                }}>
+                                    Delete plan
+                                </Button>
+                                <Button variant="plain" color="neutral" onClick={() => setDeletePlan(false)}>
+                                    Cancel
+                                </Button>
+                            </DialogActions>
+                        </ModalDialog>
+                    </Modal>
+
                     <Box sx={{ flexGrow: 1 , width: '75.2vw', margin: '10px'}}>
                         <Grid
                             container
@@ -566,12 +709,23 @@ export default function TeamExample() {
                                         <React.Fragment>
                                             <ListItem
                                                 endAction={
-                                                <IconButton aria-label="Delete" size="sm" color="danger">
-                                                    <Delete />
-                                                </IconButton>
+                                                <div>
+                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => setEditPlan(true)}>
+                                                        <Edit />
+                                                    </IconButton>
+                                                    <IconButton aria-label="Delete" size="sm" color="danger" onClick={() => {
+                                                        setDeletePlan(true);
+                                                        setPlanToDelete(userPlan.plan_id)
+                                                        console.log("plan clicked", userPlan.plan_id);
+                                                        console.log("plan to delete",planToDelete);
+                                                    }}>
+                                                        <Delete />
+                                                    </IconButton>
+                                                </div>
                                             }>
                                                 <Typography>
                                                     Name: {userPlan.insured_name}
+                                                    ID: {userPlan.plan_id}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem sx={{ borderBottom: '1px solid #ddd' }}>
@@ -586,12 +740,13 @@ export default function TeamExample() {
                                             </ListItem>
                                             <ListItem>
                                                 <Typography>
-                                                    Plan Name: {userPlan.plan_name}
+                                                    {userPlan.plan_name}
+                                                    {userPlan.plan_premium}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem sx={{ borderBottom: '1px solid #ddd' }}>
                                                 <Typography>
-                                                    Rider Name: {userPlan.rider_name}
+                                                    {userPlan.rider_name}: ${userPlan.rider_premium}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem>
