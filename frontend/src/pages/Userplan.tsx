@@ -181,9 +181,9 @@ export default function TeamExample() {
     const[name,setName] = useState('');
     const[dob,setDOB] = useState('');
 
-    const [selectedCompany, setSelectedCompany] = useState(null);
-    const [selectedPlan, setSelectedPlan] = useState(null);
-    const [selectedRider, setSelectedRider] = useState('');
+    const [selectedCompany, setSelectedCompany] = useState<any>(null);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+    const [selectedRider, setSelectedRider] = useState<any>('');
     const [filterData, setFilterData] = useState<any>({});
 
     // useEffect(() => {
