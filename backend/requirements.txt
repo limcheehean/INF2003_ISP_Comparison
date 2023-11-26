@@ -2,5 +2,8 @@ toml~=0.10.2
 flask~=2.3.3
 bcrypt~=4.0.1
 Flask-PyMongo
+Flask-Mail
+Flask-MySQL
+email-validator
 flask~=2.3.3
 PyMySQL~=1.1.0
