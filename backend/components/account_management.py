@@ -9,7 +9,7 @@ from flask_mail import Message
 from flaskext.mysql import pymysql
 
 # utility functions
-from utility import email_check, password_check, name_check
+from utility import email_check, password_check, name_check, send_mail_async
 
 
 ############################
@@ -154,8 +154,20 @@ def handle_signup(db: pymysql.Connection, mail, request):
                   sender=("ISP Comparison", "admin@ispcompare.spmovy.com"),
                   recipients=[signup_email])
 
-    msg.body = "signup_confirmation_link is " + signup_confirmation_link
-    mail.send(msg)
+    msg.subject = "Welcome to ISP Comparison"
+    msg.body = f"""
+    Dear {signup_name},
+    Thank you for signing up with ISP Comparison! We are excited to have you on board. To complete the registration process and start enjoying our services, please confirm your email address by clicking the link below:
+     {signup_confirmation_link}
+    Please note that this link will expire in 10 minutes for security reasons. If you don't confirm your email within this time frame, you may need to start the registration process again.
+    If you have not signed up for ISP Comparison, please ignore this email.
+    Thank you once again for choosing ISP Comparison. We look forward to serving you!
+    Best regards,
+    The ISP Comparison Team
+    """
+
+    #mail.send(msg)
+    send_mail_async(mail,msg)
 
     # <!> Can choose to redirect to other pages with render_template('page.html')
     return {"status": "success", "message": "Account activation link sent to email"}, 200
