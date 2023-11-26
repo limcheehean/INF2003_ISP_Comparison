@@ -26,9 +26,7 @@ import BookRoundedIcon from '@mui/icons-material/BookRounded';
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-//import { StringLiteralType } from 'typescript';
 import { useAuth } from '../components/AuthContext';
-//import "../App.css";
 
 function ColorSchemeToggle() {
     const { mode, setMode } = useColorScheme();
@@ -64,27 +62,6 @@ interface FormElements extends HTMLFormControlsCollection {
     ward_types: HTMLInputElement;
     plan_ids: HTMLInputElement;
 }
-
-// TABS
-// function TabPanel(props: any) {
-//     const { children, value, index, ...other } = props;
-
-//     return (
-//         <div
-//             role="tabpanel"
-//             hidden={value !== index}
-//             id={`simple-tabpanel-${index}`}
-//             aria-labelledby={`simple-tab-${index}`}
-//             {...other}
-//         >
-//             {value === index && (
-//                 <Box sx={{ p: 3 }}>
-//                     {children}
-//                 </Box>
-//             )}
-//         </div>
-//     );
-// }
 
 // LJ table
 interface Rider {
@@ -219,10 +196,6 @@ export default function TeamExample() {
         "Total Premium": true,
         "Cash Outlay": true
     });
-    // const [tabValue, setTabValue] = useState(0);
-    // const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-    //     setTabValue(newValue);
-    // };
 
     // CheckBoxes
     const getFilterData = async () => {
@@ -583,34 +556,6 @@ export default function TeamExample() {
                                         ))
                                     }
                                 </div> <br/>
-
-                                {/* <div>
-                                    {
-                                        ["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
-                                            .map(columnText =>
-                                                <div>
-                                                    <input
-                                                        type="checkbox"
-                                                        value={columnText}
-                                                        checked={selectedColumns[columnText]}
-                                                        onChange={e => {
-                                                            // At least 1 must be selected
-                                                            if (!e.target.checked) {
-                                                                const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
-                                                                if (num_selected <= 1) {
-                                                                    e.target.checked = true;
-                                                                    return;
-                                                                }
-                                                            }
-                                                            setSelectedColumns({...selectedColumns, [columnText]: e.target.checked})
-                                                        }}
-                                                    />
-                                                    <label>{columnText}</label>
-                                                </div>
-                                        )
-
-                                    }
-                                </div> */}
                                 <Sheet variant="outlined">
                                 <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
                                     <thead>
