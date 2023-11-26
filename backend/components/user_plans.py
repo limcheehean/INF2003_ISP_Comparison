@@ -13,6 +13,7 @@ get_user_plans_sql = """
        u.rider_id,
        p.name AS plan_name,
        r.name AS rider_name,
+       p.company_id,
        mp.amount AS medishield_life_premium,
        pp.amount AS plan_premium,
        rp.amount AS rider_premium,
