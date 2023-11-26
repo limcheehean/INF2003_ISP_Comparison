@@ -299,7 +299,10 @@ export default function TeamExample() {
 
     const { isLoggedIn } = useAuth();
 
-    
+    if (isLoggedIn) {
+        return <Navigate to="/copaymentCalculator"/>;
+        // console.log("I am supposed to be here");
+    }
 
     if (!isLoggedIn) {
         return <Navigate to="/"/>;
