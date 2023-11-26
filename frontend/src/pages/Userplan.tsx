@@ -164,10 +164,9 @@ interface UserPlan {
 
 export default function TeamExample() {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
-    const [openAddPlan, setopenAddPlan] = useState<boolean>(false);
-    const [openDeletePlan, setDeletePlan] = useState<boolean>(false);
-    const [openEditPlan, setEditPlan] = useState<boolean>(false);
-    const [planToDeleteIndex, setPlanToDeleteIndex] = useState(null);
+    const [openAddPlan, setOpenAddPlan] = useState<boolean>(false);
+    const [openDeletePlan, setOpenDeletePlan] = useState<boolean>(false);
+    const [openEditPlan, setOpenEditPlan] = useState<boolean>(false);
     const [planToDelete, setPlanToDelete] = useState<number>();
     const [userPlans, setUserPlans] = useState<UserPlans>({
         grand_total_premiums: null,
@@ -506,12 +505,13 @@ export default function TeamExample() {
                         variant="outlined"
                         color="neutral"
                         startDecorator={<Add />}
-                        onClick={() => setopenAddPlan(true)}
+                        onClick={() => setOpenAddPlan(true)}
                     >
                         Add Plan
                     </Button>
+
                     <Modal open={openAddPlan} onClose={() => {
-                        setopenAddPlan(false);
+                        setOpenAddPlan(false);
                         setSelectedCompany(null); // Clear selectedCompany
                         setSelectedPlan(null); // Clear selectedPlan
                         setSelectedRider(''); // Clear selectedRider
@@ -523,7 +523,7 @@ export default function TeamExample() {
                                 onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
                                     event.preventDefault();
                                     await addPlan();
-                                    setopenAddPlan(false)
+                                    setOpenAddPlan(false)
                                     setSelectedCompany(null); // Clear selectedCompany
                                     setSelectedPlan(null); // Clear selectedPlan
                                     setSelectedRider(''); // Clear selectedRider
@@ -545,6 +545,7 @@ export default function TeamExample() {
                                                     name="Name"
                                                     value={name}
                                                     onChange={(e) => {setName(e.target.value); console.log(e.target.value)}}
+                                                    required
                                                 />
                                             </FormControl>
                                         </Grid>
@@ -556,6 +557,7 @@ export default function TeamExample() {
                                                     name="Insured Date of birth"
                                                     value={dob}
                                                     onChange={(e) => {setDOB(e.target.value); console.log(e.target.value)}}
+                                                    required
                                                 />
                                             </FormControl>
                                         </Grid>
@@ -567,6 +569,7 @@ export default function TeamExample() {
                                                     value={selectedCompany}
                                                     onChange={(e:any, value:any) => {setSelectedCompany(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -593,6 +596,7 @@ export default function TeamExample() {
                                                     value={selectedPlan}
                                                     onChange={(e:any, value:any) => {setSelectedPlan(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -619,6 +623,7 @@ export default function TeamExample() {
                                                     value={selectedRider}
                                                     onChange={(e:any, value:any) => {setSelectedRider(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -639,7 +644,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                                             <Button variant="solid" color="danger" onClick={() => {
-                                                setopenAddPlan(false);
+                                                setOpenAddPlan(false);
                                                 setSelectedCompany(null); // Clear selectedCompany
                                                 setSelectedPlan(null); // Clear selectedPlan
                                                 setSelectedRider(''); // Clear selectedRider
@@ -658,8 +663,160 @@ export default function TeamExample() {
                     </Modal>
 
 
+                    <Modal open={openEditPlan} onClose={() => {
+                        setOpenEditPlan(false);
+                        setSelectedCompany(null); // Clear selectedCompany
+                        setSelectedPlan(null); // Clear selectedPlan
+                        setSelectedRider(''); // Clear selectedRider
+                    }}>
+                        <ModalDialog>
+                            <DialogTitle>Edit plan</DialogTitle>
+                            <DialogContent>Edit the information of the plan.</DialogContent>
+                            <form
+                                onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
+                                    event.preventDefault();
+                                    await addPlan();
+                                    setOpenEditPlan(false)
+                                    setSelectedCompany(null); // Clear selectedCompany
+                                    setSelectedPlan(null); // Clear selectedPlan
+                                    setSelectedRider(''); // Clear selectedRider
+
+                                }}
+                            >
+                                <Box>
+                                    <Grid
+                                        container
+                                        rowSpacing={1}
+                                        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                                        sx={{ width: '100%' }}
+                                    >
+                                        <Grid xs={6}>
+                                            <FormControl sx={{width: 240}}>
+                                                <FormLabel>Insured name</FormLabel>
+                                                <Input
+                                                    type="text"
+                                                    name="Name"
+                                                    value={name}
+                                                    onChange={(e) => {setName(e.target.value); console.log(e.target.value)}}
+                                                    required
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl sx={{width: 240}}>
+                                                <FormLabel>Insured Date of birth</FormLabel>
+                                                <Input
+                                                    type="date"
+                                                    name="Insured Date of birth"
+                                                    value={dob}
+                                                    onChange={(e) => {setDOB(e.target.value); console.log(e.target.value)}}
+                                                    required
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>company id</FormLabel>
+                                                <Select
+                                                    placeholder="Select a company"
+                                                    value={selectedCompany}
+                                                    onChange={(e:any, value:any) => {setSelectedCompany(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.companies || []).map((company: any) => (
+                                                        <Option key={company.id} value={company.id}>
+                                                            {company.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>plan id</FormLabel>
+                                                <Select
+                                                    placeholder="Select a Plan"
+                                                    value={selectedPlan}
+                                                    onChange={(e:any, value:any) => {setSelectedPlan(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.plans || []).map((plan: any) => (
+                                                        <Option key={plan.id} value={plan.id}>
+                                                            {plan.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>rider id</FormLabel>
+                                                <Select
+                                                    placeholder="Select a Rider"
+                                                    value={selectedRider}
+                                                    onChange={(e:any, value:any) => {setSelectedRider(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.riders || []).map((rider: any) => (
+                                                        <Option key={rider.id} value={rider.id}>
+                                                            {rider.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                                            <Button variant="solid" color="danger" onClick={() => {
+                                                setOpenEditPlan(false);
+                                                setSelectedCompany(null); // Clear selectedCompany
+                                                setSelectedPlan(null); // Clear selectedPlan
+                                                setSelectedRider(''); // Clear selectedRider
+                                            }}>
+                                                Cancel
+                                            </Button>
+
+                                            <Button type="submit" variant="plain" color="neutral">
+                                                Confirm
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            </form>
+                        </ModalDialog>
+                    </Modal>
+
                     <Modal open={openDeletePlan} onClose={() => {
-                        setDeletePlan(false);
+                        setOpenDeletePlan(false);
                     }}>
                         <ModalDialog variant="outlined" role="alertdialog">
                             <DialogTitle>
@@ -672,13 +829,13 @@ export default function TeamExample() {
                             </DialogContent>
                             <DialogActions>
                                 <Button variant="solid" color="danger" onClick={() => {
-                                    setDeletePlan(false);
+                                    setOpenDeletePlan(false);
                                     deletePlan(planToDelete!);
                                     console.log("plan to delete NOW", planToDelete);
                                 }}>
                                     Delete plan
                                 </Button>
-                                <Button variant="plain" color="neutral" onClick={() => setDeletePlan(false)}>
+                                <Button variant="plain" color="neutral" onClick={() => setOpenDeletePlan(false)}>
                                     Cancel
                                 </Button>
                             </DialogActions>
@@ -710,12 +867,12 @@ export default function TeamExample() {
                                             <ListItem
                                                 endAction={
                                                 <div>
-                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => setEditPlan(true)}>
+                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => setOpenEditPlan(true)}>
                                                         <Edit />
                                                     </IconButton>
                                                     <IconButton aria-label="Delete" size="sm" color="danger" onClick={() => {
-                                                        setDeletePlan(true);
-                                                        setPlanToDelete(userPlan.plan_id)
+                                                        setOpenDeletePlan(true);
+                                                        // setPlanToDelete(userPlans.user_plans)
                                                         console.log("plan clicked", userPlan.plan_id);
                                                         console.log("plan to delete",planToDelete);
                                                     }}>
@@ -725,6 +882,8 @@ export default function TeamExample() {
                                             }>
                                                 <Typography>
                                                     Name: {userPlan.insured_name}
+                                                </Typography>
+                                                <Typography>
                                                     ID: {userPlan.plan_id}
                                                 </Typography>
                                             </ListItem>
