@@ -147,6 +147,7 @@ interface UserPlans {
 
 interface UserPlan {
     age_next_birthday: number,
+    id: number,
     insured_dob: string,
     insured_name: string,
     medishield_life_premium: number,
@@ -158,7 +159,8 @@ interface UserPlan {
     rider_id: number,
     rider_name: string,
     rider_premium: number,
-    total_premium: number
+    total_premium: number,
+    company_id: number
 }
 
 
@@ -175,6 +177,7 @@ export default function TeamExample() {
         user_plans: []
     });
 
+    const[id, setID] = useState<number>();
     const[name,setName] = useState('');
     const[dob,setDOB] = useState('');
 
@@ -867,13 +870,27 @@ export default function TeamExample() {
                                             <ListItem
                                                 endAction={
                                                 <div>
-                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => setOpenEditPlan(true)}>
+                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => {
+                                                        setOpenEditPlan(true);
+                                                        setID(userPlan.id);
+                                                        setName(userPlan.insured_name);
+                                                        setDOB(userPlan.insured_dob);
+                                                        console.log("id: ",id);
+                                                        console.log("name: ",name);
+                                                        console.log("dob: ",dob);
+                                                        //setSelectedCompany(userPlan.);
+                                                        setSelectedCompany(userPlan.company_id);
+                                                        setSelectedPlan(userPlan.plan_id);
+                                                        setSelectedRider(userPlan.rider_id);
+                                                        console.log("plan clicked", userPlan.id)
+                                                    }}>
                                                         <Edit />
                                                     </IconButton>
                                                     <IconButton aria-label="Delete" size="sm" color="danger" onClick={() => {
                                                         setOpenDeletePlan(true);
-                                                        // setPlanToDelete(userPlans.user_plans)
-                                                        console.log("plan clicked", userPlan.plan_id);
+                                                        setPlanToDelete(userPlan.id);
+                                                        console.log("plan id", userPlans.user_plans)
+                                                        console.log("plan clicked", userPlan.id)
                                                         console.log("plan to delete",planToDelete);
                                                     }}>
                                                         <Delete />
@@ -899,8 +916,7 @@ export default function TeamExample() {
                                             </ListItem>
                                             <ListItem>
                                                 <Typography>
-                                                    {userPlan.plan_name}
-                                                    {userPlan.plan_premium}
+                                                    {userPlan.plan_name}: ${userPlan.plan_premium}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem sx={{ borderBottom: '1px solid #ddd' }}>
