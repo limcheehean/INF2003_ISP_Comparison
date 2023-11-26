@@ -209,14 +209,24 @@ export default function TeamExample() {
     React.useEffect(() => {
         const fetchPlans = async () => {
             try {
-                const response = await fetch('/api/user_plans');
+                const response = await fetch('/api/get_filter', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        company_ids: [],
+                        ward_types: [],
+                        plan_ids: [],
+                    })
+                });
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
                 }
                 const data = await response.json();
-                if (data && data.data && Array.isArray(data.data.user_plans)) {
-                    setPlans(data.data.user_plans);
-                    setRider(data.data.user_plans);
+                if (data && data.status === 'success' && data.data) {
+                    setPlans(data.data.plans || []);
+                    setRider(data.data.riders || []);
                 } else {
                     console.error('Invalid response format:', data);
                 }
@@ -284,7 +294,7 @@ export default function TeamExample() {
         try {
             const response = await fetch('/api/logout', {
                 method: 'GET',
-                
+
             });
             if (response.ok) {
                 console.log('Logout successful');
@@ -300,12 +310,12 @@ export default function TeamExample() {
     const { isLoggedIn } = useAuth();
 
     if (isLoggedIn === null) {
-        return <Navigate to="/copaymentCalculator"/>;
+        return <Navigate to="/copaymentCalculator" />;
     }
-    
+
 
     if (!isLoggedIn) {
-        return <Navigate to="/"/>;
+        return <Navigate to="/" />;
         // console.log("I am supposed to be here");
     }
 
@@ -445,9 +455,9 @@ export default function TeamExample() {
 
                                             <FormControl>
                                                 <FormLabel><Typography level="h4">Plan</Typography></FormLabel>
-                                               
 
-                                                <Select
+
+                                                {/* <Select
                                                     placeholder={selectedPlan ? "Selected Plan" : "Select a plan"}
                                                     value={selectedPlan}
                                                     onChange={(e, value: any) => {
@@ -471,7 +481,35 @@ export default function TeamExample() {
                                                             {plan.plan_name}
                                                         </Option>
                                                     ))}
+                                                </Select> */}
+                                                <Select
+                                                    placeholder={selectedPlan ? 'Selected Plan' : 'Select a plan'}
+                                                    value={selectedPlan}
+                                                    onChange={(e, value: any) => {
+                                                        if (value && typeof value === 'number') {
+                                                            setSelectedPlan(value);
+                                                            console.log(value);
+                                                        }
+                                                    }}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    sx={{
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {plans.map((plan) => (
+                                                        <Option key={plan.id} value={plan.id}>
+                                                            {plan.name}
+                                                        </Option>
+                                                    ))}
+
+
                                                 </Select>
+
 
                                             </FormControl>
 
@@ -502,8 +540,8 @@ export default function TeamExample() {
                                                     }}
                                                 >
                                                     {rider.map((rider) => (
-                                                        <Option key={rider.rider_id} value={rider.rider_id}>
-                                                            {rider.rider_name}
+                                                        <Option key={rider.id} value={rider.id}>
+                                                            {rider.name}
                                                         </Option>
                                                     ))}
 
