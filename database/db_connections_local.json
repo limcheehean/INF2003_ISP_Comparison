@@ -1,0 +1,12 @@
+{
+    "local": {
+      "host": "localhost",
+      "username": "root",
+      "password": "root"
+    },
+    "remote": {
+      "host": "db.spmovy.com",
+      "username": "",
+      "password": ""
+    }
+  }

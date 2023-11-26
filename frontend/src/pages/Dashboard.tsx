@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { ChangeEvent, useState, useEffect } from "react";
-import { useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 import { CssVarsProvider, useColorScheme } from '@mui/joy/styles';
 import CssBaseline from '@mui/joy/CssBaseline';
@@ -10,9 +9,10 @@ import Input from '@mui/joy/Input';
 import IconButton from '@mui/joy/IconButton';
 import Sheet from '@mui/joy/Sheet';
 import Table from '@mui/joy/Table';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import Button from '@mui/joy/Button';
+import Tabs from '@mui/joy/Tabs';
+import TabList from '@mui/joy/TabList';
+import Tab from '@mui/joy/Tab';
+import TabPanel from '@mui/joy/TabPanel';
 
 // Icons import
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
@@ -22,13 +22,11 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
 import BookRoundedIcon from '@mui/icons-material/BookRounded';
-import ArticleRoundedIcon from '@mui/icons-material/ArticleRounded';
-import CalculateIcon from '@mui/icons-material/Calculate';
-import LogoutIcon from '@mui/icons-material/Logout';
 
 // custom
 import Menu from '../components/Menu';
 import Layout from '../components/Layout';
+//import { StringLiteralType } from 'typescript';
 import { useAuth } from '../components/AuthContext';
 //import "../App.css";
 
@@ -278,6 +276,7 @@ export default function TeamExample() {
       setSelectedFilter({});
       setRiderBenefits({});
       setPlanBenefits({});
+      setComparePremiumsData({});
     };
 
     useEffect(() => {
@@ -346,48 +345,6 @@ export default function TeamExample() {
 
     }
 
-    const navigate = useNavigate();
-
-    const navigateToCopaymentCalculator = () => {
-        // navigate to the calculator route
-        navigate('/copaymentCalculator');
-    };
-
-    const navigateToMyPlans = () => {
-        // navigate to the calculator route
-        navigate('/userplan');
-    };
-
-    const navigateToDashboard = () => {
-        // navigate to the calculator route
-        navigate('/dashboard');
-    };
-
-    const handleLogout = async () => {
-        try {
-            const response = await fetch('/api/logout', {
-                method: 'GET',
-                
-            });
-            if (response.ok) {
-                console.log('Logout successful');
-                navigate('/');
-            } else {
-                console.error('Logout failed');
-            }
-        } catch (error) {
-            console.error('Error during logout')
-        }
-    };
-
-    const {isLoggedIn } = useAuth();
-
-    if (!isLoggedIn) {
-        return <Navigate to="/"/>;
-        // console.log("I am supposed to be here");
-    }
-
-
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
@@ -432,12 +389,27 @@ export default function TeamExample() {
                             Team
                         </Typography>
                     </Box>
-                    <Box sx={{ display: 'flex', gap: 3 }}>
-                    <Button startDecorator={<GridViewRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToDashboard}>Dashboard</Button>
-                    <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
-                    <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
-                    </Box>
-                    
+                    <Input
+                        size="sm"
+                        variant="outlined"
+                        placeholder="Search anything…"
+                        startDecorator={<SearchRoundedIcon color="primary" />}
+                        endDecorator={
+                            <IconButton variant="outlined" color="neutral">
+                                <Typography fontWeight="lg" fontSize="sm" textColor="text.icon">
+                                    ⌘ + k
+                                </Typography>
+                            </IconButton>
+                        }
+                        sx={{
+                            flexBasis: '500px',
+                            display: {
+                                xs: 'none',
+                                sm: 'flex',
+                            },
+                            boxShadow: 'sm',
+                        }}
+                    />
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -453,21 +425,44 @@ export default function TeamExample() {
                             variant="soft"
                             color="neutral"
                             component="a"
-                            onClick={handleLogout}
+                            href="/blog/first-look-at-joy/"
                         >
-                            <LogoutIcon />
+                            <BookRoundedIcon />
                         </IconButton>
-
+                        <Menu
+                            id="app-selector"
+                            control={
+                                <IconButton
+                                    size="sm"
+                                    variant="soft"
+                                    color="neutral"
+                                    aria-label="Apps"
+                                >
+                                    <GridViewRoundedIcon />
+                                </IconButton>
+                            }
+                            menus={[
+                                {
+                                    label: 'Email',
+                                    href: '/joy-ui/getting-started/templates/email/',
+                                },
+                                {
+                                    label: 'Team',
+                                    active: true,
+                                    href: '/joy-ui/getting-started/templates/team/',
+                                    'aria-current': 'page',
+                                },
+                                {
+                                    label: 'Files',
+                                    href: '/joy-ui/getting-started/templates/files/',
+                                },
+                            ]}
+                        />
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>
                 <Layout.SideNav>
                     <div>
-                        <div>
-                        <button onClick={clearFilters}>Clear</button>
-                        <button onClick={clearFilters}>Clear</button>
-                        <button onClick={clearFilters}>Clear</button>
-                        </div>
                         <div>
                             <h2>Companies:</h2>
                             {(filterData?.companies || []).map((company: any) => (
@@ -555,86 +550,116 @@ export default function TeamExample() {
                 </Layout.SideNav>
                 <Layout.Main>
                     <Box sx={{ width: "72.5vw", overflow: 'auto' }}>
-                        <div>
-                            {
-                                ["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
-                                    .map(columnText =>
-                                        <div>
-                                            <input
-                                                type="checkbox"
-                                                value={columnText}
-                                                checked={selectedColumns[columnText]}
-                                                onChange={e => {
-                                                    // At least 1 must be selected
-                                                    if (!e.target.checked) {
-                                                        const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
-                                                        if (num_selected <= 1) {
-                                                            e.target.checked = true;
-                                                            return;
+                        <Tabs aria-label="Basic tabs" defaultValue={0}>
+                            <TabList>
+                                <Tab>Compare Premiums</Tab>
+                                <Tab>Plan Benefits</Tab>
+                                <Tab>Rider Benefits</Tab>
+                            </TabList>
+                            <TabPanel value={0}>
+                                <br/>
+                                <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                                    {["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
+                                        .map(columnText => (
+                                            <div key={columnText}>
+                                                <input
+                                                    type="checkbox"
+                                                    value={columnText}
+                                                    checked={selectedColumns[columnText]}
+                                                    onChange={e => {
+                                                        // At least 1 must be selected
+                                                        if (!e.target.checked) {
+                                                            const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
+                                                            if (num_selected <= 1) {
+                                                                e.target.checked = true;
+                                                                return;
+                                                            }
                                                         }
-                                                    }
-                                                    setSelectedColumns({...selectedColumns, [columnText]: e.target.checked})
-                                                }}
-                                            />
-                                            <label>{columnText}</label>
-                                        </div>
-                                )
+                                                        setSelectedColumns({ ...selectedColumns, [columnText]: e.target.checked })
+                                                    }}
+                                                />
+                                                <label>{columnText}</label>
+                                            </div>
+                                        ))
+                                    }
+                                </div> <br/>
 
-                            }
-                        </div>
-                        <Sheet variant="outlined">
-                            {/* <Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example">
-                                <Tab label="Comparison Table" />
-                                <Tab label="Plan Benefits" />
-                                <Tab label="Rider Benefits" />
-                            </Tabs>
-                            <TabPanel value={tabValue} index={0}> */}
-                                {/* Compare premiums */}
+                                {/* <div>
+                                    {
+                                        ["Plan Premium", "Rider Premium", "Total Premium", "Cash Outlay"]
+                                            .map(columnText =>
+                                                <div>
+                                                    <input
+                                                        type="checkbox"
+                                                        value={columnText}
+                                                        checked={selectedColumns[columnText]}
+                                                        onChange={e => {
+                                                            // At least 1 must be selected
+                                                            if (!e.target.checked) {
+                                                                const num_selected = Object.values(selectedColumns).filter((value: any) => value === true).length;
+                                                                if (num_selected <= 1) {
+                                                                    e.target.checked = true;
+                                                                    return;
+                                                                }
+                                                            }
+                                                            setSelectedColumns({...selectedColumns, [columnText]: e.target.checked})
+                                                        }}
+                                                    />
+                                                    <label>{columnText}</label>
+                                                </div>
+                                        )
+
+                                    }
+                                </div> */}
+                                <Sheet variant="outlined">
                                 <Table variant="soft" borderAxis="bothBetween" sx={{ tableLayout: 'auto', '& th': { whiteSpace: 'normal'}}}>
-                                <thead>
-                                    <tr>
-                                        {/* Render top-level headers */}
-                                        {(comparePremiumsData?.columns || []).map((column: any) => {
-                                            // Apply colSpan for parent columns that have children
-                                            const colSpan = column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).length : 1;
-                                            return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
-                                        })}
-                                    </tr>
-                                    {/* Render sub-headers if any columns have children */}
-                                    {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
+                                    <thead>
                                         <tr>
-                                            {(comparePremiumsData.columns|| []).flatMap((column: any) =>
-                                            column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
-                                            )}
+                                            {/* Render top-level headers */}
+                                            {(comparePremiumsData?.columns || []).map((column: any) => {
+                                                // Apply colSpan for parent columns that have children
+                                                const colSpan = column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).length : 1;
+                                                return <th key={column.name} colSpan={colSpan}>{column.text}</th>;
+                                            })}
                                         </tr>
-                                    )}
-                                </thead>
-                                <tbody>
-                                    {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
-                                    <tr key={rowIndex}>
-                                        {(comparePremiumsData?.columns || []).map((column: any) => {
-                                            if (column.children) {
-                                                return column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => (
-                                                    <td key={childColumn.name}>{row[childColumn.name]}</td>
-                                                ));
-                                            } else {
-                                                return <td key={column.name}>{row[column.name]}</td>;
-                                            }
-                                        })}
-                                    </tr>
-                                    ))}
-                                </tbody>
-                                </Table>
-                            {/* </TabPanel>
-                            <TabPanel value={tabValue} index={1}> */}
-                                {/* Plan Benefits */}
-                                <PlanBenefitTable data={planBenefits} />
-                            {/* </TabPanel>
-                            <TabPanel value={tabValue} index={2}> */}
-                                {/* Rider Benefits */}
-                                <RiderBenefitTable data={riderBenefits} />
-                            {/* </TabPanel>     */}
-                        </Sheet>
+                                        {/* Render sub-headers if any columns have children */}
+                                        {(comparePremiumsData?.columns || []).some((column: any) => column.children) && (
+                                            <tr>
+                                                {(comparePremiumsData.columns|| []).flatMap((column: any) =>
+                                                column.children ? column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => <th key={childColumn.name}>{childColumn.text}</th>) : <th key={column.name}></th>
+                                                )}
+                                            </tr>
+                                        )}
+                                    </thead>
+                                    <tbody>
+                                        {(comparePremiumsData?.rows || []).map((row: any, rowIndex: number) => (
+                                        <tr key={rowIndex}>
+                                            {(comparePremiumsData?.columns || []).map((column: any) => {
+                                                if (column.children) {
+                                                    return column.children.filter((childColumn: any) => selectedColumns[childColumn.text]).map((childColumn: any) => (
+                                                        <td key={childColumn.name}>{row[childColumn.name]}</td>
+                                                    ));
+                                                } else {
+                                                    return <td key={column.name}>{row[column.name]}</td>;
+                                                }
+                                            })}
+                                        </tr>
+                                        ))}
+                                    </tbody>
+                                    </Table>
+                                </Sheet>
+                            </TabPanel>
+                            <TabPanel value={1}>
+                                <Sheet variant='outlined'>
+                                    <PlanBenefitTable data={planBenefits} />
+                                </Sheet>
+                            </TabPanel>
+                            <TabPanel value={2}>
+                                <Sheet variant='outlined'>
+                                    <RiderBenefitTable data={riderBenefits} />
+                                </Sheet>
+                            </TabPanel>
+                        </Tabs>
                     </Box>
                 </Layout.Main>
             </Layout.Root>
