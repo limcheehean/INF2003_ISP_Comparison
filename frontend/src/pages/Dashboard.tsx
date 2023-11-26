@@ -467,7 +467,7 @@ export default function TeamExample() {
                 <Layout.SideNav>
                     <div>
                         <div>
-                            <h2>Companies:</h2>
+                            <h2>Companies</h2>
                             {(filterData?.companies || []).map((company: any) => (
                                 <div key={company.id}>
                                     <input
@@ -488,7 +488,7 @@ export default function TeamExample() {
                             ))}
                         </div>
                         <div>
-                            <h2>Ward Types:</h2>
+                            <h2>Ward Types</h2>
                             {(filterData?.wards || []).map((wardType: any) => (
                                 <div key={wardType}>
                                     <input
@@ -508,7 +508,7 @@ export default function TeamExample() {
                             ))}
                         </div>
                         <div>
-                            <h2>Plan IDs:</h2>
+                            <h2>Plans</h2>
                             {(filterData?.plans || []).map((plan: any) => (
                                 <div key={plan.id}>
                                     <input
@@ -526,7 +526,7 @@ export default function TeamExample() {
                                     <label>{plan.name}</label>
                                 </div>
                             ))}
-                          <h2>Rider IDs:</h2>
+                          <h2>Riders</h2>
                           {(filterData?.riders || []).map((rider: any) => (
                             <div key={rider.id}>
                                 <input
