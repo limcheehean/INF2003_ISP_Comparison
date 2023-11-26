@@ -1,5 +1,5 @@
 // AuthContext.tsx
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 interface AuthContextProps {
   isLoggedIn: boolean;
@@ -10,10 +10,28 @@ interface AuthContextProps {
 const AuthContext = createContext<AuthContextProps | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [isLoggedIn, setLoggedIn] = useState(false);
+  const [isLoggedIn, setLoggedIn] = useState<boolean | null>(null);
 
-  const login = () => setLoggedIn(true);
-  const logout = () => setLoggedIn(false);
+  useEffect(() => {
+    const storedLoggedIn = sessionStorage.getItem('isLoggedIn') === 'true';
+    setLoggedIn(storedLoggedIn);
+  }, []);
+
+
+  const login = () => {
+    setLoggedIn(true);
+    sessionStorage.setItem('isLoggedIn', 'true');
+  };
+
+  const logout = () => {
+    setLoggedIn(false);
+    sessionStorage.removeItem('isLoggedIn');
+  };
+
+  if (isLoggedIn === null) {
+    // Loading state, you can render a loader here
+    return null;
+  }
 
   return (
       <AuthContext.Provider value={{ isLoggedIn, login, logout }}>
