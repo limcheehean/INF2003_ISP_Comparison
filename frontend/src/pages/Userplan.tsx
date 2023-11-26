@@ -13,10 +13,12 @@ import ListItem from '@mui/joy/ListItem';
 import ListItemButton from '@mui/joy/ListItemButton';
 import ListItemDecorator from '@mui/joy/ListItemDecorator';
 import ListItemContent from '@mui/joy/ListItemContent';
-import {DialogContent, DialogTitle, DialogActions, Modal, ModalDialog, Tooltip, Select, selectClasses} from "@mui/joy";
+import {DialogContent, DialogTitle, DialogActions, Modal, ModalDialog, Select, selectClasses} from "@mui/joy";
 import FormControl from "@mui/joy/FormControl";
 import FormLabel from "@mui/joy/FormLabel";
+import Divider from '@mui/joy/Divider';
 import Option from '@mui/joy/Option';
+import Grid from "@mui/joy/Grid";
 
 // Icons import
 import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
@@ -29,16 +31,15 @@ import GridViewRoundedIcon from '@mui/icons-material/GridViewRounded';
 import KeyboardArrowDownRoundedIcon from '@mui/icons-material/KeyboardArrowDownRounded';
 import MenuIcon from '@mui/icons-material/Menu';
 import GroupRoundedIcon from '@mui/icons-material/GroupRounded';
-import {Add, Delete, KeyboardArrowDown} from "@mui/icons-material";
+import {Add, Delete, Edit, KeyboardArrowDown} from "@mui/icons-material";
 import CalculateIcon from '@mui/icons-material/Calculate';
 import LogoutIcon from '@mui/icons-material/Logout';
+import WarningRoundedIcon from '@mui/icons-material/WarningRounded';
 
 
 
 // custom
-import Menu from '../components/Menu';
 import Layout from '../components/Layout';
-import Grid from "@mui/joy/Grid";
 import { useAuth } from '../components/AuthContext';
 
 function ColorSchemeToggle() {
@@ -90,46 +91,6 @@ function TeamNav() {
                         '& .JoyListItemButton-root': { p: '8px' },
                     }}
                 >
-                    <ListItem>
-                        <ListItemButton selected>
-                            <ListItemDecorator>
-                                <PeopleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Ward</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <AssignmentIndRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>My Plans</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Rider</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Add plan</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Delete Plan</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
                 </List>
             </ListItem>
         </List>
@@ -146,6 +107,7 @@ interface UserPlans {
 
 interface UserPlan {
     age_next_birthday: number,
+    id: number,
     insured_dob: string,
     insured_name: string,
     medishield_life_premium: number,
@@ -157,19 +119,17 @@ interface UserPlan {
     rider_id: number,
     rider_name: string,
     rider_premium: number,
-    total_premium: number
+    total_premium: number,
+    company_id: number
 }
 
 
 export default function TeamExample() {
     const [drawerOpen, setDrawerOpen] = React.useState(false);
-    const [openAddPlan, setopenAddPlan] = useState<boolean>(false);
-    const [openDeletePlan, setDeletePlan] = useState<boolean>(false);
-    const [planToDeleteIndex, setPlanToDeleteIndex] = useState(null);
-    const [planToDelete, setPlanToDelete] = useState({
-        plan_id: null,
-        user_id: null
-    })
+    const [openAddPlan, setOpenAddPlan] = useState<boolean>(false);
+    const [openDeletePlan, setOpenDeletePlan] = useState<boolean>(false);
+    const [openEditPlan, setOpenEditPlan] = useState<boolean>(false);
+    const [planToDelete, setPlanToDelete] = useState<number>();
     const [userPlans, setUserPlans] = useState<UserPlans>({
         grand_total_premiums: null,
         total_payable_by_cash: null,
@@ -177,14 +137,14 @@ export default function TeamExample() {
         user_plans: []
     });
 
+    const[id, setID] = useState<number>();
     const[name,setName] = useState('');
     const[dob,setDOB] = useState('');
 
-    const [selectedCompany, setSelectedCompany] = useState(null);
-    const [selectedPlan, setSelectedPlan] = useState(null);
-    const [selectedRider, setSelectedRider] = useState('');
+    const [selectedCompany, setSelectedCompany] = useState<any>(null);
+    const [selectedPlan, setSelectedPlan] = useState<any>(null);
+    const [selectedRider, setSelectedRider] = useState<any>('');
     const [filterData, setFilterData] = useState<any>({});
-
 
 
     const addPlan = async () => {
@@ -205,9 +165,56 @@ export default function TeamExample() {
 
         const responseData = await response.json();
         console.log(responseData);
+
+        fetchUserPlans();
     }
 
+    const editPlan = async () => {
+        const response = await fetch('/api/user_plans',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "plan_id": selectedPlan,
+                "rider_id": selectedRider,
+                "insured_name": name,
+                "insured_dob": dob,
+                "id": id
+            })
+        });
 
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        fetchUserPlans();
+    }
+
+    const deletePlan = async (userPlanID: number) => {
+        const response = await fetch(`/api/user_plans/${userPlanID}`, {
+            method: 'DELETE',
+            headers: {'Content-Type': 'application/json'},
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        fetchUserPlans();
+    }
+
+    const clearField = () => {
+        setName('');
+        setDOB('');
+        setSelectedCompany(null);
+        setSelectedPlan(null);
+        setSelectedRider(null);
+    };
 
     const getFilter = async () => {
         const response = await fetch('/api/get_filter', {
@@ -228,23 +235,13 @@ export default function TeamExample() {
         setFilterData(responseData.data)
     }
 
-    useEffect(() => {
-
+    const fetchUserPlans = () => {
         fetch('/api/user_plans') // Replace with the actual API endpoint
             .then((response) => response.json())
             .then((data) => {
                 console.log(data);
                 console.log(data.status);
                 console.log(data.data);
-                if (typeof data === 'object' && data !== null) {
-                    Object.keys(data.data).forEach((key) => {
-                        // Check the data type of each property
-                        console.log(`${key}: ${typeof data[key]}`);
-                        console.log('hello heee');
-                    });
-                } else {
-                    console.error('Data is not an object.');
-                }
 
                 setUserPlans(data.data);
 
@@ -253,14 +250,15 @@ export default function TeamExample() {
             .catch((error) => {
                 console.error('Error fetching user plans:', error);
             });
+    }
 
+    useEffect(() => {
 
-
+        fetchUserPlans();
 
         (async() => {
             await getFilter();
         })();
-
 
     }, [selectedCompany, selectedPlan]);
 
@@ -285,7 +283,7 @@ export default function TeamExample() {
         try {
             const response = await fetch('/api/logout', {
                 method: 'GET',
-                
+
             });
             if (response.ok) {
                 console.log('Logout successful');
@@ -313,11 +311,7 @@ export default function TeamExample() {
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
-            {drawerOpen && (
-                <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-                    <TeamNav />
-                </Layout.SideDrawer>
-            )}
+
             <Layout.Root
                 sx={{
                     ...(drawerOpen && {
@@ -359,7 +353,7 @@ export default function TeamExample() {
                     <Button startDecorator={<ArticleRoundedIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToMyPlans}>My Plans</Button>
                     <Button startDecorator={<CalculateIcon/>} variant="plain" sx={{ color: '#455a64'}} onClick={navigateToCopaymentCalculator}>Copayment Calculator</Button>
                     </Box>
-                    
+
                     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 1.5 }}>
                         <IconButton
                             size="sm"
@@ -376,7 +370,7 @@ export default function TeamExample() {
                             color="neutral"
                             component="a"
                             onClick={handleLogout}
-                            
+
                         >
                             <LogoutIcon />
                         </IconButton>
@@ -384,12 +378,6 @@ export default function TeamExample() {
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>
-                <Layout.SideNav>
-                    <TeamNav />
-                </Layout.SideNav>
-
-                {/*Layout.SidePane*/}
-                {/* Code here */}
 
                 <Layout.Main>
 
@@ -397,15 +385,14 @@ export default function TeamExample() {
                         variant="outlined"
                         color="neutral"
                         startDecorator={<Add />}
-                        onClick={() => setopenAddPlan(true)}
+                        onClick={() => setOpenAddPlan(true)}
                     >
                         Add Plan
                     </Button>
+
                     <Modal open={openAddPlan} onClose={() => {
-                        setopenAddPlan(false);
-                        setSelectedCompany(null); // Clear selectedCompany
-                        setSelectedPlan(null); // Clear selectedPlan
-                        setSelectedRider(''); // Clear selectedRider
+                        setOpenAddPlan(false);
+                        clearField();
                     }}>
                         <ModalDialog>
                             <DialogTitle>Add new plan</DialogTitle>
@@ -414,7 +401,8 @@ export default function TeamExample() {
                                 onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
                                     event.preventDefault();
                                     await addPlan();
-                                    setopenAddPlan(false);
+                                    setOpenAddPlan(false)
+                                    clearField();
 
                                 }}
                             >
@@ -427,12 +415,13 @@ export default function TeamExample() {
                                     >
                                         <Grid xs={6}>
                                             <FormControl sx={{width: 240}}>
-                                                <FormLabel>Insured name</FormLabel>
+                                                <FormLabel>Insured Name</FormLabel>
                                                 <Input
                                                     type="text"
                                                     name="Name"
                                                     value={name}
                                                     onChange={(e) => {setName(e.target.value); console.log(e.target.value)}}
+                                                    required
                                                 />
                                             </FormControl>
                                         </Grid>
@@ -444,17 +433,19 @@ export default function TeamExample() {
                                                     name="Insured Date of birth"
                                                     value={dob}
                                                     onChange={(e) => {setDOB(e.target.value); console.log(e.target.value)}}
+                                                    required
                                                 />
                                             </FormControl>
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>company id</FormLabel>
+                                                <FormLabel>Company</FormLabel>
                                                 <Select
                                                     placeholder="Select a company"
                                                     value={selectedCompany}
                                                     onChange={(e:any, value:any) => {setSelectedCompany(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -475,12 +466,13 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>plan id</FormLabel>
+                                                <FormLabel>Plan</FormLabel>
                                                 <Select
                                                     placeholder="Select a Plan"
                                                     value={selectedPlan}
                                                     onChange={(e:any, value:any) => {setSelectedPlan(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -501,12 +493,13 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>rider id</FormLabel>
+                                                <FormLabel>Rider</FormLabel>
                                                 <Select
                                                     placeholder="Select a Rider"
                                                     value={selectedRider}
                                                     onChange={(e:any, value:any) => {setSelectedRider(value); console.log(value)}}
                                                     indicator={<KeyboardArrowDown />}
+                                                    required
                                                     sx={{
                                                         width: 240,
                                                         [`& .${selectClasses.indicator}`]: {
@@ -527,10 +520,8 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                                             <Button variant="solid" color="danger" onClick={() => {
-                                                setopenAddPlan(false);
-                                                setSelectedCompany(null); // Clear selectedCompany
-                                                setSelectedPlan(null); // Clear selectedPlan
-                                                setSelectedRider(''); // Clear selectedRider
+                                                setOpenAddPlan(false);
+                                                clearField();
                                                 }}>
                                                 Cancel
                                             </Button>
@@ -546,7 +537,180 @@ export default function TeamExample() {
                     </Modal>
 
 
-                    <Box sx={{ flexGrow: 1 , width: '75.2vw', margin: '10px'}}>
+                    <Modal open={openEditPlan} onClose={() => {
+                        setOpenEditPlan(false);
+                        clearField();
+                    }}>
+                        <ModalDialog>
+                            <DialogTitle>Edit plan</DialogTitle>
+                            <DialogContent>Edit the information of the plan.</DialogContent>
+                            <form
+                                onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
+                                    event.preventDefault();
+                                    await editPlan();
+                                    setOpenEditPlan(false)
+                                    clearField();
+
+                                }}
+                            >
+                                <Box>
+                                    <Grid
+                                        container
+                                        rowSpacing={1}
+                                        columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+                                        sx={{ width: '100%' }}
+                                    >
+                                        <Grid xs={6}>
+                                            <FormControl sx={{width: 240}}>
+                                                <FormLabel>Insured Name</FormLabel>
+                                                <Input
+                                                    type="text"
+                                                    name="Name"
+                                                    value={name}
+                                                    onChange={(e) => {setName(e.target.value); console.log(e.target.value)}}
+                                                    required
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl sx={{width: 240}}>
+                                                <FormLabel>Insured Date of birth</FormLabel>
+                                                <Input
+                                                    type="date"
+                                                    name="Insured Date of birth"
+                                                    value={dob}
+                                                    onChange={(e) => {setDOB(e.target.value); console.log(e.target.value)}}
+                                                    required
+                                                />
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>Company</FormLabel>
+                                                <Select
+                                                    placeholder="Select a company"
+                                                    value={selectedCompany}
+                                                    onChange={(e:any, value:any) => {setSelectedCompany(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.companies || []).map((company: any) => (
+                                                        <Option key={company.id} value={company.id}>
+                                                            {company.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>Plan</FormLabel>
+                                                <Select
+                                                    placeholder="Select a Plan"
+                                                    value={selectedPlan}
+                                                    onChange={(e:any, value:any) => {setSelectedPlan(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.plans || []).map((plan: any) => (
+                                                        <Option key={plan.id} value={plan.id}>
+                                                            {plan.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={6}>
+                                            <FormControl>
+                                                <FormLabel>Rider</FormLabel>
+                                                <Select
+                                                    placeholder="Select a Rider"
+                                                    value={selectedRider}
+                                                    onChange={(e:any, value:any) => {setSelectedRider(value); console.log(value)}}
+                                                    indicator={<KeyboardArrowDown />}
+                                                    required
+                                                    sx={{
+                                                        width: 240,
+                                                        [`& .${selectClasses.indicator}`]: {
+                                                            transition: '0.2s',
+                                                            [`&.${selectClasses.expanded}`]: {
+                                                                transform: 'rotate(-180deg)',
+                                                            },
+                                                        },
+                                                    }}
+                                                >
+                                                    {(filterData.riders || []).map((rider: any) => (
+                                                        <Option key={rider.id} value={rider.id}>
+                                                            {rider.name}
+                                                        </Option>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                                            <Button variant="solid" color="danger" onClick={() => {
+                                                setOpenEditPlan(false);
+                                                clearField();
+                                            }}>
+                                                Cancel
+                                            </Button>
+
+                                            <Button type="submit" variant="plain" color="neutral">
+                                                Confirm
+                                            </Button>
+                                        </Grid>
+                                    </Grid>
+                                </Box>
+                            </form>
+                        </ModalDialog>
+                    </Modal>
+
+                    <Modal open={openDeletePlan} onClose={() => {
+                        setOpenDeletePlan(false);
+                    }}>
+                        <ModalDialog variant="outlined" role="alertdialog">
+                            <DialogTitle>
+                                <WarningRoundedIcon />
+                                Confirmation
+                            </DialogTitle>
+                            <Divider />
+                            <DialogContent>
+                                Are you sure you want to delete this plan?
+                            </DialogContent>
+                            <DialogActions>
+                                <Button variant="solid" color="danger" onClick={() => {
+                                    setOpenDeletePlan(false);
+                                    deletePlan(planToDelete!);
+                                    console.log("plan to delete NOW", planToDelete);
+                                }}>
+                                    Delete plan
+                                </Button>
+                                <Button variant="plain" color="neutral" onClick={() => setOpenDeletePlan(false)}>
+                                    Cancel
+                                </Button>
+                            </DialogActions>
+                        </ModalDialog>
+                    </Modal>
+
+                    <Box sx={{ flexGrow: 1 , width: '98.2vw', margin: '10px'}}>
                         <Grid
                             container
                             spacing={2}
@@ -570,9 +734,29 @@ export default function TeamExample() {
                                         <React.Fragment>
                                             <ListItem
                                                 endAction={
-                                                <IconButton aria-label="Delete" size="sm" color="danger">
-                                                    <Delete />
-                                                </IconButton>
+                                                <div>
+                                                    <IconButton aria-label="Edit" size="sm" color="primary" onClick={() => {
+                                                        setOpenEditPlan(true);
+                                                        setID(userPlan.id);
+                                                        setName(userPlan.insured_name);
+                                                        setDOB(userPlan.insured_dob);
+                                                        setSelectedCompany(userPlan.company_id);
+                                                        setSelectedPlan(userPlan.plan_id);
+                                                        setSelectedRider(userPlan.rider_id);
+                                                        console.log("plan clicked", userPlan.id)
+                                                    }}>
+                                                        <Edit />
+                                                    </IconButton>
+                                                    <IconButton aria-label="Delete" size="sm" color="danger" onClick={() => {
+                                                        setOpenDeletePlan(true);
+                                                        setPlanToDelete(userPlan.id);
+                                                        console.log("plan id", userPlans.user_plans)
+                                                        console.log("plan clicked", userPlan.id)
+                                                        console.log("plan to delete",planToDelete);
+                                                    }}>
+                                                        <Delete />
+                                                    </IconButton>
+                                                </div>
                                             }>
                                                 <Typography>
                                                     Name: {userPlan.insured_name}
@@ -590,12 +774,12 @@ export default function TeamExample() {
                                             </ListItem>
                                             <ListItem>
                                                 <Typography>
-                                                    Plan Name: {userPlan.plan_name}
+                                                    {userPlan.plan_name}: ${userPlan.plan_premium}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem sx={{ borderBottom: '1px solid #ddd' }}>
                                                 <Typography>
-                                                    Rider Name: {userPlan.rider_name}
+                                                    {userPlan.rider_name}: ${userPlan.rider_premium}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem>

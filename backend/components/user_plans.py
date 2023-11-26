@@ -5,13 +5,15 @@ from pymysql import IntegrityError
 from CustomDictCursor import CustomDictCursor
 
 get_user_plans_sql = """
-    SELECT u.insured_name,
+    SELECT u.id,
+       u.insured_name,
        u.insured_dob,
        TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 AS age_next_birthday,
        u.plan_id,
        u.rider_id,
        p.name AS plan_name,
        r.name AS rider_name,
+       p.company_id,
        mp.amount AS medishield_life_premium,
        pp.amount AS plan_premium,
        rp.amount AS rider_premium,
@@ -121,16 +123,14 @@ def update_user_plans(db, mongo, request):
 
 def delete_user_plans(db, mongo, userplan_id):
 
-    plan_ids = userplan_id
-
     values = []
 
     user_id = mongo.session.find_one({"session_id": session.get("uid")}).get("user_id")
 
     values.append(user_id)
-    values.append(plan_ids)
+    values.append(userplan_id)
 
-    sql = "DELETE FROM userplan WHERE user_id = %s AND plan_id = %s"
+    sql = "DELETE FROM userplan WHERE user_id = %s AND id = %s"
 
     try:
         cursor = db.cursor()
