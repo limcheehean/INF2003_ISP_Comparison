@@ -5,7 +5,8 @@ from pymysql import IntegrityError
 from CustomDictCursor import CustomDictCursor
 
 get_user_plans_sql = """
-    SELECT u.insured_name,
+    SELECT u.id,
+       u.insured_name,
        u.insured_dob,
        TIMESTAMPDIFF(YEAR, insured_dob, CURRENT_DATE) + 1 AS age_next_birthday,
        u.plan_id,
