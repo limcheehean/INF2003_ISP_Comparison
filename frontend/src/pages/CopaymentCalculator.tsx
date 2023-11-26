@@ -299,6 +299,9 @@ export default function TeamExample() {
 
     const { isLoggedIn } = useAuth();
 
+    if (isLoggedIn === null) {
+        return <Navigate to="/copaymentCalculator"/>;
+    }
     
 
     if (!isLoggedIn) {

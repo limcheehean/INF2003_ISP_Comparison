@@ -300,6 +300,10 @@ export default function TeamExample() {
 
     const { isLoggedIn } = useAuth();
 
+    if (isLoggedIn === null) {
+        return <Navigate to="/userplan"/>;
+    }
+
     if (!isLoggedIn) {
         return <Navigate to="/"/>;
         // console.log("I am supposed to be here");
