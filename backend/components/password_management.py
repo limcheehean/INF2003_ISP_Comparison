@@ -4,6 +4,7 @@ from uuid import uuid4
 from bcrypt import hashpw, gensalt
 from flask import url_for
 from flask_mail import Message
+from utility import send_mail_async
 
 password_uuid_dict = {}
 
@@ -64,8 +65,22 @@ def handle_forgot_password(db, mail, request):
 
 
     msg = Message("Password Reset Link", sender=("ISP Comparison", "admin@ispcompare.spmovy.com"), recipients=[forgotPwd_email])
-    msg.body = "You are receiving this email as you have forgotten your password. Clink on this link to reset your password: " + forgotPwd_link
-    mail.send(msg)
+    msg.body = f"""
+    Dear User,
+    
+    You are receiving this email because a request was made to reset the password associated with your account. If you did not make this request, please ignore this email or contact our support team immediately.
+    To reset your password, please click on the link below:
+    
+    {forgotPwd_link}
+    
+    This link will expire in 10 mintues for security reasons.
+    If you have any issues or did not request a password reset, please contact our support team at admin@ispcompare.spmovy.com.
+    
+    Best Regards,
+    The ISP Comparison Team
+    """
+    #mail.send(msg)
+    send_mail_async(mail,msg)
 
 
     password_uuid_dict.update({str(forgotPwd_token): datetime.now()})
