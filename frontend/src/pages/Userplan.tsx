@@ -91,46 +91,6 @@ function TeamNav() {
                         '& .JoyListItemButton-root': { p: '8px' },
                     }}
                 >
-                    <ListItem>
-                        <ListItemButton selected>
-                            <ListItemDecorator>
-                                <PeopleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Ward</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <AssignmentIndRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>My Plans</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Rider</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Add plan</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
-                    <ListItem>
-                        <ListItemButton>
-                            <ListItemDecorator sx={{ color: 'neutral.500' }}>
-                                <ArticleRoundedIcon fontSize="small" />
-                            </ListItemDecorator>
-                            <ListItemContent>Delete Plan</ListItemContent>
-                        </ListItemButton>
-                    </ListItem>
                 </List>
             </ListItem>
         </List>
@@ -186,33 +146,6 @@ export default function TeamExample() {
     const [selectedRider, setSelectedRider] = useState<any>('');
     const [filterData, setFilterData] = useState<any>({});
 
-    // useEffect(() => {
-    //     // Make an API request to fetch user plans data
-    //     fetch('/api/user_plans') // Replace with the actual API endpoint
-    //         .then((response) => response.json())
-    //         .then((data) => {
-    //             console.log(data);
-    //             console.log(data.status);
-    //             console.log(data.data);
-    //             if (typeof data === 'object' && data !== null) {
-    //                 Object.keys(data.data).forEach((key) => {
-    //                     // Check the data type of each property
-    //                     console.log(`${key}: ${typeof data[key]}`);
-    //                 });
-    //             } else {
-    //                 console.error('Data is not an object.');
-    //             }
-    //
-    //             setUserPlans(data.data);
-    //
-    //             //setUserPlans(data);
-    //             console.log('i fire once');
-    //         })
-    //         .catch((error) => {
-    //             console.error('Error fetching user plans:', error);
-    //         });
-    // }, []);
-
 
     const addPlan = async () => {
         const response = await fetch('/api/user_plans',{
@@ -223,6 +156,29 @@ export default function TeamExample() {
                 "rider_id": selectedRider,
                 "insured_name": name,
                 "insured_dob": dob
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+
+        const responseData = await response.json();
+        console.log(responseData);
+
+        fetchUserPlans();
+    }
+
+    const editPlan = async () => {
+        const response = await fetch('/api/user_plans',{
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                "plan_id": selectedPlan,
+                "rider_id": selectedRider,
+                "insured_name": name,
+                "insured_dob": dob,
+                "id": id
             })
         });
 
@@ -251,6 +207,14 @@ export default function TeamExample() {
 
         fetchUserPlans();
     }
+
+    const clearField = () => {
+        setName('');
+        setDOB('');
+        setSelectedCompany(null);
+        setSelectedPlan(null);
+        setSelectedRider(null);
+    };
 
     const getFilter = async () => {
         const response = await fetch('/api/get_filter', {
@@ -290,92 +254,11 @@ export default function TeamExample() {
 
     useEffect(() => {
 
-
-        // fetch('/api/user_plans') // Replace with the actual API endpoint
-        //     .then((response) => response.json())
-        //     .then((data) => {
-        //         console.log(data);
-        //         console.log(data.status);
-        //         console.log(data.data);
-        //
-        //         setUserPlans(data.data);
-        //
-        //         console.log('i fire once');
-        //     })
-        //     .catch((error) => {
-        //         console.error('Error fetching user plans:', error);
-        //     });
-
         fetchUserPlans();
-
 
         (async() => {
             await getFilter();
         })();
-
-        // (async () => {
-        //     try {
-        //         const response = await fetch('/api/get_filter', {
-        //             method: 'POST',
-        //             headers: {'Content-Type': 'application/json'},
-        //             body: JSON.stringify(data),
-        //         });
-        //
-        //         if (!response.ok) {
-        //             throw new Error(`HTTP error! Status: ${response.status}`);
-        //         }
-        //
-        //         const responseData = await response.json();
-        //         console.log(responseData);
-        //
-        //         if (typeof responseData === 'object' && responseData !== null) {
-        //             Object.keys(responseData.data).forEach((key) => {
-        //                 // Check the data type of each property
-        //                 console.log(`${key}: ${typeof responseData[key]}`);
-        //             });
-        //         } else {
-        //             console.error('Data is not an object.');
-        //         }
-        //
-        //
-        //         console.log(responseData.data);
-        //
-        //         if (responseData && responseData.data) {
-        //             setCompanies(responseData.data.companies);
-        //             const { companies, plans, riders, wards } = responseData.data;
-        //
-        //             if (companies) {
-        //                 console.log('Companies:', companies);
-        //                 setCompanies(companies);
-        //                 console.log("companies!!!!",companies2);
-        //                 // Use the 'companies' array in your code
-        //             }
-        //
-        //             if (plans) {
-        //                 console.log('Plans:', plans);
-        //                 // Use the 'plans' array in your code
-        //             }
-        //
-        //             if (riders) {
-        //                 console.log('Riders:', riders);
-        //
-        //                 // Use the 'riders' array in your code
-        //             }
-        //
-        //             if (wards) {
-        //                 console.log('Wards:', wards);
-        //                 // Use the 'wards' array in your code
-        //             }
-        //         } else {
-        //             console.error('Data or data properties are undefined');
-        //         }
-        //
-        //
-        //     } catch (error) {
-        //         console.error('Error:', error);
-        //     }
-        // })();
-
 
     }, [selectedCompany, selectedPlan]);
 
@@ -424,11 +307,7 @@ export default function TeamExample() {
     return (
         <CssVarsProvider disableTransitionOnChange>
             <CssBaseline />
-            {drawerOpen && (
-                <Layout.SideDrawer onClose={() => setDrawerOpen(false)}>
-                    <TeamNav />
-                </Layout.SideDrawer>
-            )}
+
             <Layout.Root
                 sx={{
                     ...(drawerOpen && {
@@ -495,12 +374,6 @@ export default function TeamExample() {
                         <ColorSchemeToggle />
                     </Box>
                 </Layout.Header>
-                <Layout.SideNav>
-                    <TeamNav />
-                </Layout.SideNav>
-
-                {/*Layout.SidePane*/}
-                {/* Code here */}
 
                 <Layout.Main>
 
@@ -515,9 +388,7 @@ export default function TeamExample() {
 
                     <Modal open={openAddPlan} onClose={() => {
                         setOpenAddPlan(false);
-                        setSelectedCompany(null); // Clear selectedCompany
-                        setSelectedPlan(null); // Clear selectedPlan
-                        setSelectedRider(''); // Clear selectedRider
+                        clearField();
                     }}>
                         <ModalDialog>
                             <DialogTitle>Add new plan</DialogTitle>
@@ -527,9 +398,7 @@ export default function TeamExample() {
                                     event.preventDefault();
                                     await addPlan();
                                     setOpenAddPlan(false)
-                                    setSelectedCompany(null); // Clear selectedCompany
-                                    setSelectedPlan(null); // Clear selectedPlan
-                                    setSelectedRider(''); // Clear selectedRider
+                                    clearField();
 
                                 }}
                             >
@@ -542,7 +411,7 @@ export default function TeamExample() {
                                     >
                                         <Grid xs={6}>
                                             <FormControl sx={{width: 240}}>
-                                                <FormLabel>Insured name</FormLabel>
+                                                <FormLabel>Insured Name</FormLabel>
                                                 <Input
                                                     type="text"
                                                     name="Name"
@@ -566,7 +435,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>company id</FormLabel>
+                                                <FormLabel>Company</FormLabel>
                                                 <Select
                                                     placeholder="Select a company"
                                                     value={selectedCompany}
@@ -593,7 +462,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>plan id</FormLabel>
+                                                <FormLabel>Plan</FormLabel>
                                                 <Select
                                                     placeholder="Select a Plan"
                                                     value={selectedPlan}
@@ -620,7 +489,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>rider id</FormLabel>
+                                                <FormLabel>Rider</FormLabel>
                                                 <Select
                                                     placeholder="Select a Rider"
                                                     value={selectedRider}
@@ -648,9 +517,7 @@ export default function TeamExample() {
                                         <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                                             <Button variant="solid" color="danger" onClick={() => {
                                                 setOpenAddPlan(false);
-                                                setSelectedCompany(null); // Clear selectedCompany
-                                                setSelectedPlan(null); // Clear selectedPlan
-                                                setSelectedRider(''); // Clear selectedRider
+                                                clearField();
                                                 }}>
                                                 Cancel
                                             </Button>
@@ -668,9 +535,7 @@ export default function TeamExample() {
 
                     <Modal open={openEditPlan} onClose={() => {
                         setOpenEditPlan(false);
-                        setSelectedCompany(null); // Clear selectedCompany
-                        setSelectedPlan(null); // Clear selectedPlan
-                        setSelectedRider(''); // Clear selectedRider
+                        clearField();
                     }}>
                         <ModalDialog>
                             <DialogTitle>Edit plan</DialogTitle>
@@ -678,11 +543,9 @@ export default function TeamExample() {
                             <form
                                 onSubmit={async (event: React.FormEvent<HTMLFormElement>) => {
                                     event.preventDefault();
-                                    await addPlan();
+                                    await editPlan();
                                     setOpenEditPlan(false)
-                                    setSelectedCompany(null); // Clear selectedCompany
-                                    setSelectedPlan(null); // Clear selectedPlan
-                                    setSelectedRider(''); // Clear selectedRider
+                                    clearField();
 
                                 }}
                             >
@@ -695,7 +558,7 @@ export default function TeamExample() {
                                     >
                                         <Grid xs={6}>
                                             <FormControl sx={{width: 240}}>
-                                                <FormLabel>Insured name</FormLabel>
+                                                <FormLabel>Insured Name</FormLabel>
                                                 <Input
                                                     type="text"
                                                     name="Name"
@@ -719,7 +582,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>company id</FormLabel>
+                                                <FormLabel>Company</FormLabel>
                                                 <Select
                                                     placeholder="Select a company"
                                                     value={selectedCompany}
@@ -746,7 +609,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>plan id</FormLabel>
+                                                <FormLabel>Plan</FormLabel>
                                                 <Select
                                                     placeholder="Select a Plan"
                                                     value={selectedPlan}
@@ -773,7 +636,7 @@ export default function TeamExample() {
                                         </Grid>
                                         <Grid xs={6}>
                                             <FormControl>
-                                                <FormLabel>rider id</FormLabel>
+                                                <FormLabel>Rider</FormLabel>
                                                 <Select
                                                     placeholder="Select a Rider"
                                                     value={selectedRider}
@@ -801,9 +664,7 @@ export default function TeamExample() {
                                         <Grid xs={12} sx={{display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                                             <Button variant="solid" color="danger" onClick={() => {
                                                 setOpenEditPlan(false);
-                                                setSelectedCompany(null); // Clear selectedCompany
-                                                setSelectedPlan(null); // Clear selectedPlan
-                                                setSelectedRider(''); // Clear selectedRider
+                                                clearField();
                                             }}>
                                                 Cancel
                                             </Button>
@@ -845,7 +706,7 @@ export default function TeamExample() {
                         </ModalDialog>
                     </Modal>
 
-                    <Box sx={{ flexGrow: 1 , width: '75.2vw', margin: '10px'}}>
+                    <Box sx={{ flexGrow: 1 , width: '98.2vw', margin: '10px'}}>
                         <Grid
                             container
                             spacing={2}
@@ -875,10 +736,6 @@ export default function TeamExample() {
                                                         setID(userPlan.id);
                                                         setName(userPlan.insured_name);
                                                         setDOB(userPlan.insured_dob);
-                                                        console.log("id: ",id);
-                                                        console.log("name: ",name);
-                                                        console.log("dob: ",dob);
-                                                        //setSelectedCompany(userPlan.);
                                                         setSelectedCompany(userPlan.company_id);
                                                         setSelectedPlan(userPlan.plan_id);
                                                         setSelectedRider(userPlan.rider_id);
@@ -899,9 +756,6 @@ export default function TeamExample() {
                                             }>
                                                 <Typography>
                                                     Name: {userPlan.insured_name}
-                                                </Typography>
-                                                <Typography>
-                                                    ID: {userPlan.plan_id}
                                                 </Typography>
                                             </ListItem>
                                             <ListItem sx={{ borderBottom: '1px solid #ddd' }}>
