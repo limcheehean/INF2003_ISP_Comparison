@@ -122,16 +122,14 @@ def update_user_plans(db, mongo, request):
 
 def delete_user_plans(db, mongo, userplan_id):
 
-    plan_ids = userplan_id
-
     values = []
 
     user_id = mongo.session.find_one({"session_id": session.get("uid")}).get("user_id")
 
     values.append(user_id)
-    values.append(plan_ids)
+    values.append(userplan_id)
 
-    sql = "DELETE FROM userplan WHERE user_id = %s AND plan_id = %s"
+    sql = "DELETE FROM userplan WHERE user_id = %s AND id = %s"
 
     try:
         cursor = db.cursor()
